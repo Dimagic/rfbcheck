@@ -56,7 +56,7 @@ class GainTest(QtCore.QThread):
                 self.testController.resSignal.emit('Gain', self.whatConn, str(gainMin), str(currentGain), str(gainMax),
                                                    0)
             elif q == QMessageBox.Cancel:
-                self.testController.resSignal.emit('Gain', parent.whatConn, str(gainMin), str(currentGain),
+                self.testController.resSignal.emit('Gain', self.testController.whatConn, str(gainMin), str(currentGain),
                                                    str(gainMax), 0)
                 self.testController.stopTestFlag = True
         if self.whatConn == 'Dl':

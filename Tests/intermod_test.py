@@ -1,5 +1,3 @@
-import time
-from Equip.instrument import *
 from Equip.equip import *
 import Equip.commands as cmd
 from PyQt5.QtWidgets import QMessageBox

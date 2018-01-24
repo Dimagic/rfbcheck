@@ -128,9 +128,6 @@ class TestContoller(QtCore.QThread):
     def getParrent(self):
         return self.currParent
 
-    def getSqlConn(self):
-        pass
-
     def checkUlDl(self):
         self.ser.ser.write(binascii.unhexlify(cmd.setSalcOpMode))
         self.ser.ser.write(binascii.unhexlify(cmd.reset))
@@ -152,7 +149,8 @@ class TestContoller(QtCore.QThread):
             self.progressBarSignal.emit('Check connection', 0, 0)
             if i == 0: continue
             try:
-                self.instr = Instrument(i, self.currParent)  # ToDo if return None!!!!!
+                self.instr = Instrument(i, self.currParent)
+                # TODO: if return None!!!!!
             except Exception as e:
                 self.currParent.sendMsg('c', 'Instrumet initialization error', str(e), 1)
             self.instr.gen.write(":OUTP:STAT ON")

@@ -110,11 +110,11 @@ def getAvgGain(parent):
         return(sum(gainArr)/len(gainArr))
 
 
-def strToFreq(parent,curRange):
+def strToFreq(curRange):
         r = re.findall('[0-9]+', curRange)
         start = toFloat(r[0])
         stop = toFloat(r[1])
-        return(start,stop)
+        return start, stop
 
 
 

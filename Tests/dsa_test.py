@@ -1,14 +1,7 @@
-import threading
-import numpy as np
-import binascii
-import time
-import datetime
-import struct
 from Equip.equip import *
 import Equip.commands as cmd
 from PyQt5.QtWidgets import QMessageBox
 from PyQt5 import QtCore
-
 
 class DsaTest(QtCore.QThread):
     def __init__(self, testController, mainParent, parent = None):
@@ -18,7 +11,7 @@ class DsaTest(QtCore.QThread):
         self.parent = mainParent
         self.testController = testController
 
-        if self.parent.stopTestFlag == True:
+        if self.parent.stopTestFlag:
             return
         self.testController.logSignal.emit("Starting DSA test",0)
         self.sa = self.parent.instr.sa
@@ -31,7 +24,7 @@ class DsaTest(QtCore.QThread):
         self.sa.write(":SENSE:FREQ:center "+str(self.freq)+" MHz")
         self.gen.write(":FREQ:FIX "+str(self.freq)+" MHz")
         self.sa.write(":SENSE:FREQ:span 1 MHz")
-        if self.parent.testSetDsaShort.isChecked() == True:
+        if self.parent.testSetDsaShort.isChecked():
             self.forDSAtest = [0, 0.5, 1, 2, 4, 8, 16, 31]
         else:
             self.forDSAtest = np.arange(0, 31.5 , 0.5)
@@ -41,7 +34,6 @@ class DsaTest(QtCore.QThread):
         self.dsaTest(self.parent.ser,cmd,self.testController.whatConn,self.parent.listSettings,self.parent,3)
         self.parent.useCorrection = True
         self.sa.write(":SENSE:FREQ:span 3 MHz")
-
 
     def dsaTest(self, conn, cmd, whatConn, listSet,parent,dsaType):
         conn.ser.write(binascii.unhexlify(cmd.reset))
@@ -78,7 +70,7 @@ class DsaTest(QtCore.QThread):
 
         setDSA(conn, cmd, whatConn, dsa1test, dsa2test, dsa3test)
 
-#set ampl for test
+        # set ampl for test
         if listSet[11] != 0:
             parent.instr.gen.write("POW:AMPL "+str(listSet[11])+" dBm")
         else:
@@ -89,7 +81,7 @@ class DsaTest(QtCore.QThread):
         haveWarning = False
         haveFail = False
         for j,i in enumerate(self.forDSAtest):
-            if self.parent.stopTestFlag == True:
+            if self.parent.stopTestFlag:
                 setDSA(conn, cmd, whatConn, dsa1, dsa2, dsa3)
                 return
 
@@ -108,57 +100,56 @@ class DsaTest(QtCore.QThread):
             setDSA(conn, cmd, whatConn, dsa1test, dsa2test, dsa3test)
             curGain = round(getAvgGain(parent),2)
 
-            if i == 0: d1 = curGain
-            delta = round(curGain - d1 + i ,2)
+            if i == 0:
+                d1 = curGain
+            delta = round(curGain - d1 + i, 2)
             self.testController.logSignal.emit(dsaName + ': '+ str(i) + '    Gain: ' + str(curGain) + '    Delta: ' + str(delta),3)
 # if gain more then SA display line
             if dsaType == 1:
                 k = '1'
-                #self.testController.dsaResSignal.emit(i,delta) #to sql dsa results
+                # self.testController.dsaResSignal.emit(i,delta) #to sql dsa results
                 self.testController.to_DsaResult.update({i:delta})
             elif dsaType == 2:
                 k = '2'
-                #self.testController.dsaResSignal.emit(i,delta) #to sql dsa results
+                # self.testController.dsaResSignal.emit(i,delta) #to sql dsa results
                 self.testController.to_DsaResult.update({i:delta})
             else:
                 k = '3'
-                #self.testController.dsaResSignal.emit(i,delta) #to sql dsa results
+                # self.testController.dsaResSignal.emit(i,delta) #to sql dsa results
                 self.testController.to_DsaResult.update({i:delta})
             if abs(delta) > 1 and i < 30:
                 haveFail = True
             elif abs(delta) > 0.4 and i < 30:
                 haveWarning = True
 
-
-
-        #parent.to_DsaUlDl.update({parent.whatConn+k:parent.to_DsaResult})
+        # parent.to_DsaUlDl.update({parent.whatConn+k:parent.to_DsaResult})
         self.testController.to_DsaUlDl.update({self.testController.whatConn+k:self.testController.to_DsaResult})
-        #print(parent.to_DsaUlDl)
+        # print(parent.to_DsaUlDl)
         self.testController.to_DsaResult= {}
 
         # if have warning or fail
-        if haveWarning == False:
-            self.testController.resSignal.emit(dsaName,parent.whatConn,'','Pass','',1)
+        if not haveWarning:
+            self.testController.resSignal.emit(dsaName, parent.whatConn, '', 'Pass', '', 1)
             fillTestLog(parent,dsaName,'Pass')
-        elif haveWarning == True  and haveFail == False:
-            self.testController.resSignal.emit(dsaName,parent.whatConn,'','Warning','',-1)
+        elif haveWarning and not haveFail:
+            self.testController.resSignal.emit(dsaName, parent.whatConn, '', 'Warning', '', -1)
             fillTestLog(parent,dsaName,'Warning')
         else:
-            q = parent.sendMsg('w','Warning','%s test fail' % dsaName,3)
+            q = parent.sendMsg('w', 'Warning', '%s test fail' % dsaName, 3)
             if  q == QMessageBox.Retry:
                 self.dsaTest(conn, cmd, whatConn, listSet,parent,dsaType)
                 return
             elif q == QMessageBox.Cancel:
                 parent.startTestBtn.setText('Start')
                 parent.stopTestFlag = True
-            self.testController.resSignal.emit(dsaName,parent.whatConn,'','Fail','',0)
-            fillTestLog(parent,dsaName,'Fail')
+            self.testController.resSignal.emit(dsaName,parent.whatConn, '', 'Fail', '', 0)
+            fillTestLog(parent, dsaName, 'Fail')
 
 
         setDSA(conn, cmd, whatConn, dsa1, dsa2, dsa3)
 
 def fillTestLog(parent,dsaType,status):
     if parent.whatConn == 'Dl':
-        parent.testLogDl.update({dsaType:status})
+        parent.testLogDl.update({dsaType: status})
     else:
-        parent.testLogUl.update({dsaType:status})
+        parent.testLogUl.update({dsaType: status})

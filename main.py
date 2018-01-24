@@ -1,7 +1,6 @@
 # RFBCheck
 # v0.1.23 20180124
 
-
 from Forms.form import Ui_MainWindow
 from Tests.testController import *
 from Equip.applySetFile import *
@@ -27,8 +26,6 @@ class TestTime(threading.Thread):
 class mainProgram(QtWidgets.QMainWindow, Ui_MainWindow):
     def __init__(self, form, parent=None):
         super(mainProgram, self).__init__(parent)
-
-        #self.tt = Thread(name='testTimer', target=TestTime, args=(self,))
 
         self.useCorrection = True
         self.testLogDl = {}
@@ -144,7 +141,7 @@ class mainProgram(QtWidgets.QMainWindow, Ui_MainWindow):
         except Exception as e:
             self.sendMsg('w', 'Error', str(e), 1)
             return
-        return (rfb, sn, date)
+        return rfb, sn, date
 
     def printReportBtnClicked(self):
         try:
@@ -204,7 +201,7 @@ class mainProgram(QtWidgets.QMainWindow, Ui_MainWindow):
                     'UL DSA1', 'UL DSA2', 'UL DSA3', 'DSA pow', 'ALC IN pow']
         rows = cursor.execute("select * from test_settings where rfb_type = :n",
                               {'n': self.rfbTypeCombo.currentText()}).fetchall()
-        # ToDo if not fined setting??? need error
+        # TODO: if not fined setting??? need error
         for rowSetttings in rows:
             self.listSettings = list(rowSetttings)[1:]
         conn.close()
@@ -229,9 +226,6 @@ class mainProgram(QtWidgets.QMainWindow, Ui_MainWindow):
             for n in row:
                 self.atrSettings.update({atrKeys[k]: n})
                 k += 1
-
-        print(self.atrSettings)
-
         if len(self.atrSettings) == 0:
             self.sendMsg('w', 'Warning', 'ATR record for ' + self.rfbTypeCombo.currentText() + ' not found', 1)
             self.calibrLbl.setText('False')
@@ -343,7 +337,8 @@ class mainProgram(QtWidgets.QMainWindow, Ui_MainWindow):
                 cursor.execute("update instruments set address = :n, useAtten = :n2, fullName = :n3 where name = 'NA'",
                                {'n': self.instrAddrCombo.currentText(), 'n2': 0, 'n3': self.currNaNameLbl.text()})
             else:
-                pass  # ToDo ERROR (set current instrument address)
+                pass
+                # TODO: ERROR (set current instrument address)
             conn.commit()
         except Exception as e:
             conn.close()
