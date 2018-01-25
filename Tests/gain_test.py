@@ -7,7 +7,8 @@ class GainTest(QtCore.QThread):
     def __init__(self, testController, mainParent, parent=None):
         super(GainTest, self).__init__(parent)
         if testController.stopTestFlag:
-            QtCore.QThread.yieldCurrentThread()
+            # QtCore.QThread.yieldCurrentThread()
+            self.yieldCurrentThread()
 
         testController.logSignal.emit("***** Start Gain test *****", 3)
 
@@ -46,19 +47,19 @@ class GainTest(QtCore.QThread):
         self.testController.logSignal.emit("Gain " + self.whatConn + " = " + str(currentGain) + " dBm", 0)
         if gainMin <= currentGain <= gainMax:
             self.testController.resSignal.emit('Gain', self.whatConn, str(gainMin), str(currentGain), str(gainMax), 1)
-        else:
-            q = self.mainParent.sendMsg('w', 'Warning',
-                                        'Gain test fail. Gain ' + self.whatConn + ' = ' + str(currentGain) + ' dBm', 3)
-            if q == QMessageBox.Retry:
-                self.gainTest(freq, gainMin, gainMax)
-                return
-            elif q == QMessageBox.Ignore:
-                self.testController.resSignal.emit('Gain', self.whatConn, str(gainMin), str(currentGain), str(gainMax),
-                                                   0)
-            elif q == QMessageBox.Cancel:
-                self.testController.resSignal.emit('Gain', self.testController.whatConn, str(gainMin), str(currentGain),
-                                                   str(gainMax), 0)
-                self.testController.stopTestFlag = True
+        # else:
+        #     q = self.mainParent.sendMsg('w', 'Warning',
+        #                                 'Gain test fail. Gain ' + self.whatConn + ' = ' + str(currentGain) + ' dBm', 3)
+        #     if q == QMessageBox.Retry:
+        #         self.gainTest(freq, gainMin, gainMax)
+        #         return
+        #     elif q == QMessageBox.Ignore:
+        #         self.testController.resSignal.emit('Gain', self.whatConn, str(gainMin), str(currentGain), str(gainMax),
+        #                                            0)
+        #     elif q == QMessageBox.Cancel:
+        #         self.testController.resSignal.emit('Gain', self.testController.whatConn, str(gainMin), str(currentGain),
+        #                                            str(gainMax), 0)
+        #         self.testController.stopTestFlag = True
         if self.whatConn == 'Dl':
             self.testController.testLogDl.update({'Gain': currentGain})
         else:

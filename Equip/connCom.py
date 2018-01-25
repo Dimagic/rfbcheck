@@ -16,6 +16,3 @@ class connCom:
             msg.setWindowTitle("Connection problem")
             msg.setStandardButtons(QMessageBox.Ok)
             msg.exec_()
-
-
-

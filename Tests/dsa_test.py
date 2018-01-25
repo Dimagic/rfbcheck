@@ -6,21 +6,24 @@ from PyQt5 import QtCore
 class DsaTest(QtCore.QThread):
     def __init__(self, testController, mainParent, parent = None):
         super(DsaTest, self).__init__(parent)
-        testController.logSignal.emit("***** Start DSA test *****",3)
+        testController.logSignal.emit("***** Start DSA test *****", 3)
 
         self.parent = mainParent
         self.testController = testController
+        self.sa = testController.instr.sa
+        self.gen = testController.instr.gen
+        self.whatConn = testController.whatConn
+        self.listSettings = mainParent.listSettings
+        self.ser = testController.ser
 
-        if self.parent.stopTestFlag:
-            return
-        self.testController.logSignal.emit("Starting DSA test",0)
-        self.sa = self.parent.instr.sa
-        self.gen = self.parent.instr.gen
+        # if self.parent.stopTestFlag:
+        #     return
 
-        if self.parent.whatConn == 'Dl':
-            self.freq = self.parent.listSettings[1]
+        if self.whatConn == 'Dl':
+            self.freq = self.listSettings[1]
         else:
-            self.freq = self.parent.listSettings[2]
+            self.freq = self.listSettings[2]
+
         self.sa.write(":SENSE:FREQ:center "+str(self.freq)+" MHz")
         self.gen.write(":FREQ:FIX "+str(self.freq)+" MHz")
         self.sa.write(":SENSE:FREQ:span 1 MHz")
@@ -28,22 +31,24 @@ class DsaTest(QtCore.QThread):
             self.forDSAtest = [0, 0.5, 1, 2, 4, 8, 16, 31]
         else:
             self.forDSAtest = np.arange(0, 31.5 , 0.5)
+
         self.parent.useCorrection = False
-        self.dsaTest(self.parent.ser,cmd,self.testController.whatConn,self.parent.listSettings,self.parent,1)
-        self.dsaTest(self.parent.ser,cmd,self.testController.whatConn,self.parent.listSettings,self.parent,2)
-        self.dsaTest(self.parent.ser,cmd,self.testController.whatConn,self.parent.listSettings,self.parent,3)
+        self.dsaTest(testController.listSettings, testController, 1)
+        self.dsaTest(testController.listSettings, testController, 2)
+        self.dsaTest(testController.listSettings, testController, 3)
         self.parent.useCorrection = True
         self.sa.write(":SENSE:FREQ:span 3 MHz")
 
-    def dsaTest(self, conn, cmd, whatConn, listSet,parent,dsaType):
-        conn.ser.write(binascii.unhexlify(cmd.reset))
+    def dsaTest(self, listSet, parent, dsaType):
+        self.ser.ser.write(binascii.unhexlify(cmd.reset))
+
         time.sleep(1)
-        if whatConn == "Dl":
+        if self.whatConn == "Dl":
             dsa1 = listSet[5]
             dsa2 = listSet[6]
             dsa3 = listSet[7]
             ampl = listSet[3]
-        elif whatConn == "Ul":
+        elif self.whatConn == "Ul":
             dsa1 = listSet[8]
             dsa2 = listSet[9]
             dsa3 = listSet[10]
@@ -65,24 +70,24 @@ class DsaTest(QtCore.QThread):
             dsa3test = toFloat(dsa3)
 
         else:
-            parent.sendMsg('c','Error','Incorrect DSA type',1)
+            parent.sendMsg('c', 'Error', 'Incorrect DSA type', 1)
             return
 
-        setDSA(conn, cmd, whatConn, dsa1test, dsa2test, dsa3test)
+        setDSA(self.ser, cmd, self.whatConn, dsa1test, dsa2test, dsa3test)
 
         # set ampl for test
         if listSet[11] != 0:
             parent.instr.gen.write("POW:AMPL "+str(listSet[11])+" dBm")
         else:
-            setAmplTo(self,conn,cmd,parent.instr, parent.instr.sa, parent.instr.gen, ampl, parent)
+            setAmplTo(self.ser, cmd, self.gen, ampl, parent)
             time.sleep(2)
         parent.useCorrection = False
 
         haveWarning = False
         haveFail = False
-        for j,i in enumerate(self.forDSAtest):
+        for j, i in enumerate(self.forDSAtest):
             if self.parent.stopTestFlag:
-                setDSA(conn, cmd, whatConn, dsa1, dsa2, dsa3)
+                setDSA(self.ser, cmd, self.whatConn, dsa1, dsa2, dsa3)
                 return
 
             if dsaType == 3:
@@ -95,61 +100,61 @@ class DsaTest(QtCore.QThread):
                 dsaName = 'DSA 1'
                 dsa1test = toFloat(i)
 
-            self.testController.progressBarSignal.emit(dsaName,len(self.forDSAtest)-1,j)
+            self.testController.progressBarSignal.emit(dsaName, len(self.forDSAtest)-1, j)
 
-            setDSA(conn, cmd, whatConn, dsa1test, dsa2test, dsa3test)
-            curGain = round(getAvgGain(parent),2)
+            setDSA(self.ser, cmd, self.whatConn, dsa1test, dsa2test, dsa3test)
+            curGain = round(getAvgGain(parent), 2)
 
             if i == 0:
                 d1 = curGain
             delta = round(curGain - d1 + i, 2)
-            self.testController.logSignal.emit(dsaName + ': '+ str(i) + '    Gain: ' + str(curGain) + '    Delta: ' + str(delta),3)
+            self.testController.logSignal.emit(dsaName + ': ' + str(i) + '    Gain: ' + str(curGain) +
+                                               '    Delta: ' + str(delta), 3)
 # if gain more then SA display line
             if dsaType == 1:
                 k = '1'
                 # self.testController.dsaResSignal.emit(i,delta) #to sql dsa results
-                self.testController.to_DsaResult.update({i:delta})
+                self.testController.to_DsaResult.update({i: delta})
             elif dsaType == 2:
                 k = '2'
                 # self.testController.dsaResSignal.emit(i,delta) #to sql dsa results
-                self.testController.to_DsaResult.update({i:delta})
+                self.testController.to_DsaResult.update({i: delta})
             else:
                 k = '3'
                 # self.testController.dsaResSignal.emit(i,delta) #to sql dsa results
-                self.testController.to_DsaResult.update({i:delta})
+                self.testController.to_DsaResult.update({i: delta})
             if abs(delta) > 1 and i < 30:
                 haveFail = True
             elif abs(delta) > 0.4 and i < 30:
                 haveWarning = True
 
         # parent.to_DsaUlDl.update({parent.whatConn+k:parent.to_DsaResult})
-        self.testController.to_DsaUlDl.update({self.testController.whatConn+k:self.testController.to_DsaResult})
+        self.testController.to_DsaUlDl.update({self.testController.whatConn+k: self.testController.to_DsaResult})
         # print(parent.to_DsaUlDl)
-        self.testController.to_DsaResult= {}
+        self.testController.to_DsaResult = {}
 
         # if have warning or fail
         if not haveWarning:
             self.testController.resSignal.emit(dsaName, parent.whatConn, '', 'Pass', '', 1)
-            fillTestLog(parent,dsaName,'Pass')
+            self.fillTestLog(parent, dsaName, 'Pass')
         elif haveWarning and not haveFail:
             self.testController.resSignal.emit(dsaName, parent.whatConn, '', 'Warning', '', -1)
-            fillTestLog(parent,dsaName,'Warning')
+            self.fillTestLog(parent, dsaName, 'Warning')
         else:
             q = parent.sendMsg('w', 'Warning', '%s test fail' % dsaName, 3)
-            if  q == QMessageBox.Retry:
-                self.dsaTest(conn, cmd, whatConn, listSet,parent,dsaType)
+            if q == QMessageBox.Retry:
+                self.dsaTest(self.ser, cmd, self.whatConn, listSet,parent,dsaType)
                 return
             elif q == QMessageBox.Cancel:
                 parent.startTestBtn.setText('Start')
                 parent.stopTestFlag = True
-            self.testController.resSignal.emit(dsaName,parent.whatConn, '', 'Fail', '', 0)
-            fillTestLog(parent, dsaName, 'Fail')
+            self.testController.resSignal.emit(dsaName, parent.whatConn, '', 'Fail', '', 0)
+            self.fillTestLog(parent, dsaName, 'Fail')
 
+        setDSA(self.ser, cmd, self.whatConn, dsa1, dsa2, dsa3)
 
-        setDSA(conn, cmd, whatConn, dsa1, dsa2, dsa3)
-
-def fillTestLog(parent,dsaType,status):
-    if parent.whatConn == 'Dl':
-        parent.testLogDl.update({dsaType: status})
-    else:
-        parent.testLogUl.update({dsaType: status})
+    def fillTestLog(self, parent, dsaType, status):
+            if parent.whatConn == 'Dl':
+                parent.testLogDl.update({dsaType: status})
+            else:
+                parent.testLogUl.update({dsaType: status})

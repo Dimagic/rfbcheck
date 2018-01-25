@@ -27,12 +27,13 @@ class TestContoller(QtCore.QThread):
 
         self.currParent = currParent  # main program
         self.testArr = []  # checked tests
-
+        self.controller = self
         self.ser = None  # Com port connection
         self.instr = None  # instruments
         self.whatConn = None  # Ul/Dl
         self.to_DsaUlDl = {}  # results DSA test from DB
         self.to_DsaResult = {}  # temporary results DSA test
+        self.listSettings = currParent.listSettings
         self.testLogDl = {}
         self.testLogUl = {}
         self.stopTestFlag = False
@@ -48,8 +49,11 @@ class TestContoller(QtCore.QThread):
 
     def run(self):
         self.ser = self.getComConn()
+        if self.ser is None:
+            return
         self.whatConn = self.checkUlDl()
-        if self.whatConn == None: return
+        if self.whatConn is None:
+            return
         self.logSignal.emit('START TEST', 0)
         self.instr.gen.write(":OUTP:STAT ON")
 
@@ -65,21 +69,25 @@ class TestContoller(QtCore.QThread):
 
     def runTests(self):
         if self.currParent.checkGainTest.isChecked():
-            if self.currParent.stopTestFlag: return
+            if self.stopTestFlag:
+                return
             GainTest(self, self.currParent)
 
         if self.currParent.checkGainTest.isChecked():
-            if self.currParent.stopTestFlag: return
+            if self.stopTestFlag:
+                return
             FlatnessTest(self, self.currParent)
+
+        if self.currParent.checkDsaTest.isChecked():
+            if self.stopTestFlag:
+                return
+            DsaTest(self, self.currParent)
 
         return  # !!!!!!! RETURN
 
-        if self.currParent.checkDsaTest.isChecked():
-            if self.currParent.stopTestFlag: return
-            DsaTest(self, self.currParent)
-
         if self.currParent.checkImTest.isChecked():
-            if self.currParent.stopTestFlag: return
+            if self.stopTestFlag:
+                return
             if self.currParent.whatConn == 'Dl':
                 freq = self.currParent.listSettings[1]
             elif self.currParent.whatConn == 'Ul':
@@ -87,11 +95,13 @@ class TestContoller(QtCore.QThread):
             IModTest(self, self.currParent, freq)
 
         if self.currParent.checkBitAlarmTest.isChecked():
-            if self.currParent.stopTestFlag: return
+            if self.stopTestFlag:
+                return
             BitAlarmTest(self, self.currParent)
 
         if self.currParent.checkAlcTest.isChecked():
-            if self.currParent.stopTestFlag: return
+            if self.stopTestFlag:
+                return
             AlcTest(self, self.currParent)
 
     def getTests(self, currParent):
@@ -125,10 +135,12 @@ class TestContoller(QtCore.QThread):
                 self.currParent.sendMsg('w', 'Warning', 'Connection problem', 1)
                 return
 
+
     def getParrent(self):
         return self.currParent
 
     def checkUlDl(self):
+        print(self.ser)
         self.ser.ser.write(binascii.unhexlify(cmd.setSalcOpMode))
         self.ser.ser.write(binascii.unhexlify(cmd.reset))
         setAlc(self.ser, cmd.setAlcInDl, 255, cmd.shiftDlIn)
@@ -168,7 +180,7 @@ class TestContoller(QtCore.QThread):
         if self.whatConn is None:
             self.logSignal.emit("No signal", 2)
             self.whatConn = None
-            return
+            self.ser.ser.close()
         self.instr.gen.write(":OUTP:STAT OFF")
         time.sleep(1)
         return self.whatConn

@@ -23,7 +23,7 @@ class TestTime(threading.Thread):
             time.sleep(.5)
 
 
-class mainProgram(QtWidgets.QMainWindow, Ui_MainWindow):
+class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
     def __init__(self, form, parent=None):
         super(mainProgram, self).__init__(parent)
 
@@ -36,6 +36,8 @@ class mainProgram(QtWidgets.QMainWindow, Ui_MainWindow):
 
         self.calibrSaToGen = {}
         self.calibrGenToSa = {}
+
+        self.myThread = None
 
         self.to_DsaUlDl = {}
         self.to_DsaResult = {}
@@ -237,7 +239,7 @@ class mainProgram(QtWidgets.QMainWindow, Ui_MainWindow):
         try:
             calibrationCheck(self)
         except Exception as e:
-            self.sendMsg('W','Getting calibration error',str(e),1)
+            self.sendMsg('W', 'Getting calibration error', str(e), 1)
         return
 
     def connectDb(self):
@@ -257,6 +259,7 @@ class mainProgram(QtWidgets.QMainWindow, Ui_MainWindow):
         applySetFile(self.rfbTypeCombo.currentText(), self)
 
     def sendMsg(self, icon, msgTitle, msgText, typeQestions):
+        # TODO: threading problem "QApplication: Object event filter cannot be in a different thread."
         msg = QMessageBox()
         if icon == 'q':
             msg.setIcon(QMessageBox.Question)
@@ -268,13 +271,14 @@ class mainProgram(QtWidgets.QMainWindow, Ui_MainWindow):
             msg.setIcon(QMessageBox.Critical)
         msg.setText(msgText)
         msg.setWindowTitle(msgTitle)
+        msg.setWindowIcon(QtGui.QIcon("Img/ico32_pgn_icon.ico"))
         if typeQestions == 1:
             msg.setStandardButtons(QMessageBox.Ok)
         elif typeQestions == 2:
             msg.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
         elif typeQestions == 3:
             msg.setStandardButtons(QMessageBox.Ignore | QMessageBox.Retry | QMessageBox.Cancel)
-        return (msg.exec_())
+        return msg.exec_()
 
     def getInstrAddr(self):
         return (visa.ResourceManager().list_resources())
@@ -283,7 +287,7 @@ class mainProgram(QtWidgets.QMainWindow, Ui_MainWindow):
         try:
             conn = self.connectDb()
             cursor = conn.cursor()
-            return (conn, cursor)
+            return conn, cursor
         except Exception as e:
             self.sendLog(str(e), 2)
 
@@ -384,19 +388,14 @@ class mainProgram(QtWidgets.QMainWindow, Ui_MainWindow):
         if self.calibrLbl.text() == 'False':
             self.sendMsg('w', 'Warning', 'Need to do the calibration', 1)
             return
-        if self.checkRecordInDb() == True:
+        if self.checkRecordInDb():
             if self.startTestBtn.text() == "Start":
-                # self.whatConn = self.checkUlDl()
-                ##                if self.whatConn == None:
-                ##                    return
-                ##                else:
                 self.isItCalibr = False
                 self.myThread = TestContoller(self)
                 self.myThread.logSignal.connect(self.sendLog, QtCore.Qt.QueuedConnection)
                 self.myThread.resSignal.connect(self.tableResultAddItem, QtCore.Qt.QueuedConnection)
                 self.myThread.msgSignal.connect(self.sendMsg, QtCore.Qt.QueuedConnection)
                 self.myThread.dsaResSignal.connect(self.set_DSAtoSql, QtCore.Qt.QueuedConnection)
-
                 self.myThread.progressBarSignal.connect(self.setProgressBar, QtCore.Qt.QueuedConnection)
 
                 self.myThread.started.connect(self.on_started)
@@ -404,7 +403,7 @@ class mainProgram(QtWidgets.QMainWindow, Ui_MainWindow):
                 self.myThread.start()
             elif self.startTestBtn.text() == "Stop":
                 if self.sendMsg('i', 'Stop test', 'Are you sure?', 2) == QMessageBox.Ok:
-                    self.stopTestFlag = True
+                    self.myThread.stopTestFlag = True
             else:
                 self.sendMsg('c', 'Error', 'Starting thread is fail', 1)
 
@@ -472,4 +471,5 @@ if __name__ == '__main__':
     prog = mainProgram(form)
     form.setWindowIcon(QtGui.QIcon("Img/ico32_pgn_icon.ico"))
     form.show()
+    app.exec_()
     sys.exit(app.exec_())
