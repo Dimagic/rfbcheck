@@ -7,7 +7,8 @@ class GainTest(QtCore.QThread):
     def __init__(self, testController, mainParent, parent=None):
         super(GainTest, self).__init__(parent)
         if testController.stopTestFlag:
-            QtCore.QThread.yieldCurrentThread()
+            # QtCore.QThread.yieldCurrentThread()
+            self.yieldCurrentThread()
 
         testController.logSignal.emit("***** Start Gain test *****", 3)
 

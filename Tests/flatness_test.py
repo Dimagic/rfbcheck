@@ -6,8 +6,6 @@ from PyQt5 import QtCore
 class FlatnessTest(QtCore.QThread):
     def __init__(self, testController, mainParent, parent=None):
         super(FlatnessTest, self).__init__(parent)
-        if testController.stopTestFlag:
-            QtCore.QThread.yieldCurrentThread()
         testController.logSignal.emit("***** Start Flatness test *****", 3)
 
         self.testController = testController
@@ -24,11 +22,10 @@ class FlatnessTest(QtCore.QThread):
 
         if testController.whatConn == "Dl":
             testController.testLogDl.update({'SN': self.mainParent.rfbSN.text()})
-            self.flatnessTest(testController.listSettings[1], testController.atrSettings.get('flat_dl_max'))
-            self.flatnessTest(testController)
+            self.flatnessTest(self.listSettings[1], self.atrSettings.get('flat_dl_max'))
         elif testController.whatConn == "Ul":
             testController.testLogUl.update({'SN': self.mainParent.rfbSN.text()})
-            self.flatnessTest(testController.listSettings[2], testController.atrSettings.get('flat_ul_max'))
+            self.flatnessTest(self.listSettings[2], self.atrSettings.get('flat_ul_max'))
         else:
             self.testController.msgSignal.emit("w", "Warning", "Flatness_test Dl/Ul", 1)
 
