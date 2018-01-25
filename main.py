@@ -38,6 +38,7 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
         self.calibrGenToSa = {}
 
         self.myThread = None
+        self.tt = None
 
         self.to_DsaUlDl = {}
         self.to_DsaResult = {}
@@ -383,8 +384,6 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
 
     # Run tests ----------------------------------------------------------------
     def startThreadTest(self):
-        print(self.startTestBtn.text())
-
         if self.calibrLbl.text() == 'False':
             self.sendMsg('w', 'Warning', 'Need to do the calibration', 1)
             return
@@ -427,6 +426,8 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
         self.rfbSN.setEnabled(True)
         self.testsGroupBox.setEnabled(True)
         self.startTestBtn.setText('Start')
+
+
 
     def setProgressBar(self, testName, barMax, barCurr):
         if self.currTestLbl.text() != testName:

@@ -25,9 +25,9 @@ class TestContoller(QtCore.QThread):
     def __init__(self, currParent, parent=None):
         QtCore.QThread.__init__(self, parent)
 
+        self.controller = self
         self.currParent = currParent  # main program
         self.testArr = []  # checked tests
-        self.controller = self
         self.ser = None  # Com port connection
         self.instr = None  # instruments
         self.whatConn = None  # Ul/Dl
@@ -48,10 +48,14 @@ class TestContoller(QtCore.QThread):
             return
 
     def run(self):
+        # TODO: com port and instrument initialisation problem
         self.ser = self.getComConn()
-        if self.ser is None:
+
+        if self.ser is not None:
+            self.whatConn = self.checkUlDl()
+        else:
             return
-        self.whatConn = self.checkUlDl()
+
         if self.whatConn is None:
             return
         self.logSignal.emit('START TEST', 0)
@@ -83,8 +87,6 @@ class TestContoller(QtCore.QThread):
                 return
             DsaTest(self, self.currParent)
 
-        return  # !!!!!!! RETURN
-
         if self.currParent.checkImTest.isChecked():
             if self.stopTestFlag:
                 return
@@ -93,6 +95,8 @@ class TestContoller(QtCore.QThread):
             elif self.currParent.whatConn == 'Ul':
                 freq = self.currParent.listSettings[2]
             IModTest(self, self.currParent, freq)
+
+        return  # !!!!!!! RETURN
 
         if self.currParent.checkBitAlarmTest.isChecked():
             if self.stopTestFlag:
@@ -119,7 +123,12 @@ class TestContoller(QtCore.QThread):
             self.testArr.append('AlcTest')
 
     def getComConn(self):
+        print(self.ser)
         self.ser = connCom()
+        print(self.ser)
+        print('--------------------------')
+        if self.ser is None:
+            return
         if self.ser.ser.isOpen():
             try:
                 self.ser.ser.write(binascii.unhexlify('AAAA543022556677403D01'))
@@ -127,20 +136,18 @@ class TestContoller(QtCore.QThread):
                 band = int(rx[26:34], 16) / 1000
                 return self.ser
                 # TODO: fil label port and baud
-                ##                self.currParent.portLbl.setText(self.ser.ser.port)
-                ##                self.currParent.baudLbl.setText(str(self.ser.ser.baudrate))
-                self.logSignal.emit("Connected to port " + str(self.ser.ser.port), 0)
+                # self.currParent.baudLbl.setText(str(self.ser.ser.baudrate))
+                # self.logSignal.emit("Connected to port " + str(self.ser.ser.port), 0)
             except Exception as e:
-                self.ser.ser.close()
+                # self.ser.ser.close()
                 self.currParent.sendMsg('w', 'Warning', 'Connection problem', 1)
-                return
+                self.yieldCurrentThread()
 
 
     def getParrent(self):
         return self.currParent
 
     def checkUlDl(self):
-        print(self.ser)
         self.ser.ser.write(binascii.unhexlify(cmd.setSalcOpMode))
         self.ser.ser.write(binascii.unhexlify(cmd.reset))
         setAlc(self.ser, cmd.setAlcInDl, 255, cmd.shiftDlIn)
@@ -159,12 +166,16 @@ class TestContoller(QtCore.QThread):
 
         for i in [Dl, Ul]:
             self.progressBarSignal.emit('Check connection', 0, 0)
-            if i == 0: continue
+            if i == 0:
+                continue
             try:
                 self.instr = Instrument(i, self.currParent)
+                if self.instr is None:
+                    self.stopTestFlag = True
+                    return
                 # TODO: if return None!!!!!
             except Exception as e:
-                self.currParent.sendMsg('c', 'Instrumet initialization error', str(e), 1)
+                self.currParent.sendMsg('c', 'Instrument initialisation error', str(e), 1)
             self.instr.gen.write(":OUTP:STAT ON")
             time.sleep(3)
             if float(getAvgGain(self)) > -50:
@@ -181,6 +192,7 @@ class TestContoller(QtCore.QThread):
             self.logSignal.emit("No signal", 2)
             self.whatConn = None
             self.ser.ser.close()
+            return
         self.instr.gen.write(":OUTP:STAT OFF")
         time.sleep(1)
         return self.whatConn

@@ -3,12 +3,10 @@ import Equip.commands as cmd
 from PyQt5.QtWidgets import QMessageBox
 from PyQt5 import QtCore
 
-
-
 class IModTest(QtCore.QThread):
     def __init__(self, testController, mainParent, freq, parent = None):
         super(IModTest, self).__init__(parent)
-        testController.logSignal.emit("***** Start IMod test *****",3)
+        testController.logSignal.emit("***** Start IMod test *****", 3)
 
         self.instrument = mainParent.instr
         self.listLog = mainParent.listLog
