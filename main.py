@@ -59,11 +59,11 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
 
         self.radioInstrChecked()
         listInstr = self.getInstrAddr()
-
-        if len(listInstr) < 2:
-            self.sendLog('Problem of instruments initialisation', 2)
-        for i in listInstr:
-            self.instrAddrCombo.addItem(str(i))
+        if listInstr is not None:
+            if len(listInstr) < 2:
+                self.sendLog('Problem of instruments initialisation', 2)
+            for i in listInstr:
+                self.instrAddrCombo.addItem(str(i))
         self.getCurrInstrAddr()
         self.setInstrBtn.clicked.connect(self.setCurrInstrAddr)
         self.journalUpdateBtn.clicked.connect(self.journalUpdateBtnClick)
@@ -282,7 +282,10 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
         return msg.exec_()
 
     def getInstrAddr(self):
-        return (visa.ResourceManager().list_resources())
+        try:
+            return visa.ResourceManager().list_resources()
+        except Exception as e:
+            self.sendMsg('c', 'Instr. init error', str(e), 1)
 
     def getConnDb(self):
         try:
