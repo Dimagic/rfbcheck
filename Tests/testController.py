@@ -48,7 +48,7 @@ class TestContoller(QtCore.QThread):
             return
 
     def run(self):
-        # TODO: com port and instrument initialisation problem :-)
+        # TODO: com port and instrument initialisation problem :-) 8-0
         self.ser = self.getComConn()
 
         if self.ser is not None:
