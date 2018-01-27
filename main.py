@@ -374,7 +374,7 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
             row = cursor.execute("select rfb_type from test_results where sn = :n1",
                                  {'n1': self.rfbSN.text()}).fetchone()
             conn.close()
-            if row != None and row[0] != self.rfbTypeCombo.currentText():
+            if row is not None and row[0] != self.rfbTypeCombo.currentText():
                 self.sendMsg('w', 'Warning',
                              'SN: ' + str(self.rfbSN.text()) + ' already exist. RFB type: ' + str(row[0]), 1)
                 # self.startTestBtn.setText("Start")
@@ -416,7 +416,6 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
         self.tt.start()
         if self.testLogDl.get('SN') != self.rfbSN.text() or self.testLogUl.get('SN') != self.rfbSN.text():
             self.clrLogBtnClick()
-
         self.rfbTypeCombo.setEnabled(False)
         self.rfbSN.setEnabled(False)
         self.testsGroupBox.setEnabled(False)
@@ -429,8 +428,6 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
         self.rfbSN.setEnabled(True)
         self.testsGroupBox.setEnabled(True)
         self.startTestBtn.setText('Start')
-
-
 
     def setProgressBar(self, testName, barMax, barCurr):
         if self.currTestLbl.text() != testName:
@@ -476,4 +473,5 @@ if __name__ == '__main__':
     form.setWindowIcon(QtGui.QIcon("Img/ico32_pgn_icon.ico"))
     form.show()
     app.exec_()
-    sys.exit(app.exec_())
+    # sys.exit(app.exec_())
+    sys.exit(0)
