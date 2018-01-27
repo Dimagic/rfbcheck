@@ -1,4 +1,5 @@
 import serial
+from serial import SerialException
 from PyQt5 import QtCore
 from Equip.writeTestResult import WriteResult
 from Tests.gain_test import GainTest
@@ -134,6 +135,9 @@ class TestContoller(QtCore.QThread):
                 self.currParent.portLbl.setText(str(self.ser.port))
                 self.logSignal.emit("Connected to port " + str(self.ser.port), 0)
                 self.haveConn = True
+        except SerialException as e:
+            self.logSignal.emit('Connection access problem: ' + str(e), 1)
+            self.msgSignal.emit('c', 'Connection access problem', str(e), 1)
         except Exception as e:
             self.haveConn = False
             self.logSignal.emit('Connection problem: ' + str(e), 1)
