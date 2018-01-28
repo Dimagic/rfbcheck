@@ -40,9 +40,6 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
         self.myThread = None
         self.tt = None
 
-        self.to_DsaUlDl = {}
-        self.to_DsaResult = {}
-
         self.atrSettings = {}
         self.instr = None
         self.setupUi(form)
@@ -313,15 +310,18 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
         conn.close()
 
     def radioInstrChecked(self):
-        if self.setSaRadio.isChecked() == True:
+        if self.setSaRadio.isChecked():
             self.saAtten.setEnabled(True)
             self.genAtten.setEnabled(False)
-        if self.setGenRadio.isChecked() == True:
+            self.naAtten.setEnabled(False)
+        if self.setGenRadio.isChecked():
             self.saAtten.setEnabled(False)
             self.genAtten.setEnabled(True)
-        if self.setNaRadio.isChecked() == True:
+            self.naAtten.setEnabled(False)
+        if self.setNaRadio.isChecked():
             self.saAtten.setEnabled(False)
             self.genAtten.setEnabled(False)
+            self.naAtten.setEnabled(True)
 
     def setCurrInstrAddr(self):
         conn, cursor = self.getConnDb()

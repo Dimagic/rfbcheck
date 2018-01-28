@@ -220,5 +220,5 @@ class TestContoller(QtCore.QThread):
             ulPresent = True
         if self.currParent.rfbSN.text().upper() != 'XXXX':
             if dlMustToBe == dlPresent and ulMustToBe == ulPresent:
-                WriteResult(self.currParent, self.currParent.testLogDl, self.currParent.testLogUl)
+                WriteResult(self, self.currParent.testLogDl, self.currParent.testLogUl)
                 self.msgSignal.emit('i', 'RFBcheck', 'Test comlite', 1)

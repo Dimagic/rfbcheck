@@ -130,7 +130,7 @@ class DsaTest(QtCore.QThread):
 
         # parent.to_DsaUlDl.update({parent.whatConn+k:parent.to_DsaResult})
         self.testController.to_DsaUlDl.update({self.testController.whatConn+k: self.testController.to_DsaResult})
-        # print(parent.to_DsaUlDl)
+        print(parent.to_DsaUlDl)
         self.testController.to_DsaResult = {}
 
         # if have warning or fail
