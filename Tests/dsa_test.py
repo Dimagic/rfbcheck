@@ -40,7 +40,7 @@ class DsaTest(QtCore.QThread):
         self.sa.write(":SENSE:FREQ:span 3 MHz")
 
     def dsaTest(self, listSet, parent, dsaType):
-        self.ser.ser.write(binascii.unhexlify(cmd.reset))
+        self.ser.write(binascii.unhexlify(cmd.reset))
 
         time.sleep(1)
         if self.whatConn == "Dl":

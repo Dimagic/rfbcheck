@@ -23,7 +23,7 @@ class GainTest(QtCore.QThread):
 
         if self.mainParent.stopTestFlag:
             return
-        self.ser = self.testController.ser.ser
+        self.ser = self.testController.ser
         gainDlMin = self.mainParent.atrSettings.get('gain_dl_min')
         gainDlMax = self.mainParent.atrSettings.get('gain_dl_max')
         gainUlMin = self.mainParent.atrSettings.get('gain_ul_min')
@@ -41,6 +41,7 @@ class GainTest(QtCore.QThread):
         self.gen.write(":FREQ:FIX " + str(freq) + " MHz")
         self.gen.write("POW:AMPL -45 dBm")
         time.sleep(1)
+        self.testController.useCorrection = True
         ampl = getAvgGain(self.testController)
         genPow = float(self.gen.query("POW:AMPL?"))
         currentGain = round(abs(genPow) + ampl, 1)

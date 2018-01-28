@@ -59,11 +59,11 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
 
         self.radioInstrChecked()
         listInstr = self.getInstrAddr()
-
-        if len(listInstr) < 2:
-            self.sendLog('Problem of instruments initialisation', 2)
-        for i in listInstr:
-            self.instrAddrCombo.addItem(str(i))
+        if listInstr is not None:
+            if len(listInstr) < 2:
+                self.sendLog('Problem of instruments initialisation', 2)
+            for i in listInstr:
+                self.instrAddrCombo.addItem(str(i))
         self.getCurrInstrAddr()
         self.setInstrBtn.clicked.connect(self.setCurrInstrAddr)
         self.journalUpdateBtn.clicked.connect(self.journalUpdateBtnClick)
@@ -71,8 +71,6 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
         self.printReportBtn.clicked.connect(self.printReportBtnClicked)
 
         self.clrLogBtn.clicked.connect(self.clrLogBtnClick)
-        self.connectComBtn.clicked.connect(self.connectComBtnClick)
-        self.connectComBtn.setText("Connect")
         self.portLbl.setText("")
         self.baudLbl.setText("")
 
@@ -282,7 +280,10 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
         return msg.exec_()
 
     def getInstrAddr(self):
-        return (visa.ResourceManager().list_resources())
+        try:
+            return visa.ResourceManager().list_resources()
+        except Exception as e:
+            self.sendMsg('c', 'Instr. init error', str(e), 1)
 
     def getConnDb(self):
         try:
@@ -371,7 +372,7 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
             row = cursor.execute("select rfb_type from test_results where sn = :n1",
                                  {'n1': self.rfbSN.text()}).fetchone()
             conn.close()
-            if row != None and row[0] != self.rfbTypeCombo.currentText():
+            if row is not None and row[0] != self.rfbTypeCombo.currentText():
                 self.sendMsg('w', 'Warning',
                              'SN: ' + str(self.rfbSN.text()) + ' already exist. RFB type: ' + str(row[0]), 1)
                 # self.startTestBtn.setText("Start")
@@ -411,9 +412,12 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
         self.testIsRun = True
         self.tt = Thread(name='testTimer', target=TestTime, args=(self,))
         self.tt.start()
-        if self.testLogDl.get('SN') != self.rfbSN.text() or self.testLogUl.get('SN') != self.rfbSN.text():
-            self.clrLogBtnClick()
+        print(self.myThread.testLogDl.get('SN'))
+        print(self.myThread.testLogUl.get('SN'))
 
+        # if self.myThread.testLogDl.get('SN') != self.rfbSN.text() or \
+        #         self.myThread.testLogUl.get('SN') != self.rfbSN.text():
+        #     self.clrLogBtnClick()
         self.rfbTypeCombo.setEnabled(False)
         self.rfbSN.setEnabled(False)
         self.testsGroupBox.setEnabled(False)
@@ -426,8 +430,6 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
         self.rfbSN.setEnabled(True)
         self.testsGroupBox.setEnabled(True)
         self.startTestBtn.setText('Start')
-
-
 
     def setProgressBar(self, testName, barMax, barCurr):
         if self.currTestLbl.text() != testName:
@@ -473,4 +475,5 @@ if __name__ == '__main__':
     form.setWindowIcon(QtGui.QIcon("Img/ico32_pgn_icon.ico"))
     form.show()
     app.exec_()
-    sys.exit(app.exec_())
+    # sys.exit(app.exec_())
+    sys.exit(0)
