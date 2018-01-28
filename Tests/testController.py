@@ -1,3 +1,5 @@
+import serial
+from serial import SerialException
 from PyQt5 import QtCore
 from Equip.writeTestResult import WriteResult
 from Tests.gain_test import GainTest
@@ -6,9 +8,7 @@ from Tests.dsa_test import DsaTest
 from Tests.intermod_test import IModTest
 from Tests.bitAlarm_test import BitAlarmTest
 from Tests.alc_test import AlcTest
-
 from Equip.equip import *
-from Equip.connCom import *
 from Equip.instrument import *
 
 import Equip.commands as cmd
@@ -37,21 +37,21 @@ class TestContoller(QtCore.QThread):
         self.testLogDl = {}
         self.testLogUl = {}
         self.stopTestFlag = False
+        self.haveConn = False
 
         if currParent.testLogDl.get('SN') != currParent.rfbSN.text():
             currParent.testLogDl = {}
         if currParent.testLogUl.get('SN') != currParent.rfbSN.text():
             currParent.testLogUl = {}
         self.getTests(currParent)
-        if len(self.testArr) == 0:
-            self.msgSignal.emit('w', "Warning", "You have to choice minimum one test", 1)
-            return
 
     def run(self):
         # TODO: com port and instrument initialisation problem
-        self.ser = self.getComConn()
-
-        if self.ser is not None:
+        if len(self.testArr) is 0:
+            self.msgSignal.emit('w', "Warning", "You have to choice minimum one test", 1)
+            return
+        self.getComConn()
+        if self.haveConn:
             self.whatConn = self.checkUlDl()
         else:
             return
@@ -60,12 +60,9 @@ class TestContoller(QtCore.QThread):
             return
         self.logSignal.emit('START TEST', 0)
         self.instr.gen.write(":OUTP:STAT ON")
-
         self.currParent.stopTestFlag = False
-
         self.runTests()
-
-        self.ser.ser.close()
+        self.ser.close()
         self.instr.gen.write(":OUTP:STAT OFF")
         self.currParent.startTestBtn.setText("Start")
 
@@ -123,26 +120,31 @@ class TestContoller(QtCore.QThread):
             self.testArr.append('AlcTest')
 
     def getComConn(self):
-        print(self.ser)
-        self.ser = connCom()
-        print(self.ser)
-        print('--------------------------')
-        if self.ser is None:
-            return
-        if self.ser.ser.isOpen():
-            try:
-                self.ser.ser.write(binascii.unhexlify('AAAA543022556677403D01'))
-                rx = binascii.hexlify(self.ser.ser.readline())
+        baud = 57600
+        port = "COM1"
+        try:
+            self.ser = serial.Serial(port, baud, timeout=0.5)
+            print(self.ser)
+            if self.ser.isOpen():
+                self.ser.write(binascii.unhexlify('AAAA543022556677403D01'))
+                rx = binascii.hexlify(self.ser.readline())
                 band = int(rx[26:34], 16) / 1000
-                return self.ser
+                # return self.ser
                 # TODO: fil label port and baud
-                # self.currParent.baudLbl.setText(str(self.ser.ser.baudrate))
-                # self.logSignal.emit("Connected to port " + str(self.ser.ser.port), 0)
-            except Exception as e:
-                # self.ser.ser.close()
-                self.currParent.sendMsg('w', 'Warning', 'Connection problem', 1)
-                self.yieldCurrentThread()
-
+                self.currParent.baudLbl.setText(str(self.ser.baudrate))
+                self.currParent.portLbl.setText(str(self.ser.port))
+                self.logSignal.emit("Connected to port " + str(self.ser.port), 0)
+                self.haveConn = True
+        except SerialException as e:
+            self.logSignal.emit('Connection access problem: ' + str(e), 1)
+            self.msgSignal.emit('c', 'Connection access problem', str(e), 1)
+        except Exception as e:
+            self.haveConn = False
+            self.logSignal.emit('Connection problem: ' + str(e), 1)
+            self.msgSignal.emit('c', 'Connection problem', str(e), 1)
+            if self.ser is not None:
+                if self.ser.isOpen():
+                    self.ser.close()
 
     def getParrent(self):
         return self.currParent
