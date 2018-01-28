@@ -21,10 +21,12 @@ class FlatnessTest(QtCore.QThread):
         self.gainDict = {}
 
         if testController.whatConn == "Dl":
-            testController.testLogDl.update({'SN': self.mainParent.rfbSN.text()})
+            # testController.testLogDl.update({'SN': self.mainParent.rfbSN.text()})
+            testController.fillTestLogSignal.emit('Dl', 'SN', str(self.mainParent.rfbSN.text()))
             self.flatnessTest(self.listSettings[1], self.atrSettings.get('flat_dl_max'))
         elif testController.whatConn == "Ul":
-            testController.testLogUl.update({'SN': self.mainParent.rfbSN.text()})
+            # testController.testLogUl.update({'SN': self.mainParent.rfbSN.text()})
+            testController.fillTestLogSignal.emit('Ul', 'SN', str(self.mainParent.rfbSN.text()))
             self.flatnessTest(self.listSettings[2], self.atrSettings.get('flat_ul_max'))
         else:
             self.testController.msgSignal.emit("w", "Warning", "Flatness_test Dl/Ul", 1)
@@ -87,9 +89,11 @@ class FlatnessTest(QtCore.QThread):
                 self.testController.stopTestFlag = True
             self.testController.resSignal.emit('Flatness', self.testController.whatConn, '0', str(currFlat), str(flat), 0)
         if self.testController.whatConn == 'Dl':
-            self.testController.testLogDl.update({'Flatness': currFlat})
+            # self.testController.testLogDl.update({'Flatness': currFlat})
+            self.testController.fillTestLogSignal.emit('Dl', 'Flatness', str(currFlat))
         else:
-            self.testController.testLogUl.update({'Flatness': currFlat})
+            # self.testController.testLogUl.update({'Flatness': currFlat})
+            self.testController.fillTestLogSignal.emit('Ul', 'Flatness', str(currFlat))
 
     def getFlatness(self, start, stop):
         self.testController.useCorrection = True

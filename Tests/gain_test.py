@@ -29,10 +29,12 @@ class GainTest(QtCore.QThread):
         gainUlMin = self.mainParent.atrSettings.get('gain_ul_min')
         gainUlMax = self.mainParent.atrSettings.get('gain_ul_max')
         if self.testController.whatConn == "Dl":
-            testController.testLogDl.update({'SN': self.mainParent.rfbSN.text()})
+            # testController.testLogDl.update({'SN': self.mainParent.rfbSN.text()})
+            testController.fillTestLogSignal.emit('Dl', 'SN', str(self.mainParent.rfbSN.text()))
             self.gainTest(self.freqDl, gainDlMin, gainDlMax)
         elif self.testController.whatConn == "Ul":
-            testController.testLogUl.update({'SN': self.mainParent.rfbSN.text()})
+            # testController.testLogUl.update({'SN': self.mainParent.rfbSN.text()})
+            testController.fillTestLogSignal.emit('Ul', 'SN', str(self.mainParent.rfbSN.text()))
             self.gainTest(self.freqUl, gainUlMin, gainUlMax)
 
     def gainTest(self, freq, gainMin, gainMax):
@@ -62,6 +64,8 @@ class GainTest(QtCore.QThread):
                                                    str(gainMax), 0)
                 self.testController.stopTestFlag = True
         if self.whatConn == 'Dl':
-            self.testController.testLogDl.update({'Gain': currentGain})
+            # self.testController.testLogDl.update({'Gain': currentGain})
+            self.testController.fillTestLogSignal.emit('Dl', 'Gain', str(currentGain))
         else:
-            self.testController.testLogUl.update({'Gain': currentGain})
+            # self.testController.testLogUl.update({'Gain': currentGain})
+            self.testController.fillTestLogSignal.emit('Ul', 'Gain', str(currentGain))

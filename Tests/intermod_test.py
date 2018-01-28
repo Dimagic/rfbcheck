@@ -88,9 +88,9 @@ class IModTest(QtCore.QThread):
         if haveFail is False:
             self.testController.resSignal.emit('Intermodulation', self.testController.whatConn, '', 'Pass', '', 1)
             if self.testController.whatConn == 'Dl':
-                self.testController.testLogDl.update({'IMod': 'Pass'})
+                self.testController.fillTestLogSignal.emit('Dl', 'IMod', 'Pass')
             else:
-                self.testController.testLogUl.update({'IMod': 'Pass'})
+                self.testController.fillTestLogSignal.emit('Ul', 'IMod', 'Pass')
         else:
             q = self.testController.sendMsg('w', 'Warning', 'IMod test fail', 3)
             if q == QMessageBox.Retry:
@@ -100,9 +100,9 @@ class IModTest(QtCore.QThread):
                 self.parent.stopTestFlag = True
             self.testController.resSignal.emit('Intermodulation', self.testController.whatConn, '', 'Fail', '', 0)
             if self.testController.whatConn == 'Dl':
-                self.testController.testLogDl.update({'IMod': 'Fail'})
+                self.testController.fillTestLogSignal.emit('Dl', 'IMod', 'Fail')
             else:
-                self.testController.testLogUl.update({'IMod': 'Fail'})
+                self.testController.fillTestLogSignal.emit('Ul', 'IMod', 'Fail')
 
         self.sa.write(":CALC:MARK1:STAT 1")
         self.sa.write("CALC:MARK:CPS 0")

@@ -21,6 +21,7 @@ class TestContoller(QtCore.QThread):
     msgSignal = QtCore.pyqtSignal(str, str, str, int)
     dsaResSignal = QtCore.pyqtSignal(float, float)
     progressBarSignal = QtCore.pyqtSignal(str, float, float)
+    fillTestLogSignal = QtCore.pyqtSignal(str, str, str)
 
     def __init__(self, currParent, parent=None):
         QtCore.QThread.__init__(self, parent)
@@ -38,10 +39,16 @@ class TestContoller(QtCore.QThread):
         self.haveConn = False
         self.useCorrection = False
         # TODO: fill testLog
-        if currParent.testLogDl.get('SN') != currParent.rfbSN.text():
-            self.testLogDl = {}
-        if currParent.testLogUl.get('SN') != currParent.rfbSN.text():
-            self.testLogUl = {}
+        # if len(self.testLogDl) != 0:
+        #     if self.testLogDl.get('SN') != currParent.rfbSN.text():
+        #         self.testLogDl = {}
+        # else:
+        #     self.testLogDl = self.testLogDl
+        # if currParent.testLogUl.get('SN') != currParent.rfbSN.text():
+        #     self.testLogUl = {}
+        # else:
+        #     self.testLogUl = self.testLogUl
+
         self.getTests(currParent)
 
     def run(self):
@@ -60,13 +67,14 @@ class TestContoller(QtCore.QThread):
         self.logSignal.emit('START TEST', 0)
         self.instr.gen.write(":OUTP:STAT ON")
         self.currParent.stopTestFlag = False
+
         self.runTests()
+
         self.ser.close()
         self.currParent.baudLbl.setText('')
         self.currParent.portLbl.setText('')
         self.instr.gen.write(":OUTP:STAT OFF")
         self.currParent.startTestBtn.setText("Start")
-
         self.writeResults()
 
     def runTests(self):
@@ -181,12 +189,13 @@ class TestContoller(QtCore.QThread):
             if float(getAvgGain(self)) > -50:
                 if i == Dl:
                     self.logSignal.emit("Testing DownLink", 0)
-                    self.testLogDl.update({'SN': self.currParent.rfbSN.text()})
+                    #self.testLogDl.update({'SN': self.currParent.rfbSN.text()})
+                    self.fillTestLogSignal.emit('Dl', 'SN', str(self.currParent.rfbSN.text()))
                     self.whatConn = "Dl"
                     break
                 elif i == Ul:
                     self.logSignal.emit("Testing UpLink", 0)
-                    self.testLogUl.update({'SN': self.currParent.rfbSN.text()})
+                    self.fillTestLogSignal.emit('Ul', 'SN', str(self.currParent.rfbSN.text()))
                     self.whatConn = "Ul"
         if self.whatConn is None:
             self.logSignal.emit("No signal", 2)
@@ -205,11 +214,11 @@ class TestContoller(QtCore.QThread):
         if self.currParent.atrSettings.get('freq_band_ul_1').find('@') != -1 or self.currParent.atrSettings.get(
                 'freq_band_ul_2').find('@') != -1:
             ulMustToBe = True
-        if dlMustToBe and len(self.testLogDl) > 0:
+        if dlMustToBe and len(self.currParent.testLogDl) > 0:
             dlPresent = True
-        if ulMustToBe and len(self.testLogUl) > 0:
+        if ulMustToBe and len(self.currParent.testLogUl) > 0:
             ulPresent = True
         if self.currParent.rfbSN.text().upper() != 'XXXX':
             if dlMustToBe == dlPresent and ulMustToBe == ulPresent:
-                WriteResult(self.currParent, self.testLogDl, self.testLogUl)
+                WriteResult(self.currParent, self.currParent.testLogDl, self.currParent.testLogUl)
                 self.msgSignal.emit('i', 'RFBcheck', 'Test comlite', 1)

@@ -396,6 +396,7 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
                 self.myThread.resSignal.connect(self.tableResultAddItem, QtCore.Qt.QueuedConnection)
                 self.myThread.msgSignal.connect(self.sendMsg, QtCore.Qt.QueuedConnection)
                 self.myThread.dsaResSignal.connect(self.set_DSAtoSql, QtCore.Qt.QueuedConnection)
+                self.myThread.fillTestLogSignal.connect(self.fillTestLog, QtCore.Qt.QueuedConnection)
                 self.myThread.progressBarSignal.connect(self.setProgressBar, QtCore.Qt.QueuedConnection)
 
                 self.myThread.started.connect(self.on_started)
@@ -412,8 +413,6 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
         self.testIsRun = True
         self.tt = Thread(name='testTimer', target=TestTime, args=(self,))
         self.tt.start()
-        print(self.myThread.testLogDl.get('SN'))
-        print(self.myThread.testLogUl.get('SN'))
 
         # if self.myThread.testLogDl.get('SN') != self.rfbSN.text() or \
         #         self.myThread.testLogUl.get('SN') != self.rfbSN.text():
@@ -466,6 +465,15 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
         numrows = len(self.listLog)
         self.listLog.item(numrows - 1).setBackground(QtCore.Qt.white)
         self.listLog.scrollToBottom()
+
+    def fillTestLog(self, whatConn, testKey, testVal):
+        if whatConn == 'Dl':
+            self.testLogDl.update({testKey: testVal})
+        elif whatConn == 'Ul':
+            self.testLogUl.update({testKey: testVal})
+        else:
+            self.sendMsg('w', 'Error...', 'Writing testLog Ul/Dl Fail', '1')
+
 
 
 if __name__ == '__main__':

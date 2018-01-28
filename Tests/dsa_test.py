@@ -30,7 +30,7 @@ class DsaTest(QtCore.QThread):
         if self.parent.testSetDsaShort.isChecked():
             self.forDSAtest = [0, 0.5, 1, 2, 4, 8, 16, 31]
         else:
-            self.forDSAtest = np.arange(0, 31.5 , 0.5)
+            self.forDSAtest = np.arange(0, 31.5, 0.5)
 
         self.parent.useCorrection = False
         self.dsaTest(testController.listSettings, testController, 1)
@@ -40,8 +40,8 @@ class DsaTest(QtCore.QThread):
         self.sa.write(":SENSE:FREQ:span 3 MHz")
 
     def dsaTest(self, listSet, parent, dsaType):
+        # TODO: write DSA result to DB fail
         self.ser.write(binascii.unhexlify(cmd.reset))
-
         time.sleep(1)
         if self.whatConn == "Dl":
             dsa1 = listSet[5]
@@ -136,25 +136,26 @@ class DsaTest(QtCore.QThread):
         # if have warning or fail
         if not haveWarning:
             self.testController.resSignal.emit(dsaName, parent.whatConn, '', 'Pass', '', 1)
-            self.fillTestLog(parent, dsaName, 'Pass')
+            self.testController.fillTestLogSignal.emit(self.testController.whatConn, dsaName, 'Pass')
         elif haveWarning and not haveFail:
             self.testController.resSignal.emit(dsaName, parent.whatConn, '', 'Warning', '', -1)
             self.fillTestLog(parent, dsaName, 'Warning')
+            self.testController.fillTestLogSignal.emit(self.testController.whatConn, dsaName, 'Warning')
         else:
             q = parent.sendMsg('w', 'Warning', '%s test fail' % dsaName, 3)
             if q == QMessageBox.Retry:
-                self.dsaTest(self.ser, cmd, self.whatConn, listSet,parent,dsaType)
+                self.dsaTest(self.ser, cmd, self.whatConn, listSet, parent, dsaType)
                 return
             elif q == QMessageBox.Cancel:
                 parent.startTestBtn.setText('Start')
                 parent.stopTestFlag = True
             self.testController.resSignal.emit(dsaName, parent.whatConn, '', 'Fail', '', 0)
-            self.fillTestLog(parent, dsaName, 'Fail')
+            self.testController.fillTestLogSignal.emit(self.testController.whatConn, dsaName, 'Fail')
 
         setDSA(self.ser, cmd, self.whatConn, dsa1, dsa2, dsa3)
 
-    def fillTestLog(self, parent, dsaType, status):
-            if parent.whatConn == 'Dl':
-                parent.testLogDl.update({dsaType: status})
-            else:
-                parent.testLogUl.update({dsaType: status})
+    # def fillTestLog(self, parent, dsaType, status):
+    #         if parent.whatConn == 'Dl':
+    #             parent.testLogDl.update({dsaType: status})
+    #         else:
+    #             parent.testLogUl.update({dsaType: status})
