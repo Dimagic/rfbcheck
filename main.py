@@ -71,8 +71,6 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
         self.printReportBtn.clicked.connect(self.printReportBtnClicked)
 
         self.clrLogBtn.clicked.connect(self.clrLogBtnClick)
-        self.connectComBtn.clicked.connect(self.connectComBtnClick)
-        self.connectComBtn.setText("Connect")
         self.portLbl.setText("")
         self.baudLbl.setText("")
 
@@ -414,8 +412,12 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
         self.testIsRun = True
         self.tt = Thread(name='testTimer', target=TestTime, args=(self,))
         self.tt.start()
-        if self.testLogDl.get('SN') != self.rfbSN.text() or self.testLogUl.get('SN') != self.rfbSN.text():
-            self.clrLogBtnClick()
+        print(self.myThread.testLogDl.get('SN'))
+        print(self.myThread.testLogUl.get('SN'))
+
+        # if self.myThread.testLogDl.get('SN') != self.rfbSN.text() or \
+        #         self.myThread.testLogUl.get('SN') != self.rfbSN.text():
+        #     self.clrLogBtnClick()
         self.rfbTypeCombo.setEnabled(False)
         self.rfbSN.setEnabled(False)
         self.testsGroupBox.setEnabled(False)

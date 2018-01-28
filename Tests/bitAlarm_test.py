@@ -13,18 +13,19 @@ class BitAlarmTest(QtCore.QThread):
         testController.logSignal.emit("***** Start BIT alarm test *****", 3)
         testController.progressBarSignal.emit('BIT Alarm', 0, 0)
 
-        if mainParent.stopTestFlag == True:
+        if testController.stopTestFlag:
             return
         self.testController = testController
         self.parent = mainParent
-        self.ser = mainParent.ser.ser
+        self.ser = testController.ser
+        self.sa = testController.instr.sa
         self.arrAlarms = None
         self.alarms = None
 
         self.test()
 
     def test(self):
-        currentGain = float(self.parent.instr.sendQerySa("CALC:MARK:Y?"))
+        currentGain = float(self.sa.query("CALC:MARK:Y?"))
         print(currentGain)
         if currentGain >= -50:
             gain = True
@@ -41,7 +42,7 @@ class BitAlarmTest(QtCore.QThread):
         if cmd.alarmName[1] and cmd.alarmName[7] in self.alarms:
             wasAlarm = True
 
-        n = float(self.parent.instr.sendQerySa("CALC:MARK:Y?"))
+        n = float(self.sa.query("CALC:MARK:Y?"))
         self.testController.logSignal.emit('BIT gain: ' + str(n), 1)
         if n < -10:  # TODO: ??????
             gain = False
@@ -65,10 +66,10 @@ class BitAlarmTest(QtCore.QThread):
             self.testController.resSignal.emit('BIT', self.parent.whatConn, '', 'Fail', '', 0)
             status = 'Fail'
 
-        if self.parent.whatConn == 'Dl':
-            self.parent.testLogDl.update({'BIT': status})
+        if self.testController.whatConn == 'Dl':
+            self.testController.testLogDl.update({'BIT': status})
         else:
-            self.parent.testLogUl.update({'BIT': status})
+            self.testController.testLogUl.update({'BIT': status})
 
     def getHexAddr(self):
         pref = 'AAAA543022556677'
@@ -117,10 +118,11 @@ class BitAlarmTest(QtCore.QThread):
 
     def sendIfFreq(self, freq):
         loDl, loUl = self.getLoFreq()
-        if self.parent.whatConn == 'Dl':
+        pref = ''
+        if self.testController.whatConn == 'Dl':
             pref = 'AAAA5430295566775200'
             freqLo = loDl
-        elif self.parent.whatConn == 'Ul':
+        elif self.testController.whatConn == 'Ul':
             pref = 'AAAA5430295566775202'
             freqLo = loUl
         freqHex = hex(int(freq)).replace('0x', '')
@@ -144,7 +146,8 @@ class BitAlarmTest(QtCore.QThread):
             reader = csv.DictReader(csvfile)
             for row in reader:
                 arr = row.get(None)
-                if type(arr) != list: continue
+                if type(arr) != list:
+                    continue
                 if row['# 0 1182685875'] == 'PATH_A_RF_PLL':
                     loDl = ''
                     for i in range(4, 8, 1):
@@ -157,7 +160,7 @@ class BitAlarmTest(QtCore.QThread):
                         loUl += hex(int(arr[i])).replace('0x', '')
                     while len(loUl) < 8:
                         loUl = '0' + loUl
-            return (loDl, loUl)
+            return loDl, loUl
 
 ##    def getLoFreq(self,addr):
 ##        self.ser.flushInput()

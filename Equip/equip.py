@@ -53,7 +53,7 @@ def setAlc(conn, alc, n, shift):
     s = str(hex(n)).replace('0x', '')
     sd = getHexStr(str(hex(n - shift)).replace('0x', ''))
     toSend = (alc + getHexStr(s) + sd).upper()
-    conn.ser.write(binascii.unhexlify(toSend))
+    conn.write(binascii.unhexlify(toSend))
     time.sleep(0.1)
 
 
@@ -102,20 +102,16 @@ def getAvgGain(parent):
         return
 
     freq = float(testController.instr.gen.query("FREQ:CW?")) / 1000000
-    ##        parent.instr.sa.write("CALC:MARK1:X "+str(freq)+" MHz")
     saToGen = parent.calibrSaToGen.get(freq)
     genToSa = parent.calibrGenToSa.get(freq)
     time.sleep(0.1)
     gainArr = []
     for n in range(1, 11, 1):
         gainArr.append(float(testController.instr.sa.query("CALC:MARK:Y?")))
-
-    # print(float(parent.instr.sa.query("CALC:MARK:Y?")))
-    if parent.useCorrection == True:
-        ##            print(sum(gainArr)/len(gainArr),saToGen,genToSa)
-        return (sum(gainArr) / len(gainArr) - saToGen - genToSa)
+    if testController.useCorrection:
+        return sum(gainArr) / len(gainArr) - saToGen - genToSa
     else:
-        return (sum(gainArr) / len(gainArr))
+        return sum(gainArr) / len(gainArr)
 
 
 def strToFreq(curRange):
@@ -213,7 +209,7 @@ def setDSA(conn, cmd, whatConn, dsa1, dsa2, dsa3):
         sumHex = sumHex.replace('0x', '')
 
     toSend = (toSend + '0000' + str(sumHex)).upper()
-    conn.ser.write(binascii.unhexlify(toSend))
+    conn.write(binascii.unhexlify(toSend))
     ##    print('Tx: ' + toSend)
     ##    print('Rx: ' + str(binascii.hexlify(conn.ser.read(conn.ser.inWaiting()))))
     time.sleep(0.3)
