@@ -65,11 +65,7 @@ class BitAlarmTest(QtCore.QThread):
             self.testController.logSignal.emit('BIT alarm FAIL', 2)
             self.testController.resSignal.emit('BIT', self.parent.whatConn, '', 'Fail', '', 0)
             status = 'Fail'
-
-        if self.testController.whatConn == 'Dl':
-            self.testController.testLogDl.update({'BIT': status})
-        else:
-            self.testController.testLogUl.update({'BIT': status})
+        self.testController.fillTestLog('BIT', status)
 
     def getHexAddr(self):
         pref = 'AAAA543022556677'
@@ -89,21 +85,21 @@ class BitAlarmTest(QtCore.QThread):
             else:
                 request = request[k:]
                 break
-        print(str(rx)[n:n + 4])
-        print(request)
+        # print(str(rx)[n:n + 4])
+        # print(request)
         strAlarms = bin(int(request, 16))[2:]
-        # binary = lambda x: " ".join(reversed( [i+j for i,j in zip( *[ ["{0:04b}".format(int(c,16)) for c in reversed("0"+x)][n::2] for n in [1,0] ] ) ] ))
+        # binary = lambda x: " ".join(reversed( [i+j for i,j in zip( *[ ["{0:04b}".format(int(c,16)) for c in
+        #           reversed("0"+x)][n::2] for n in [1,0] ] ) ] ))
         # strAlarms = binascii.hexlify(rx[n:n+4])
-        print(strAlarms)
-        ##        if len(strAlarms) < 16:
-        ##            for i,j in enumerate(strAlarms):
-        ##                if j == '1':
-        ##                    n = i
-        ##            strAlarms = strAlarms[:n+1]
-        # strAlarms = bin(int(rx[26:30],16))
-        print(str(rx))
-        ##        print(str(rx).find('3220'))
-        print(strAlarms)
+        # print(strAlarms)
+        # ##        if len(strAlarms) < 16:
+        # ##            for i,j in enumerate(strAlarms):
+        # ##                if j == '1':
+        # ##                    n = i
+        # ##            strAlarms = strAlarms[:n+1]
+        # # strAlarms = bin(int(rx[26:30],16))
+        # print(str(rx))
+        # print(strAlarms)
 
         self.arrAlarms = strAlarms.zfill(16)
         self.arrAlarms = self.arrAlarms[::-1]
@@ -114,7 +110,7 @@ class BitAlarmTest(QtCore.QThread):
             if i == '1':
                 self.alarms = self.alarms + cmd.alarmName[n] + '; '
             n += 1
-        self.parent.sendLog(self.alarms, 0)
+        self.testController.logSignal.emit(self.alarms, 0)
 
     def sendIfFreq(self, freq):
         loDl, loUl = self.getLoFreq()

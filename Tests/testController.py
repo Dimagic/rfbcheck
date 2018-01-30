@@ -1,6 +1,7 @@
 import serial
+from PyQt5.QtWidgets import QMessageBox
 from serial import SerialException
-from PyQt5 import QtCore
+from PyQt5 import QtCore, QtGui
 from Equip.writeTestResult import WriteResult
 from Tests.gain_test import GainTest
 from Tests.flatness_test import FlatnessTest
@@ -21,7 +22,7 @@ class TestContoller(QtCore.QThread):
     msgSignal = QtCore.pyqtSignal(str, str, str, int)
     dsaResSignal = QtCore.pyqtSignal(float, float)
     progressBarSignal = QtCore.pyqtSignal(str, float, float)
-    fillTestLogSignal = QtCore.pyqtSignal(str, str, str)
+    fillTestLogSignal = QtCore.pyqtSignal(str, str)
 
     def __init__(self, currParent, parent=None):
         QtCore.QThread.__init__(self, parent)
@@ -38,23 +39,20 @@ class TestContoller(QtCore.QThread):
         self.stopTestFlag = False
         self.haveConn = False
         self.useCorrection = False
-        # TODO: fill testLog
-        # if len(self.testLogDl) != 0:
-        #     if self.testLogDl.get('SN') != currParent.rfbSN.text():
-        #         self.testLogDl = {}
-        # else:
-        #     self.testLogDl = self.testLogDl
-        # if currParent.testLogUl.get('SN') != currParent.rfbSN.text():
-        #     self.testLogUl = {}
-        # else:
-        #     self.testLogUl = self.testLogUl
+        # TODO: move testLog to main or db. main better i think
+        try:
+            self.testLogDl.get('SN')
+            self.testLogUl.get('SN')
+        except AttributeError:
+            self.testLogDl = {}
+            self.testLogUl = {}
 
         self.getTests(currParent)
 
     def run(self):
         # TODO: com port and instrument initialisation problem
         if len(self.testArr) is 0:
-            self.msgSignal.emit('w', "Warning", "You have to choice minimum one test", 1)
+            self.currParent.sendMsg('w', "Warning", "You have to choice minimum one test", 1)
             return
         self.getComConn()
         if self.haveConn:
@@ -82,16 +80,19 @@ class TestContoller(QtCore.QThread):
             if self.stopTestFlag:
                 return
             GainTest(self, self.currParent)
+            print(self.testLogDl, self.testLogUl)
 
         if self.currParent.checkGainTest.isChecked():
             if self.stopTestFlag:
                 return
             FlatnessTest(self, self.currParent)
+            print(self.testLogDl, self.testLogUl)
 
         if self.currParent.checkDsaTest.isChecked():
             if self.stopTestFlag:
                 return
             DsaTest(self, self.currParent)
+            print(self.testLogDl, self.testLogUl)
 
         if self.currParent.checkImTest.isChecked():
             if self.stopTestFlag:
@@ -100,16 +101,19 @@ class TestContoller(QtCore.QThread):
                 IModTest(self, self.currParent, self.currParent.listSettings[1])
             elif self.whatConn == 'Ul':
                 IModTest(self, self.currParent, self.currParent.listSettings[2])
+            print(self.testLogDl, self.testLogUl)
 
         if self.currParent.checkBitAlarmTest.isChecked():
             if self.stopTestFlag:
                 return
             BitAlarmTest(self, self.currParent)
+            print(self.testLogDl, self.testLogUl)
 
         if self.currParent.checkAlcTest.isChecked():
             if self.stopTestFlag:
                 return
             AlcTest(self, self.currParent)
+            print(self.testLogDl, self.testLogUl)
         self.progressBarSignal.emit('Done', 100, 100)
 
     def getTests(self, currParent):
@@ -147,7 +151,7 @@ class TestContoller(QtCore.QThread):
         except Exception as e:
             self.haveConn = False
             self.logSignal.emit('Connection problem: ' + str(e), 1)
-            self.msgSignal.emit('c', 'Connection problem', str(e), 1)
+            self.currParent.sendMsg('c', 'Connection problem', str(e), 1)
             if self.ser is not None:
                 if self.ser.isOpen():
                     self.ser.close()
@@ -181,7 +185,6 @@ class TestContoller(QtCore.QThread):
                 if self.instr is None:
                     self.stopTestFlag = True
                     return
-                # TODO: if return None!!!!!
             except Exception as e:
                 self.currParent.sendMsg('c', 'Instrument initialisation error', str(e), 1)
             self.instr.gen.write(":OUTP:STAT ON")
@@ -189,14 +192,16 @@ class TestContoller(QtCore.QThread):
             if float(getAvgGain(self)) > -50:
                 if i == Dl:
                     self.logSignal.emit("Testing DownLink", 0)
-                    #self.testLogDl.update({'SN': self.currParent.rfbSN.text()})
-                    self.fillTestLogSignal.emit('Dl', 'SN', str(self.currParent.rfbSN.text()))
                     self.whatConn = "Dl"
+                    self.fillTestLog('SN', str(self.currParent.rfbSN.text()))
+                    self.fillTestLog('RF', str(self.currParent.rfbTypeCombo.currentText()))
                     break
                 elif i == Ul:
                     self.logSignal.emit("Testing UpLink", 0)
-                    self.fillTestLogSignal.emit('Ul', 'SN', str(self.currParent.rfbSN.text()))
                     self.whatConn = "Ul"
+                    self.fillTestLog('SN', str(self.currParent.rfbSN.text()))
+                    self.fillTestLog('RF', str(self.currParent.rfbTypeCombo.currentText()))
+                    break
         if self.whatConn is None:
             self.logSignal.emit("No signal", 2)
             self.whatConn = None
@@ -214,11 +219,19 @@ class TestContoller(QtCore.QThread):
         if self.currParent.atrSettings.get('freq_band_ul_1').find('@') != -1 or self.currParent.atrSettings.get(
                 'freq_band_ul_2').find('@') != -1:
             ulMustToBe = True
-        if dlMustToBe and len(self.currParent.testLogDl) > 0:
+        if dlMustToBe and len(self.testLogDl) > 0:
             dlPresent = True
-        if ulMustToBe and len(self.currParent.testLogUl) > 0:
+        if ulMustToBe and len(self.testLogUl) > 0:
             ulPresent = True
         if self.currParent.rfbSN.text().upper() != 'XXXX':
             if dlMustToBe == dlPresent and ulMustToBe == ulPresent:
-                WriteResult(self, self.currParent.testLogDl, self.currParent.testLogUl)
-                self.msgSignal.emit('i', 'RFBcheck', 'Test comlite', 1)
+                WriteResult(self, self.testLogDl, self.testLogUl)
+                self.currParent.sendMsg('i', 'RFBcheck', 'Test complete', 1)
+
+    def fillTestLog(self, key, val):
+        if self.whatConn == 'Dl':
+            self.testLogDl.update({key: val})
+        elif self.whatConn == 'Ul':
+            self.testLogUl.update({key: val})
+        else:
+            self.logSignal.emit('fillTestLog Error: ' + str(self.whatConn) + ' | ' + key + ' : ' + val, 0)

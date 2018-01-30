@@ -28,13 +28,10 @@ class GainTest(QtCore.QThread):
         gainDlMax = self.mainParent.atrSettings.get('gain_dl_max')
         gainUlMin = self.mainParent.atrSettings.get('gain_ul_min')
         gainUlMax = self.mainParent.atrSettings.get('gain_ul_max')
+        testController.fillTestLog('SN', str(self.mainParent.rfbSN.text()))
         if self.testController.whatConn == "Dl":
-            # testController.testLogDl.update({'SN': self.mainParent.rfbSN.text()})
-            testController.fillTestLogSignal.emit('Dl', 'SN', str(self.mainParent.rfbSN.text()))
             self.gainTest(self.freqDl, gainDlMin, gainDlMax)
         elif self.testController.whatConn == "Ul":
-            # testController.testLogUl.update({'SN': self.mainParent.rfbSN.text()})
-            testController.fillTestLogSignal.emit('Ul', 'SN', str(self.mainParent.rfbSN.text()))
             self.gainTest(self.freqUl, gainUlMin, gainUlMax)
 
     def gainTest(self, freq, gainMin, gainMax):
@@ -51,11 +48,10 @@ class GainTest(QtCore.QThread):
         if gainMin <= currentGain <= gainMax:
             self.testController.resSignal.emit('Gain', self.whatConn, str(gainMin), str(currentGain), str(gainMax), 1)
         else:
-            q = self.mainParent.sendMsg('w', 'Warning',
-                                        'Gain test fail. Gain ' + self.whatConn + ' = ' + str(currentGain) + ' dBm', 3)
+            q = self.sendMsg('w', 'Warning', 'Gain test fail. Gain ' + self.whatConn + ' = ' +
+                                        str(currentGain) + ' dBm', 3)
             if q == QMessageBox.Retry:
                 self.gainTest(freq, gainMin, gainMax)
-                return
             elif q == QMessageBox.Ignore:
                 self.testController.resSignal.emit('Gain', self.whatConn, str(gainMin), str(currentGain), str(gainMax),
                                                    0)
@@ -63,9 +59,5 @@ class GainTest(QtCore.QThread):
                 self.testController.resSignal.emit('Gain', self.testController.whatConn, str(gainMin), str(currentGain),
                                                    str(gainMax), 0)
                 self.testController.stopTestFlag = True
-        if self.whatConn == 'Dl':
-            # self.testController.testLogDl.update({'Gain': currentGain})
-            self.testController.fillTestLogSignal.emit('Dl', 'Gain', str(currentGain))
-        else:
-            # self.testController.testLogUl.update({'Gain': currentGain})
-            self.testController.fillTestLogSignal.emit('Ul', 'Gain', str(currentGain))
+        self.testController.fillTestLog('Gain', str(currentGain))
+

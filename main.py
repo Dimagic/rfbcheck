@@ -1,13 +1,14 @@
 # RFBCheck
-# v0.1.23 20180124
+# v0.1.24 20180130
+from PyQt5.QtCore import QWaitCondition
 
 from Forms.form import Ui_MainWindow
 from Tests.testController import *
 from Equip.applySetFile import *
 from Equip.calibration import *
-from Equip.journal import *
 from Equip.printReport import *
 from Equip.editRFB import *
+from Equip.journal import *
 from Tests.bitAlarm_test import *
 from PyQt5 import QtCore, QtWidgets, QtGui
 from PyQt5.QtWidgets import QTableWidgetItem, QAbstractItemView
@@ -27,9 +28,9 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
     def __init__(self, form, parent=None):
         super(mainProgram, self).__init__(parent)
 
-        self.useCorrection = True
-        self.testLogDl = {}
-        self.testLogUl = {}
+        # self.useCorrection = True
+        # self.testLogDl = {}
+        # self.testLogUl = {}
 
         self.runTest = None
         self.listSettings = []
@@ -396,7 +397,7 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
                 self.myThread.resSignal.connect(self.tableResultAddItem, QtCore.Qt.QueuedConnection)
                 self.myThread.msgSignal.connect(self.sendMsg, QtCore.Qt.QueuedConnection)
                 self.myThread.dsaResSignal.connect(self.set_DSAtoSql, QtCore.Qt.QueuedConnection)
-                self.myThread.fillTestLogSignal.connect(self.fillTestLog, QtCore.Qt.QueuedConnection)
+                # self.myThread.fillTestLogSignal.connect(self.fillTestLog, QtCore.Qt.QueuedConnection)
                 self.myThread.progressBarSignal.connect(self.setProgressBar, QtCore.Qt.QueuedConnection)
 
                 self.myThread.started.connect(self.on_started)
@@ -423,6 +424,7 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
         self.startTestBtn.setText('Stop')
 
     def on_finished(self):
+        Journal(self)
         self.testIsRun = False
         self.whatConn = None
         self.rfbTypeCombo.setEnabled(True)
@@ -466,15 +468,13 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
         self.listLog.item(numrows - 1).setBackground(QtCore.Qt.white)
         self.listLog.scrollToBottom()
 
-    def fillTestLog(self, whatConn, testKey, testVal):
-        if whatConn == 'Dl':
-            self.testLogDl.update({testKey: testVal})
-        elif whatConn == 'Ul':
-            self.testLogUl.update({testKey: testVal})
-        else:
-            self.sendMsg('w', 'Error...', 'Writing testLog Ul/Dl Fail', '1')
-
-
+    # def fillTestLog(self, whatConn, testKey, testVal):
+    #     if whatConn == 'Dl':
+    #         self.testLogDl.update({testKey: testVal})
+    #     elif whatConn == 'Ul':
+    #         self.testLogUl.update({testKey: testVal})
+    #     else:
+    #         self.sendMsg('w', 'Error...', 'Writing testLog Ul/Dl Fail', '1')
 
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)

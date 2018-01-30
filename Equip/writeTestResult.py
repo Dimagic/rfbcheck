@@ -1,29 +1,22 @@
 import datetime
 import sqlite3
-from Equip.printReport import *
-from Equip.journal import *
-import json
 
-class WriteResult():
+class WriteResult:
     def __init__(self, testController, testLogDl, testLogUl):
         self.testController = testController
         self.parent = testController.getParrent()
-
         try:
             dateTest = datetime.datetime.today().strftime("%Y%m%d %H:%M:%S")
-            print(len(testLogDl))
-            print(len(testLogUl))
             if len(testLogDl) > 0:
                 self.writingToDB(self.parent, testLogDl, 'Dl', dateTest)
             if len(testLogUl) > 0:
                 self.writingToDB(self.parent, testLogUl, 'Ul', dateTest)
-            Journal(self.parent)
         except Exception as e:
             testController.sendMsgSignal.emit('w', 'Write results to DB error', str(e), 1)
             return
 
-        testController.testLogDl = {}
-        testController.testLogUl = {}
+        self.testController.testLogDl = {}
+        self.testController.testLogUl = {}
 
     def writingToDB(self, parent, currTestLog, band, dateTest):
         conn, cursor = parent.getConnDb()
@@ -39,7 +32,7 @@ class WriteResult():
                          'alcout': currTestLog.get('ALC out'), 'test_status': ''})
             conn.commit()
 
-            print(self.testController.to_DsaUlDl.keys())
+            # print(self.testController.to_DsaUlDl.keys())
             if 'Ul1' in self.testController.to_DsaUlDl.keys() and band == 'Ul':
                 q = "insert into dsa_results (rfb,dsa1,dsa2,dsa3) values ((select max(id) from test_results " \
                     "where band_type = 'Ul' and sn = '%s'),'%s','%s','%s')" % (parent.rfbSN.text(),
@@ -56,15 +49,14 @@ class WriteResult():
                                                                                self.testController.to_DsaUlDl.get('Dl3'))
                 cursor.execute(q)
                 conn.commit()
-            parent.sendLog('Writing test result complete', 0)
-
+            self.testController.logSignal.emit('Writing test result complete', 0)
 
         except sqlite3.DatabaseError as err:
-                parent.sendMsg('c','Querry error', str(err),1)
+                self.testController.sendMsgSignal.emit('c', 'Querry error', str(err), 1)
                 conn.close()
         else:
                 conn.close()
-##                report(parent,parent.rfbSN.text(),dateTest)
+                # report(parent,parent.rfbSN.text(),dateTest)
 
 
 

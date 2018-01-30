@@ -10,7 +10,7 @@ class IModTest(QtCore.QThread):
         testController.logSignal.emit("***** Start IMod test *****", 3)
 
         self.testController = testController
-        self.mainParent = mainParent
+        self.mainParent = testController.getParrent()
         self.sa = testController.instr.sa
         self.gen = testController.instr.gen
         self.listSettings = mainParent.listSettings
@@ -66,7 +66,7 @@ class IModTest(QtCore.QThread):
         print(ampl)
 
         if len(freq) > 3:
-            self.parent.sendMsg('Intermodulation FAIL: to many peaks', 2)
+            self.mainParent.sendMsg('Intermodulation FAIL: to many peaks', 2)
             haveFail = True
         if delta > 0.7:
             self.testController.logSignal.emit('Delta between peaks FAIL: ' + str(round(delta, 3)) + " dBm", 3)
@@ -87,27 +87,16 @@ class IModTest(QtCore.QThread):
 
         if haveFail is False:
             self.testController.resSignal.emit('Intermodulation', self.testController.whatConn, '', 'Pass', '', 1)
-            if self.testController.whatConn == 'Dl':
-                self.testController.fillTestLogSignal.emit('Dl', 'IMod', 'Pass')
-            else:
-                self.testController.fillTestLogSignal.emit('Ul', 'IMod', 'Pass')
+            self.testController.fillTestLog('IMod', 'Pass')
         else:
-            q = self.testController.sendMsg('w', 'Warning', 'IMod test fail', 3)
+            q = self.mainParent.sendMsg('w', 'Warning', 'IMod test fail', 3)
             if q == QMessageBox.Retry:
                 self.mToneTest(self.gen, self.sa, freq, pow)
                 return
             elif q == QMessageBox.Cancel:
                 self.parent.stopTestFlag = True
             self.testController.resSignal.emit('Intermodulation', self.testController.whatConn, '', 'Fail', '', 0)
-            if self.testController.whatConn == 'Dl':
-                self.testController.fillTestLogSignal.emit('Dl', 'IMod', 'Fail')
-            else:
-                self.testController.fillTestLogSignal.emit('Ul', 'IMod', 'Fail')
+            self.testController.fillTestLog('IMod', 'Fail')
 
         self.sa.write(":CALC:MARK1:STAT 1")
         self.sa.write("CALC:MARK:CPS 0")
-##        gen.write(":OUTP:STAT OFF")
-##        self.parent.TestPrBar.setValue(1)
-
-##def getAmpl(sa):
-##    return float(sa.query("CALC:MARK:Y?"))

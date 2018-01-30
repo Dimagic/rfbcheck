@@ -66,10 +66,11 @@ class Journal():
         Journal.parent.tableJournal.setRowCount(0)
         Journal.parent.tableJournal.clear()
         headers = ['RFB','SN','Date test','Band','Gain','Flatnes','DSA 1','DSA 2','DSA 3','IMod','BIT','ALC In','ALC Out']
+        # TODO: FIX QObject::connect: Cannot queue arguments of type 'Qt::Orientation'
         Journal.parent.tableJournal.setHorizontalHeaderLabels(headers)
-        conn,cursor = Journal.parent.getConnDb()
-        dateBegin = int(str(Journal.parent.journalDateStart.date().toPyDate()).replace('-',''))
-        dateEnd   = int(str(Journal.parent.journalDateStop.date().toPyDate()).replace('-',''))
+        conn, cursor = Journal.parent.getConnDb()
+        dateBegin = int(str(Journal.parent.journalDateStart.date().toPyDate()).replace('-', ''))
+        dateEnd   = int(str(Journal.parent.journalDateStop.date().toPyDate()).replace('-', ''))
         q1 = "select * from test_results where cast(substr(dateTest,0,9) AS INTEGER) between %s and %s" % (dateBegin, dateEnd)
         q = "select * from ("+q1+") where (rfb_type like '%"+Journal.parent.journalFilter.text()+"%' or sn like '%"+Journal.parent.journalFilter.text()+"%') order by dateTest DESC"
         rows = cursor.execute(q).fetchall()
