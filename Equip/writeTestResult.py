@@ -4,7 +4,7 @@ import sqlite3
 class WriteResult:
     def __init__(self, testController, testLogDl, testLogUl):
         self.testController = testController
-        self.parent = testController.getParrent()
+        self.parent = testController.getParent()
         try:
             dateTest = datetime.datetime.today().strftime("%Y%m%d %H:%M:%S")
             if len(testLogDl) > 0:
@@ -14,9 +14,10 @@ class WriteResult:
         except Exception as e:
             testController.sendMsgSignal.emit('w', 'Write results to DB error', str(e), 1)
             return
-
-        self.testController.testLogDl = {}
-        self.testController.testLogUl = {}
+        finally:
+            self.parent.testLogDl = {}
+            self.parent.testLogUl = {}
+            self.parent.to_DsaUlDl = {}
 
     def writingToDB(self, parent, currTestLog, band, dateTest):
         conn, cursor = parent.getConnDb()
@@ -33,20 +34,20 @@ class WriteResult:
             conn.commit()
 
             # print(self.testController.to_DsaUlDl.keys())
-            if 'Ul1' in self.testController.to_DsaUlDl.keys() and band == 'Ul':
+            if 'Ul1' in self.parent.to_DsaUlDl.keys() and band == 'Ul':
                 q = "insert into dsa_results (rfb,dsa1,dsa2,dsa3) values ((select max(id) from test_results " \
                     "where band_type = 'Ul' and sn = '%s'),'%s','%s','%s')" % (parent.rfbSN.text(),
-                                                                               self.testController.to_DsaUlDl.get('Ul1'),
-                                                                               self.testController.to_DsaUlDl.get('Ul2'),
-                                                                               self.testController.to_DsaUlDl.get('Ul3'))
+                                                                               self.parent.to_DsaUlDl.get('Ul1'),
+                                                                               self.parent.to_DsaUlDl.get('Ul2'),
+                                                                               self.parent.to_DsaUlDl.get('Ul3'))
                 cursor.execute(q)
                 conn.commit()
-            if 'Dl1' in self.testController.to_DsaUlDl.keys() and band == 'Dl':
+            if 'Dl1' in self.parent.to_DsaUlDl.keys() and band == 'Dl':
                 q = "insert into dsa_results (rfb,dsa1,dsa2,dsa3) values ((select max(id) from test_results " \
                     "where band_type = 'Dl' and sn = '%s'),'%s','%s','%s')" % (parent.rfbSN.text(),
-                                                                               self.testController.to_DsaUlDl.get('Dl1'),
-                                                                               self.testController.to_DsaUlDl.get('Dl2'),
-                                                                               self.testController.to_DsaUlDl.get('Dl3'))
+                                                                               self.parent.to_DsaUlDl.get('Dl1'),
+                                                                               self.parent.to_DsaUlDl.get('Dl2'),
+                                                                               self.parent.to_DsaUlDl.get('Dl3'))
                 cursor.execute(q)
                 conn.commit()
             self.testController.logSignal.emit('Writing test result complete', 0)

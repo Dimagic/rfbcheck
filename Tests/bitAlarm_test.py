@@ -65,7 +65,7 @@ class BitAlarmTest(QtCore.QThread):
             self.testController.logSignal.emit('BIT alarm FAIL', 2)
             self.testController.resSignal.emit('BIT', self.parent.whatConn, '', 'Fail', '', 0)
             status = 'Fail'
-        self.testController.fillTestLog('BIT', status)
+        self.testController.fillTestLogSignal.emit('BIT', status)
 
     def getHexAddr(self):
         pref = 'AAAA543022556677'

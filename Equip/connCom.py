@@ -13,6 +13,6 @@ class connCom:
             msg = QMessageBox()
             msg.setIcon(QMessageBox.Warning)
             msg.setInformativeText(str(e))
-            msg.setWindowTitle("Connection problem")
+            msg.setWindowTitle("Connection problem 1")
             msg.setStandardButtons(QMessageBox.Ok)
             msg.exec_()

@@ -13,7 +13,7 @@ class AlcTest(QtCore.QThread):
             return
 
         self.testController = testController
-        self.mainParent = mainParent
+        self.mainParent = testController.getParent()
         self.ser = testController.ser
         self.sa = testController.instr.sa
         self.gen = testController.instr.gen
@@ -30,7 +30,7 @@ class AlcTest(QtCore.QThread):
         self.alcOutMax = self.atrSettings.get('alc_out_max')
 
         if self.listSettings[12] != 0:
-            self.instr.gen.write("POW:AMPL " + str(self.listSettings[12]) + " dBm")
+            self.gen.write("POW:AMPL " + str(self.listSettings[12]) + " dBm")
             # self.gen.write(":OUTP:STAT ON")
             time.sleep(1)
         else:
@@ -93,7 +93,7 @@ class AlcTest(QtCore.QThread):
             self.testController.logSignal.emit('ALC ' + whatConn + ' IN: FAIL', 2)
             self.testController.resSignal.emit('ALC test', self.parent.whatConn, str(self.alcInMin), 'fail',
                                                str(self.alcInMax), 0)
-            self.fillTestLog(self.parent, 'ALC in', 'Fail')
+            self.testController.fillTestLogSignal.emit(self.parent, 'ALC in', 'Fail')
             return
         else:
             for n in range(1, 255, 1):
@@ -122,8 +122,7 @@ class AlcTest(QtCore.QThread):
                         self.testController.resSignal.emit('ALC IN', self.parent.whatConn, str(self.alcInMin),
                                                            str(round(minVal, 1)) + ' ( in = ' + str(minKey) + ' )',
                                                            str(self.alcInMax), 0)
-
-                        self.fillTestLog('ALC in', minKey)
+                    self.testController.fillTestLogSignal.emit('ALC in', str(minKey))
 
         setAlc(conn, alc, 255, shift)
 
@@ -137,7 +136,7 @@ class AlcTest(QtCore.QThread):
             self.testController.logSignal.emit('ALC ' + whatConn + ' OUT: PASS ' + str(ampl) + ' dBm', 1)
             self.testController.resSignal.emit('ALC OUT', self.parent.whatConn, str(self.alcOutMin), str(ampl),
                                                str(self.alcOutMax), 1)
-            self.fillTestLog('ALC out', ampl)
+            self.testController.fillTestLogSignal.emit('ALC out', str(ampl))
         else:
             self.testController.logSignal.emit('ALC ' + whatConn + ' OUT: FAIL ' + str(ampl) + ' dBm', 2)
             q = self.mainParent.sendMsg('w', 'Warning', 'ALC Out test. Gain: ' + str(ampl) + ' dBm', 3)
@@ -149,9 +148,9 @@ class AlcTest(QtCore.QThread):
                 setAlc(conn, alc, 255, shift)
             elif q == QMessageBox.Ignore:
                 setAlc(conn, alc, 255, shift)
-            self.testControllertestController.resSignal.emit('ALC OUT', self.parent.whatConn, str(self.alcOutMin),
+            self.testController.resSignal.emit('ALC OUT', self.parent.whatConn, str(self.alcOutMin),
                                                              str(ampl), str(self.alcOutMax), 0)
-            self.fillTestLog('ALC out', ampl)
+            self.testController.fillTestLogSignal.emit('ALC out', str(ampl))
             return
 
     def fillTestLog(self, alcType, status):

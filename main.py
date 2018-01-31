@@ -1,7 +1,3 @@
-# RFBCheck
-# v0.1.24 20180130
-from PyQt5.QtCore import QWaitCondition
-
 from Forms.form import Ui_MainWindow
 from Tests.testController import *
 from Equip.applySetFile import *
@@ -13,6 +9,8 @@ from Tests.bitAlarm_test import *
 from PyQt5 import QtCore, QtWidgets, QtGui
 from PyQt5.QtWidgets import QTableWidgetItem, QAbstractItemView
 import threading
+
+version = '0.2.1 20180131'
 
 
 class TestTime(threading.Thread):
@@ -28,9 +26,8 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
     def __init__(self, form, parent=None):
         super(mainProgram, self).__init__(parent)
 
-        # self.useCorrection = True
-        # self.testLogDl = {}
-        # self.testLogUl = {}
+        self.testLogDl = {}
+        self.testLogUl = {}
 
         self.runTest = None
         self.listSettings = []
@@ -38,11 +35,14 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
         self.calibrSaToGen = {}
         self.calibrGenToSa = {}
 
+        self.to_DsaUlDl = {}  # results DSA test from DB
+
         self.myThread = None
         self.tt = None
 
         self.atrSettings = {}
         self.instr = None
+
         self.setupUi(form)
 
         self.TestPrBar.setValue(0)
@@ -257,6 +257,8 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
 
     def sendMsg(self, icon, msgTitle, msgText, typeQestions):
         # TODO: threading problem "QApplication: Object event filter cannot be in a different thread."
+        # print(QtCore.QThread.currentThread())
+        # print(self.myThread.currentThread)
         msg = QMessageBox()
         if icon == 'q':
             msg.setIcon(QMessageBox.Question)
@@ -275,6 +277,7 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
             msg.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
         elif typeQestions == 3:
             msg.setStandardButtons(QMessageBox.Ignore | QMessageBox.Retry | QMessageBox.Cancel)
+
         return msg.exec_()
 
     def getInstrAddr(self):
@@ -397,7 +400,7 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
                 self.myThread.resSignal.connect(self.tableResultAddItem, QtCore.Qt.QueuedConnection)
                 self.myThread.msgSignal.connect(self.sendMsg, QtCore.Qt.QueuedConnection)
                 self.myThread.dsaResSignal.connect(self.set_DSAtoSql, QtCore.Qt.QueuedConnection)
-                # self.myThread.fillTestLogSignal.connect(self.fillTestLog, QtCore.Qt.QueuedConnection)
+                self.myThread.fillTestLogSignal.connect(self.fillTestLog, QtCore.Qt.QueuedConnection)
                 self.myThread.progressBarSignal.connect(self.setProgressBar, QtCore.Qt.QueuedConnection)
 
                 self.myThread.started.connect(self.on_started)
@@ -412,16 +415,18 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
     # Signals procedures -------------------------------------------------------
     def on_started(self):
         self.testIsRun = True
-        self.tt = Thread(name='testTimer', target=TestTime, args=(self,))
-        self.tt.start()
-
-        # if self.myThread.testLogDl.get('SN') != self.rfbSN.text() or \
-        #         self.myThread.testLogUl.get('SN') != self.rfbSN.text():
-        #     self.clrLogBtnClick()
+        if self.testLogDl.get('SN') not in [self.rfbSN.text(), None]:
+            self.testLogDl = {}
+        if self.testLogUl.get('SN') not in [self.rfbSN.text(), None]:
+            self.testLogUl = {}
+        if self.testLogDl == {} and self.testLogUl == {}:
+            self.clrLogBtnClick()
         self.rfbTypeCombo.setEnabled(False)
         self.rfbSN.setEnabled(False)
         self.testsGroupBox.setEnabled(False)
         self.startTestBtn.setText('Stop')
+        self.tt = Thread(name='testTimer', target=TestTime, args=(self,))
+        self.tt.start()
 
     def on_finished(self):
         Journal(self)
@@ -441,7 +446,8 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
         self.TestPrBar.setValue(barCurr)
 
     def set_DSAtoSql(self, key, value):
-        self.to_DsaResult.update({key: value})
+        self.to_DsaUlDl.update({key: value})
+        # print(self.to_DsaUlDl)
 
     def tableResultAddItem(self, mesname, dlul, mesmin, mes, mesmax, status):
         numrows = self.tableResult.rowCount()
@@ -468,19 +474,22 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
         self.listLog.item(numrows - 1).setBackground(QtCore.Qt.white)
         self.listLog.scrollToBottom()
 
-    # def fillTestLog(self, whatConn, testKey, testVal):
-    #     if whatConn == 'Dl':
-    #         self.testLogDl.update({testKey: testVal})
-    #     elif whatConn == 'Ul':
-    #         self.testLogUl.update({testKey: testVal})
-    #     else:
-    #         self.sendMsg('w', 'Error...', 'Writing testLog Ul/Dl Fail', '1')
+    def fillTestLog(self, key, val):
+        if self.myThread.whatConn == 'Dl':
+            self.testLogDl.update({key: val})
+        elif self.myThread.whatConn == 'Ul':
+            self.testLogUl.update({key: val})
+        else:
+            self.sendLog('fillTestLog Error: ' + str(self.myThread.whatConn) + ' | ' + key + ' : ' + val, 0)
+        # print(self.testLogDl, self.testLogUl)
+
 
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
     form = QtWidgets.QMainWindow()
     prog = mainProgram(form)
     form.setWindowIcon(QtGui.QIcon("Img/ico32_pgn_icon.ico"))
+    form.setWindowTitle('RFBCheck ' + version)
     form.show()
     app.exec_()
     # sys.exit(app.exec_())

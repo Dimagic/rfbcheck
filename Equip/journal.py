@@ -18,49 +18,45 @@ class Journal():
     def cellHover(self, row, column):
         item = Journal.parent.tableJournal.item(row, column)
         QtWidgets.QToolTip.setFont(QtGui.QFont('SansSerif', 10))
-        #print(row,column)
+
         if column == 6:
-            q = "select dsa1 from dsa_results where rfb = (select id from test_results where sn = '%s' and dateTest = '%s' and band_type = '%s')" % (Journal.parent.tableJournal.item(row, 1).text(), Journal.parent.tableJournal.item(row, 2).text(),Journal.parent.tableJournal.item(row, 3).text())
+            q = "select dsa1 from dsa_results where rfb = (select id from test_results where sn = '%s' and " \
+                "dateTest = '%s' and band_type = '%s')" % (Journal.parent.tableJournal.item(row, 1).text(),
+                                                           Journal.parent.tableJournal.item(row, 2).text(),
+                                                           Journal.parent.tableJournal.item(row, 3).text())
         elif column == 7:
-            q = "select dsa2 from dsa_results where rfb = (select id from test_results where sn = '%s' and dateTest = '%s' and band_type = '%s')" % (Journal.parent.tableJournal.item(row, 1).text(), Journal.parent.tableJournal.item(row, 2).text(),Journal.parent.tableJournal.item(row, 3).text())
+            q = "select dsa2 from dsa_results where rfb = (select id from test_results where sn = '%s' and " \
+                "dateTest = '%s' and band_type = '%s')" % (Journal.parent.tableJournal.item(row, 1).text(),
+                                                           Journal.parent.tableJournal.item(row, 2).text(),
+                                                           Journal.parent.tableJournal.item(row, 3).text())
         elif column == 8:
-            q = "select dsa3 from dsa_results where rfb = (select id from test_results where sn = '%s' and dateTest = '%s' and band_type = '%s')" % (Journal.parent.tableJournal.item(row, 1).text(), Journal.parent.tableJournal.item(row, 2).text(),Journal.parent.tableJournal.item(row, 3).text())
+            q = "select dsa3 from dsa_results where rfb = (select id from test_results where sn = '%s' and " \
+                "dateTest = '%s' and band_type = '%s')" % (Journal.parent.tableJournal.item(row, 1).text(),
+                                                           Journal.parent.tableJournal.item(row, 2).text(),
+                                                           Journal.parent.tableJournal.item(row, 3).text())
         else:
             q = ''
 
         if q != '':
-            conn,cursor = Journal.parent.getConnDb()
+            conn, cursor = Journal.parent.getConnDb()
             rows = cursor.execute(q).fetchone()
             conn.close()
-            #print(rows)
-            #Journal.parent.tableJournal.setToolTip(item.text())
-            if rows != None:
-                dict =  ast.literal_eval(rows[0])
+            if rows is not None:
+                currDict = ast.literal_eval(rows[0])
                 toToolTip = ""
-
-                for k in sorted(dict.keys()):
+                for k in sorted(currDict.keys()):
                     tab = ""
                     for i in range(1,5 - len(str(k))):
                         tab += " "
-                    if k == sorted(dict.keys())[len(dict.keys()) - 1]:
-                        toToolTip = toToolTip + str(k) + tab + "=> " + str(dict.get(k))
+                    if k == sorted(currDict.keys())[len(currDict.keys()) - 1]:
+                        toToolTip = toToolTip + str(k) + tab + "=> " + str(currDict.get(k))
                     else:
-                        toToolTip = toToolTip + str(k) + tab + " => " + str(dict.get(k)) + "\n"
+                        toToolTip = toToolTip + str(k) + tab + " => " + str(currDict.get(k)) + "\n"
                 Journal.parent.tableJournal.setToolTip(toToolTip)
             else:
                 Journal.parent.tableJournal.setToolTip("Data not found")
         else:
             Journal.parent.tableJournal.setToolTip('')
-            #QtWidgets.QToolTip.showText(event.globalPos(), item.text(), self)
-##        Journal.parent.setToolTip(item.text())
-##        print(item.text())
-##        old_item = Journal.parent.tableJournal.item(self.current_hover[0], self.current_hover[1])
-##        if self.current_hover != [row,column]:
-##            old_item.setBackground(QBrush(QColor('white')))
-##            item.setBackground(QBrush(QColor('yellow')))
-##        self.current_hover = [row, column]
-
-
 
     def feelJournal(self):
         Journal.parent.tableJournal.setRowCount(0)
@@ -84,36 +80,18 @@ class Journal():
                 else:
                     toCell = row[j]
                 Journal.parent.tableJournal.setItem(numrows, j-1, QTableWidgetItem(str(toCell)))
-                if toCell == 'Pass': Journal.parent.tableJournal.item(numrows, j-1).setBackground(QtCore.Qt.green)
-                if toCell == 'Warning': Journal.parent.tableJournal.item(numrows, j-1).setBackground(QtCore.Qt.yellow)
-                if toCell == 'Fail': Journal.parent.tableJournal.item(numrows, j-1).setBackground(QtCore.Qt.red)
+                if toCell == 'Pass':
+                    Journal.parent.tableJournal.item(numrows, j-1).setBackground(QtCore.Qt.green)
+                if toCell == 'Warning':
+                    Journal.parent.tableJournal.item(numrows, j-1).setBackground(QtCore.Qt.yellow)
+                if toCell == 'Fail':
+                    Journal.parent.tableJournal.item(numrows, j-1).setBackground(QtCore.Qt.red)
                 if j == 5:
                     q = "select gain_dl_min, gain_dl_max, gain_ul_min, gain_ul_max from ATR where rfb_type = '%s'" % (row[1])
                     limits = cursor.execute(q).fetchall()[0]
                     if str(row[5]).isdigit() == True:
                         gain = toFloat(row[5])
-                        #print(row[4])
-##                        if row[4] == 'Dl':
-##                            if limits[0] <= gain <= limits[1]:
-##                                Journal.parent.tableJournal.item(numrows, j-1).setBackground(QtCore.Qt.green)
-##                            else:
-##                                Journal.parent.tableJournal.item(numrows, j-1).setBackground(QtCore.Qt.red)
-##                        if row[4] == 'Ul':
-##                            if limits[2] <= gain <= limits[3]:
-##                                Journal.parent.tableJournal.item(numrows, j-1).setBackground(QtCore.Qt.green)
-
-
-
-
-##                alcInIndex = headers.index("ALC In")
-##                print(alcInIndex)
-##                Journal.parent.tableJournal.setItem(numrows,alcInIndex , QTableWidgetItem(str(toCell)))
-##                if 100 <= int(toCell) <= 130: Journal.parent.tableJournal.item(numrows, alcInIndex).setBackground(QtCore.Qt.green)
-##                elif 85 <= int(toCell) <= 145: Journal.parent.tableJournal.item(numrows, alcInIndex).setBackground(QtCore.Qt.yellow)
-##                else:                     Journal.parent.tableJournal.item(numrows, alcInIndex).setBackground(QtCore.Qt.red)
                 j += 1
-
-
         conn.close()
 
 ##    def getSelectedRow(parent):

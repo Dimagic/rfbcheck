@@ -9,7 +9,7 @@ class FlatnessTest(QtCore.QThread):
         testController.logSignal.emit("***** Start Flatness test *****", 3)
 
         self.testController = testController
-        self.mainParent = testController.getParrent()
+        self.mainParent = testController.getParent()
         self.sa = testController.instr.sa
         self.gen = testController.instr.gen
         self.freqDl = mainParent.listSettings[1]
@@ -84,7 +84,7 @@ class FlatnessTest(QtCore.QThread):
             elif q == QMessageBox.Cancel:
                 self.testController.stopTestFlag = True
             self.testController.resSignal.emit('Flatness', self.testController.whatConn, '0', str(currFlat), str(flat), 0)
-        self.testController.fillTestLog('Flatness', str(currFlat))
+        self.testController.fillTestLogSignal.emit('Flatness', str(currFlat))
 
     def getFlatness(self, start, stop):
         self.testController.useCorrection = True
