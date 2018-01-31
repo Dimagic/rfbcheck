@@ -9,9 +9,7 @@ from Tests.bitAlarm_test import BitAlarmTest
 from Tests.alc_test import AlcTest
 from Equip.equip import *
 from Equip.instrument import *
-
 import Equip.commands as cmd
-from Tests.test import test
 
 
 class TestContoller(QtCore.QThread):
@@ -138,6 +136,11 @@ class TestContoller(QtCore.QThread):
                 self.currParent.portLbl.setText(str(self.ser.port))
                 self.logSignal.emit("Connected to port " + str(self.ser.port), 0)
                 self.haveConn = True
+
+                # self.connectMovie = QMovie('Img/connect2.gif')
+                # self.connectMovie.setScaledSize(QSize(30, 30))
+                # self.connectMovie.start()
+                # self.currParent.movie.setMovie(self.connectMovie)
         # except SerialException as e:
         #     self.logSignal.emit('Connection access problem: ' + str(e), 1)
         #     self.msgSignal.emit('c', 'Connection access problem', str(e), 1)

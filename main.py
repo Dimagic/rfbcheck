@@ -1,3 +1,6 @@
+from PyQt5.QtCore import QSize
+from PyQt5.QtGui import QMovie
+
 from Forms.form import Ui_MainWindow
 from Tests.testController import *
 from Equip.applySetFile import *
@@ -7,10 +10,10 @@ from Equip.editRFB import *
 from Equip.journal import *
 from Tests.bitAlarm_test import *
 from PyQt5 import QtCore, QtWidgets, QtGui
-from PyQt5.QtWidgets import QTableWidgetItem, QAbstractItemView
+from PyQt5.QtWidgets import QTableWidgetItem, QAbstractItemView, QLabel
 import threading
 
-version = '0.2.1 20180131'
+version = '0.2.2'
 
 
 class TestTime(threading.Thread):
@@ -25,6 +28,18 @@ class TestTime(threading.Thread):
 class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
     def __init__(self, form, parent=None):
         super(mainProgram, self).__init__(parent)
+
+        self.setupUi(form)
+
+        self.appIcon = QtGui.QIcon("Img/ico32_pgn_icon.ico")
+        self.passImg = QtGui.QPixmap('Img/pass.png')
+        self.failImg = QtGui.QPixmap('Img/fail.png')
+        self.warnImg = QtGui.QPixmap('Img/warning.png')
+
+        self.connectMovie = QMovie('Img/connect2.gif')
+        self.connectMovie.setScaledSize(QSize(30, 30))
+        self.connectMovie.start()
+        self.movie.setMovie(self.connectMovie)
 
         self.testLogDl = {}
         self.testLogUl = {}
@@ -42,8 +57,6 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
 
         self.atrSettings = {}
         self.instr = None
-
-        self.setupUi(form)
 
         self.TestPrBar.setValue(0)
         self.whatConn = None
@@ -120,7 +133,7 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
 
     def on_newRfbBtn_clicked(self):
         self.dialog = EditRFB(self, self)
-        self.dialog.setWindowIcon(QtGui.QIcon("Img/ico32_pgn_icon.ico"))
+        self.dialog.setWindowIcon(self.appIcon)
         self.dialog.show()
 
     def checkTestState(self, b):
@@ -270,7 +283,7 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
             msg.setIcon(QMessageBox.Critical)
         msg.setText(msgText)
         msg.setWindowTitle(msgTitle)
-        msg.setWindowIcon(QtGui.QIcon("Img/ico32_pgn_icon.ico"))
+        msg.setWindowIcon(self.appIcon)
         if typeQestions == 1:
             msg.setStandardButtons(QMessageBox.Ok)
         elif typeQestions == 2:
@@ -458,11 +471,11 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
         self.tableResult.setItem(numrows, 3, QTableWidgetItem(mes))
         self.tableResult.setItem(numrows, 4, QTableWidgetItem(mesmax))
         if status == 1:
-            icon = QtGui.QIcon(QtGui.QPixmap('Img/pass.png'))
+            icon = QtGui.QIcon(self.passImg)
         elif status == 0:
-            icon = QtGui.QIcon(QtGui.QPixmap('Img/fail.png'))
+            icon = QtGui.QIcon(self.failImg)
         else:
-            icon = QtGui.QIcon(QtGui.QPixmap('Img/warning.png'))
+            icon = QtGui.QIcon(self.warnImg)
         self.tableResult.setItem(numrows, 5, QTableWidgetItem(icon, ""))
         item = self.tableResult.item(numrows, 0)
         self.tableResult.scrollToItem(item, QAbstractItemView.PositionAtTop)
@@ -488,7 +501,7 @@ if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
     form = QtWidgets.QMainWindow()
     prog = mainProgram(form)
-    form.setWindowIcon(QtGui.QIcon("Img/ico32_pgn_icon.ico"))
+    form.setWindowIcon(prog.appIcon)
     form.setWindowTitle('RFBCheck ' + version)
     form.show()
     app.exec_()
