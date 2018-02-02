@@ -48,13 +48,10 @@ class GainTest(QtCore.QThread):
         if gainMin <= currentGain <= gainMax:
             self.testController.resSignal.emit('Gain', self.whatConn, str(gainMin), str(currentGain), str(gainMax), 1)
         else:
-            # q = self.mainParent.sendMsg('w', 'Warning', 'Gain test fail. Gain ' + self.whatConn + ' = ' + str(currentGain) + ' dBm', 3)
+            q = self.mainParent.sendMsg('w', 'Warning', 'Gain test fail. Gain ' + self.whatConn + ' = ' + str(currentGain) + ' dBm', 3)
 
             # q = self.testController.msgSignal.emit('w', 'Warning', 'Gain test fail. Gain ' + self.whatConn + ' = ' +
             #                              str(currentGain) + ' dBm', 3)
-
-            q = self.sendMsg('w', 'Warning', 'Gain test fail. Gain ' + self.whatConn + ' = ' + str(currentGain) + ' dBm', 3)
-            print(q)
             if q == QMessageBox.Retry:
                 self.gainTest(freq, gainMin, gainMax)
             elif q == QMessageBox.Ignore:
@@ -67,26 +64,26 @@ class GainTest(QtCore.QThread):
 
         self.testController.fillTestLogSignal.emit('Gain', str(currentGain))
 
-    def sendMsg(self, icon, msgTitle, msgText, typeQuestion):
-        msg = QMessageBox()
-        if icon == 'q':
-            msg.setIcon(msg.Question)
-        elif icon == 'i':
-            msg.setIcon(msg.Information)
-        elif icon == 'w':
-            msg.setIcon(msg.Warning)
-        elif icon == 'c':
-            msg.setIcon(msg.Critical)
-        msg.setText(msgText)
-        msg.setWindowTitle(msgTitle)
-        msg.setWindowIcon(QtGui.QIcon("Img/ico32_pgn_icon.ico"))
-        if typeQuestion == 1:
-            msg.setStandardButtons(msg.Ok)
-        elif typeQuestion == 2:
-            msg.setStandardButtons(msg.Ok | msg.Cancel)
-        elif typeQuestion == 3:
-            msg.setStandardButtons(msg.Ignore | msg.Retry | msg.Cancel)
-            msg.setStandardButton(msg.Cancel)
-        return msg.exec_()
+    # def sendMsg(self, icon, msgTitle, msgText, typeQuestion):
+    #     msg = QMessageBox()
+    #     if icon == 'q':
+    #         msg.setIcon(msg.Question)
+    #     elif icon == 'i':
+    #         msg.setIcon(msg.Information)
+    #     elif icon == 'w':
+    #         msg.setIcon(msg.Warning)
+    #     elif icon == 'c':
+    #         msg.setIcon(msg.Critical)
+    #     msg.setText(msgText)
+    #     msg.setWindowTitle(msgTitle)
+    #     msg.setWindowIcon(QtGui.QIcon("Img/ico32_pgn_icon.ico"))
+    #     if typeQuestion == 1:
+    #         msg.setStandardButtons(msg.Ok)
+    #     elif typeQuestion == 2:
+    #         msg.setStandardButtons(msg.Ok | msg.Cancel)
+    #     elif typeQuestion == 3:
+    #         msg.setStandardButtons(msg.Ignore | msg.Retry | msg.Cancel)
+    #         msg.setStandardButton(msg.Cancel)
+    #     return msg.exec_()
 
 

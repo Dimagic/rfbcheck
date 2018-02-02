@@ -13,7 +13,7 @@ from PyQt5 import QtCore, QtWidgets, QtGui
 from PyQt5.QtWidgets import QTableWidgetItem, QAbstractItemView, QLabel
 import threading
 
-version = '0.2.2'
+version = '0.2.3'
 
 
 class TestTime(threading.Thread):
@@ -35,11 +35,7 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
         self.passImg = QtGui.QPixmap('Img/pass.png')
         self.failImg = QtGui.QPixmap('Img/fail.png')
         self.warnImg = QtGui.QPixmap('Img/warning.png')
-
         self.connectMovie = QMovie('Img/connect2.gif')
-        self.connectMovie.setScaledSize(QSize(30, 30))
-        self.connectMovie.start()
-        self.movie.setMovie(self.connectMovie)
 
         self.testLogDl = {}
         self.testLogUl = {}
@@ -415,6 +411,7 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
                 self.myThread.dsaResSignal.connect(self.set_DSAtoSql, QtCore.Qt.QueuedConnection)
                 self.myThread.fillTestLogSignal.connect(self.fillTestLog, QtCore.Qt.QueuedConnection)
                 self.myThread.progressBarSignal.connect(self.setProgressBar, QtCore.Qt.QueuedConnection)
+                self.myThread.progressBarSignal.connect(self.setComMovie, QtCore.Qt.QueuedConnection)
 
                 self.myThread.started.connect(self.on_started)
                 self.myThread.finished.connect(self.on_finished)
@@ -494,7 +491,19 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
             self.testLogUl.update({key: val})
         else:
             self.sendLog('fillTestLog Error: ' + str(self.myThread.whatConn) + ' | ' + key + ' : ' + val, 0)
-        # print(self.testLogDl, self.testLogUl)
+
+    def setComMovie(self, port, baud):
+        print(port, baud)
+        if port != '' and baud != '':
+            self.baudLbl.setText(str(baud))
+            self.portLbl.setText(str(port))
+            self.connectMovie.setScaledSize(QSize(30, 30))
+            self.movie.setMovie(self.connectMovie)
+            self.connectMovie.start()
+        else:
+            self.baudLbl.setText('')
+            self.portLbl.setText('')
+            self.movie.setMovie(None)
 
 
 if __name__ == '__main__':

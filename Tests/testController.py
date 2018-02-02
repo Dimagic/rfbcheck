@@ -1,5 +1,8 @@
 import serial
 from PyQt5 import QtCore, QtGui
+from PyQt5.QtCore import QSize
+from PyQt5.QtGui import QMovie
+
 from Equip.writeTestResult import WriteResult
 from Tests.gain_test import GainTest
 from Tests.flatness_test import FlatnessTest
@@ -20,14 +23,13 @@ class TestContoller(QtCore.QThread):
     dsaResSignal = QtCore.pyqtSignal(str, dict)
     progressBarSignal = QtCore.pyqtSignal(str, float, float)
     fillTestLogSignal = QtCore.pyqtSignal(str, str)
+    comMovieSignal = QtCore.pyqtSignal(str, str)
 
     def __init__(self, currParent, parent=None):
         QtCore.QThread.__init__(self, parent)
 
         self.currentThread = QtCore.QThread.currentThread()
         self.controller = self
-        # print(self.currentThread)
-        # print(self.controller)
         self.currParent = currParent  # main program
         self.testArr = []  # checked tests
         self.ser = None  # Com port connection
@@ -37,6 +39,12 @@ class TestContoller(QtCore.QThread):
         self.stopTestFlag = False
         self.haveConn = False
         self.useCorrection = False
+
+        # self.connectMovie = QMovie('Img/connect2.gif')
+        # self.connectMovie.setScaledSize(QSize(30, 30))
+        # self.connectMovie.start()
+        # self.currParent.movie.setMovie(self.connectMovie)
+
         # TODO: move testLog to main or db. main better i think
         # try:
         #     self.testLogDl.get('SN')
@@ -69,8 +77,6 @@ class TestContoller(QtCore.QThread):
         self.runTests()
 
         self.ser.close()
-        self.currParent.baudLbl.setText('')
-        self.currParent.portLbl.setText('')
         self.instr.gen.write(":OUTP:STAT OFF")
         self.currParent.startTestBtn.setText("Start")
         self.writeResults()
@@ -124,34 +130,29 @@ class TestContoller(QtCore.QThread):
     def getComConn(self):
         baud = 57600
         port = "COM1"
+        self.currParent.movie.setMovie(None)
         try:
             self.ser = serial.Serial(port, baud, timeout=0.5)
             if self.ser.isOpen():
                 self.ser.write(binascii.unhexlify('AAAA543022556677403D01'))
                 rx = binascii.hexlify(self.ser.readline())
                 band = int(rx[26:34], 16) / 1000
-                # return self.ser
-                # TODO: fil label port and baud
-                self.currParent.baudLbl.setText(str(self.ser.baudrate))
-                self.currParent.portLbl.setText(str(self.ser.port))
+                self.comMovieSignal.emit(str(self.ser.port), str(self.ser.baudrate))
                 self.logSignal.emit("Connected to port " + str(self.ser.port), 0)
                 self.haveConn = True
-
-                # self.connectMovie = QMovie('Img/connect2.gif')
-                # self.connectMovie.setScaledSize(QSize(30, 30))
-                # self.connectMovie.start()
-                # self.currParent.movie.setMovie(self.connectMovie)
-        # except SerialException as e:
-        #     self.logSignal.emit('Connection access problem: ' + str(e), 1)
-        #     self.msgSignal.emit('c', 'Connection access problem', str(e), 1)
         except Exception as e:
             self.haveConn = False
             self.logSignal.emit('Connection problem: ' + str(e), 1)
-            # self.currParent.sendMsg('c', 'Connection problem 3', str(e), 1)
+            self.comMovieSignal.emit('', '')
             self.msgSignal.emit('c', 'Connection problem 3', str(e), 1)
             if self.ser is not None:
                 if self.ser.isOpen():
                     self.ser.close()
+        # finally:
+        #     if self.haveConn:
+        #         self.currParent.movie.setVisible(True)
+        #     else:
+        #         self.currParent.movie.setVisible(False)
 
     def getParent(self):
         return self.currParent
