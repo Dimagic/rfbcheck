@@ -93,6 +93,7 @@ def toFloat(n):
 def getAvgGain(parent):
     testController = parent
     parent = testController.getParent()
+    # testController.instr.sa.write("TRAC1:MODE MAXH")
     testController.instr.sa.write("CALC:MARK:CPS 1")
     gain = float(testController.instr.gen.query("POW:AMPL?"))
     if gain > -20:
@@ -108,6 +109,8 @@ def getAvgGain(parent):
     gainArr = []
     for n in range(1, 11, 1):
         gainArr.append(float(testController.instr.sa.query("CALC:MARK:Y?")))
+
+    # testController.instr.sa.write("TRAC1:MODE WRIT")
     if testController.useCorrection:
         return sum(gainArr) / len(gainArr) - saToGen - genToSa
     else:

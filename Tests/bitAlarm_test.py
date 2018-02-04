@@ -54,16 +54,16 @@ class BitAlarmTest(QtCore.QThread):
 
         if not gain and wasAlarm:
             self.testController.logSignal.emit('BIT alarm PASS', 1)
-            self.testController.resSignal.emit('BIT', self.parent.whatConn, '', 'Pass', '', 1)
+            self.testController.resSignal.emit('BIT', self.testController.whatConn, '', 'Pass', '', 1)
             status = 'Pass'
         else:
             q = self.parent.sendMsg('w', 'Warning', 'BIT alarm test fail', 3)
             if q == QMessageBox.Retry:
                 self.test()
             elif q == QMessageBox.Cancel:
-                self.parent.stopTestFlag = True
+                self.testController.stopTestFlag = True
             self.testController.logSignal.emit('BIT alarm FAIL', 2)
-            self.testController.resSignal.emit('BIT', self.parent.whatConn, '', 'Fail', '', 0)
+            self.testController.resSignal.emit('BIT', self.testController.whatConn, '', 'Fail', '', 0)
             status = 'Fail'
         self.testController.fillTestLogSignal.emit('BIT', status)
 

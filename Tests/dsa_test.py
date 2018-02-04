@@ -17,9 +17,6 @@ class DsaTest(QtCore.QThread):
         self.ser = testController.ser
         self.to_DsaResult = {}
 
-        # if self.parent.stopTestFlag:
-        #     return
-
         if self.whatConn == 'Dl':
             self.freq = self.listSettings[1]
         else:
@@ -139,7 +136,8 @@ class DsaTest(QtCore.QThread):
             self.testController.fillTestLogSignal.emit(dsaName, 'Warning')
 
         else:
-            q = self.testController.msgSignal.emit('w', 'Warning', '%s test fail' % dsaName, 3)
+            # q = self.testController.msgSignal.emit('w', 'Warning', '%s test fail' % dsaName, 3)
+            q = self.parent.sendMsg('w', 'Warning', '%s test fail' % dsaName, 3)
             if q == QMessageBox.Retry:
                 self.dsaTest(self.ser, cmd, self.whatConn, listSet, self, dsaType)
                 return

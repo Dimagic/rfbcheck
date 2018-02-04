@@ -13,7 +13,7 @@ from PyQt5 import QtCore, QtWidgets, QtGui
 from PyQt5.QtWidgets import QTableWidgetItem, QAbstractItemView, QLabel
 import threading
 
-version = '0.2.3'
+version = '0.2.4'
 
 
 class TestTime(threading.Thread):
@@ -58,7 +58,6 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
         self.whatConn = None
         self.band = None
 
-        self.stopTestFlag = False
         self.testIsRun = False
 
         self.col = ['RFB type', 'DL c.freq', 'UL c.freq', 'DL IM pow', 'UL IM pow', 'DL DSA1', 'DL DSA2', 'DL DSA3',
@@ -266,8 +265,6 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
 
     def sendMsg(self, icon, msgTitle, msgText, typeQestions):
         # TODO: threading problem "QApplication: Object event filter cannot be in a different thread."
-        # print(QtCore.QThread.currentThread())
-        # print(self.myThread.currentThread)
         msg = QMessageBox()
         if icon == 'q':
             msg.setIcon(QMessageBox.Question)
@@ -402,7 +399,7 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
             self.sendMsg('w', 'Warning', 'Need to do the calibration', 1)
             return
         if self.checkRecordInDb():
-            if self.startTestBtn.text() == "Start":
+            if not self.testIsRun:
                 self.isItCalibr = False
                 self.myThread = TestContoller(self)
                 self.myThread.logSignal.connect(self.sendLog, QtCore.Qt.QueuedConnection)
@@ -411,18 +408,19 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
                 self.myThread.dsaResSignal.connect(self.set_DSAtoSql, QtCore.Qt.QueuedConnection)
                 self.myThread.fillTestLogSignal.connect(self.fillTestLog, QtCore.Qt.QueuedConnection)
                 self.myThread.progressBarSignal.connect(self.setProgressBar, QtCore.Qt.QueuedConnection)
-                self.myThread.progressBarSignal.connect(self.setComMovie, QtCore.Qt.QueuedConnection)
+                self.myThread.comMovieSignal.connect(self.setComMovie, QtCore.Qt.QueuedConnection)
 
                 self.myThread.started.connect(self.on_started)
                 self.myThread.finished.connect(self.on_finished)
                 self.myThread.start()
-            elif self.startTestBtn.text() == "Stop":
-                if self.sendMsg('i', 'Stop test', 'Are you sure?', 2) == QMessageBox.Ok:
-                    self.myThread.stopTestFlag = True
             else:
-                self.sendMsg('c', 'Error', 'Starting thread is fail', 1)
+                q = self.sendMsg('i', 'Stop test', 'Are you sure?', 2)
+                if q == QMessageBox.Ok:
+                    self.myThread.stopTestFlag = True
+                    while self.myThread.isRunning():
+                        self.setProgressBar('Canceling', 0, 0)
+                    self.setProgressBar('Canceled', 100, 100)
 
-    # Signals procedures -------------------------------------------------------
     def on_started(self):
         self.testIsRun = True
         if self.testLogDl.get('SN') not in [self.rfbSN.text(), None]:
@@ -493,17 +491,17 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
             self.sendLog('fillTestLog Error: ' + str(self.myThread.whatConn) + ' | ' + key + ' : ' + val, 0)
 
     def setComMovie(self, port, baud):
-        print(port, baud)
         if port != '' and baud != '':
             self.baudLbl.setText(str(baud))
             self.portLbl.setText(str(port))
             self.connectMovie.setScaledSize(QSize(30, 30))
             self.movie.setMovie(self.connectMovie)
             self.connectMovie.start()
+            self.movie.setVisible(True)
         else:
             self.baudLbl.setText('')
             self.portLbl.setText('')
-            self.movie.setMovie(None)
+            self.movie.setVisible(False)
 
 
 if __name__ == '__main__':

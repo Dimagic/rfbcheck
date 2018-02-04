@@ -2,6 +2,7 @@ import serial
 from PyQt5 import QtCore, QtGui
 from PyQt5.QtCore import QSize
 from PyQt5.QtGui import QMovie
+from PyQt5.QtWidgets import QMessageBox
 
 from Equip.writeTestResult import WriteResult
 from Tests.gain_test import GainTest
@@ -58,7 +59,6 @@ class TestContoller(QtCore.QThread):
     def run(self):
         # TODO: com port and instrument initialisation problem
         if len(self.testArr) is 0:
-            print(QtCore.QThread.children(self))
             # self.sendMsg('w', "Warning", "You have to choice minimum one test", 1)
             self.msgSignal.emit('w', "Warning", "You have to choice minimum one test", 1)
             return
@@ -72,13 +72,14 @@ class TestContoller(QtCore.QThread):
             return
         self.logSignal.emit('START TEST', 0)
         self.instr.gen.write(":OUTP:STAT ON")
-        self.currParent.stopTestFlag = False
+        self.stopTestFlag = False
 
         self.runTests()
 
         self.ser.close()
+        self.comMovieSignal.emit('', '')
         self.instr.gen.write(":OUTP:STAT OFF")
-        self.currParent.startTestBtn.setText("Start")
+        self.instr.sa.write("CALC:MARK:CPS 0")
         self.writeResults()
 
     def runTests(self):
@@ -204,6 +205,7 @@ class TestContoller(QtCore.QThread):
             self.logSignal.emit("No signal", 2)
             self.whatConn = None
             self.ser.close()
+            self.comMovieSignal.emit('', '')
             return
         self.instr.gen.write(":OUTP:STAT OFF")
         time.sleep(1)
@@ -225,3 +227,5 @@ class TestContoller(QtCore.QThread):
             if dlMustToBe == dlPresent and ulMustToBe == ulPresent:
                 WriteResult(self, self.currParent.testLogDl, self.currParent.testLogUl)
                 self.msgSignal.emit('i', 'RFBcheck', 'Test complete', 1)
+
+

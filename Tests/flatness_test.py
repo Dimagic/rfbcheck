@@ -20,12 +20,14 @@ class FlatnessTest(QtCore.QThread):
         self.ser = testController.ser
         self.gainDict = {}
 
+        testController.instr.sa.write("TRAC1:MODE MAXH")
         if testController.whatConn == "Dl":
             self.flatnessTest(self.listSettings[1], self.atrSettings.get('flat_dl_max'))
         elif testController.whatConn == "Ul":
             self.flatnessTest(self.listSettings[2], self.atrSettings.get('flat_ul_max'))
         else:
             self.testController.msgSignal.emit("w", "Warning", "Flatness_test Dl/Ul", 1)
+        testController.instr.sa.write("TRAC1:MODE WRIT")
 
     def flatnessTest(self, freq, flat):
         rfBands = {'band_dl_1': self.atrSettings.get('freq_band_dl_1'),
@@ -67,6 +69,7 @@ class FlatnessTest(QtCore.QThread):
             if maxGain < self.gainDict.get(i):
                 maxGain = round(self.gainDict.get(i), 2)
                 maxFreq = i
+
         genPow = float(self.gen.query("POW:AMPL?"))
         self.testController.logSignal.emit("MIN = " + str(genPow - minGain) + " dBm on freq = " + str(minFreq) + " MHz",
                                            0)
@@ -79,6 +82,7 @@ class FlatnessTest(QtCore.QThread):
         else:
             q = self.mainParent.sendMsg('w', 'Warning', 'Flatness test fail: ' + str(currFlat) + ' dB', 3)
             if q == QMessageBox.Retry:
+                self.testController.instr.sa.write("TRAC1:CLE:ALL")
                 self.flatnessTest(freq, flat)
                 return
             elif q == QMessageBox.Cancel:
@@ -88,6 +92,9 @@ class FlatnessTest(QtCore.QThread):
 
     def getFlatness(self, start, stop):
         self.testController.useCorrection = True
+        self.sa.write("CALC:MARK:CPS 0")
+        self.sa.write("CALC:MARK1:X " + str(start) + " MHz")
+        self.sa.write("CALC:MARK1:STAT 1")
         self.sa.write(":SENSE:FREQ:center " + str(start + (stop - start) / 2) + " MHz")
         # refLvl = float(self.sa.query("DISP:WIND:TRAC:Y:RLEV:OFFS?"))
         band = int(stop - start)
@@ -97,15 +104,19 @@ class FlatnessTest(QtCore.QThread):
         self.sa.write(":SENSE:FREQ:span " + str(band + 5) + " MHz")
         self.gen.write(":FREQ:FIX " + str(start) + " MHz")
         time.sleep(1)
-        # currentGain = getAvgGain(self.testController)
         rangeGain = np.arange(start, stop + 0.5, 0.5)
-        # minGain = maxGain = round(currentGain, 2)
-        # minFreq = maxFreq = rangeGain[0]
         for j, i in enumerate(rangeGain):
             if self.testController.stopTestFlag:
                 return
             self.testController.progressBarSignal.emit('Flatness', len(rangeGain) - 1, j)
             self.gen.write(":FREQ:FIX " + str(i) + " MHz")
-            currentGain = getAvgGain(self.testController)
-            # self.testController.logSignal.emit("Freq: "+str(i)+" Gain: " +str(currentGain)[:5]+" dB",0)
+            time.sleep(.2)
+            self.sa.write("CALC:MARK1:X " + str(i) + " MHz")
+            saToGen = self.mainParent.calibrSaToGen.get(i)
+            genToSa = self.mainParent.calibrGenToSa.get(i)
+            # currentGain = getAvgGain(self.testController)
+            currentGain = float(self.sa.query("CALC:MARK1:Y?")) - saToGen - genToSa
             self.gainDict.update({i: currentGain})
+
+        self.sa.write("CALC:MARK1:STAT 0")
+        self.sa.write("CALC:MARK:CPS 1")

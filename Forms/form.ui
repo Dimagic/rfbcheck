@@ -65,7 +65,7 @@
         <x>199</x>
         <y>350</y>
         <width>601</width>
-        <height>181</height>
+        <height>211</height>
        </rect>
       </property>
       <property name="title">
@@ -77,7 +77,7 @@
          <x>10</x>
          <y>20</y>
          <width>581</width>
-         <height>151</height>
+         <height>181</height>
         </rect>
        </property>
        <property name="autoFillBackground">
@@ -127,7 +127,7 @@
      <widget class="QPushButton" name="clrLogBtn">
       <property name="geometry">
        <rect>
-        <x>710</x>
+        <x>720</x>
         <y>570</y>
         <width>81</width>
         <height>28</height>
@@ -154,7 +154,7 @@
       <property name="geometry">
        <rect>
         <x>90</x>
-        <y>500</y>
+        <y>520</y>
         <width>101</width>
         <height>31</height>
        </rect>
@@ -167,7 +167,7 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>350</y>
+        <y>380</y>
         <width>191</width>
         <height>131</height>
        </rect>
@@ -303,7 +303,7 @@
         <x>10</x>
         <y>80</y>
         <width>181</width>
-        <height>271</height>
+        <height>301</height>
        </rect>
       </property>
       <property name="maximumSize">
@@ -467,7 +467,7 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>490</y>
+        <y>510</y>
         <width>81</width>
         <height>41</height>
        </rect>
@@ -500,9 +500,9 @@
       <property name="geometry">
        <rect>
         <x>210</x>
-        <y>540</y>
+        <y>560</y>
         <width>201</width>
-        <height>61</height>
+        <height>51</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout">
@@ -526,8 +526,8 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>530</y>
-        <width>161</width>
+        <y>550</y>
+        <width>191</width>
         <height>61</height>
        </rect>
       </property>
@@ -539,7 +539,7 @@
         <rect>
          <x>10</x>
          <y>20</y>
-         <width>138</width>
+         <width>171</width>
          <height>34</height>
         </rect>
        </property>
@@ -558,11 +558,15 @@
           </property>
          </widget>
         </item>
+        <item row="0" column="2" rowspan="2">
+         <widget class="QLabel" name="movie">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
         <item row="0" column="1">
          <widget class="QLabel" name="portLbl">
-          <property name="enabled">
-           <bool>true</bool>
-          </property>
           <property name="text">
            <string>port</string>
           </property>
@@ -575,69 +579,66 @@
           </property>
          </widget>
         </item>
-        <item row="0" column="2" rowspan="2">
-         <widget class="QLabel" name="movie">
-          <property name="text">
-           <string/>
-          </property>
-         </widget>
-        </item>
        </layout>
       </widget>
      </widget>
-     <widget class="QWidget" name="">
+     <widget class="QLabel" name="label3_2">
       <property name="geometry">
        <rect>
-        <x>420</x>
-        <y>540</y>
-        <width>89</width>
-        <height>38</height>
+        <x>422</x>
+        <y>570</y>
+        <width>55</width>
+        <height>16</height>
        </rect>
       </property>
-      <layout class="QGridLayout" name="gridLayout_3">
-       <item row="0" column="0">
-        <layout class="QHBoxLayout" name="horizontalLayout_2">
-         <item>
-          <widget class="QLabel" name="label3_2">
-           <property name="text">
-            <string>Calibration:</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="calibrLbl">
-           <property name="text">
-            <string>none</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item row="1" column="0">
-        <layout class="QHBoxLayout" name="horizontalLayout">
-         <item>
-          <widget class="QLabel" name="label4">
-           <property name="text">
-            <string>Date:</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="dateCalibrLbl">
-           <property name="text">
-            <string>none</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-      </layout>
+      <property name="text">
+       <string>Calibration:</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+      </property>
+     </widget>
+     <widget class="QLabel" name="calibrLbl">
+      <property name="geometry">
+       <rect>
+        <x>483</x>
+        <y>570</y>
+        <width>24</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>none</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label4">
+      <property name="geometry">
+       <rect>
+        <x>422</x>
+        <y>591</y>
+        <width>27</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Date:</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+      </property>
+     </widget>
+     <widget class="QLabel" name="dateCalibrLbl">
+      <property name="geometry">
+       <rect>
+        <x>455</x>
+        <y>591</y>
+        <width>51</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>none</string>
+      </property>
      </widget>
     </widget>
     <widget class="QWidget" name="tabJournal">
@@ -650,7 +651,7 @@
         <x>10</x>
         <y>40</y>
         <width>801</width>
-        <height>411</height>
+        <height>511</height>
        </rect>
       </property>
       <property name="cursor" stdset="0">
@@ -792,7 +793,7 @@
       <property name="geometry">
        <rect>
         <x>230</x>
-        <y>470</y>
+        <y>580</y>
         <width>91</width>
         <height>21</height>
        </rect>
@@ -866,7 +867,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>490</y>
+        <y>600</y>
         <width>51</width>
         <height>17</height>
        </rect>
@@ -882,7 +883,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>470</y>
+        <y>580</y>
         <width>61</width>
         <height>17</height>
        </rect>
@@ -898,7 +899,7 @@
       <property name="geometry">
        <rect>
         <x>80</x>
-        <y>470</y>
+        <y>580</y>
         <width>131</width>
         <height>22</height>
        </rect>
@@ -908,7 +909,7 @@
       <property name="geometry">
        <rect>
         <x>80</x>
-        <y>450</y>
+        <y>560</y>
         <width>81</width>
         <height>16</height>
        </rect>
@@ -921,7 +922,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>450</y>
+        <y>560</y>
         <width>81</width>
         <height>16</height>
        </rect>
@@ -1277,19 +1278,6 @@
         </item>
        </layout>
       </widget>
-      <widget class="QCheckBox" name="useThread">
-       <property name="geometry">
-        <rect>
-         <x>130</x>
-         <y>20</y>
-         <width>81</width>
-         <height>17</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Use thread</string>
-       </property>
-      </widget>
      </widget>
      <widget class="QGroupBox" name="groupBox_11">
       <property name="geometry">
@@ -1518,10 +1506,6 @@
      </widget>
     </widget>
    </widget>
-   <zorder>mainTabWidget</zorder>
-   <zorder>TestPrBar</zorder>
-   <zorder>currTestLbl</zorder>
-   <zorder>ConnectionBox</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
@@ -1536,8 +1520,8 @@
     <property name="title">
      <string>File</string>
     </property>
-    <addaction name="action1"/>
-    <addaction name="action2"/>
+    <addaction name="menuChangeUser"/>
+    <addaction name="menuExit"/>
    </widget>
    <widget class="QMenu" name="menuEdit">
     <property name="title">
@@ -1548,14 +1532,20 @@
    <addaction name="menuEdit"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
-  <action name="action1">
+  <action name="menuChangeUser">
    <property name="text">
-    <string>1</string>
+    <string>Change user</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::NoRole</enum>
    </property>
   </action>
-  <action name="action2">
+  <action name="menuExit">
    <property name="text">
-    <string>2</string>
+    <string>Exit</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::QuitRole</enum>
    </property>
   </action>
  </widget>
@@ -1593,7 +1583,6 @@
   <tabstop>naAtten</tabstop>
   <tabstop>testSetDsaFull</tabstop>
   <tabstop>testSetDsaShort</tabstop>
-  <tabstop>useThread</tabstop>
   <tabstop>calibrationBtn</tabstop>
   <tabstop>clearCalBtn</tabstop>
   <tabstop>calAllBands</tabstop>

@@ -9,7 +9,7 @@ class AlcTest(QtCore.QThread):
     def __init__(self, testController, mainParent, parent=None):
         super(AlcTest, self).__init__(parent)
 
-        if mainParent.stopTestFlag:
+        if testController.stopTestFlag:
             return
 
         self.testController = testController
@@ -87,11 +87,11 @@ class AlcTest(QtCore.QThread):
                 self.alcInTest(self, conn, alc, whatConn, shift)
             elif q == QMessageBox.Cancel:
                 setAlc(conn, alc, 255, shift)
-                self.parent.stopTestFlag = True
+                self.testController.stopTestFlag = True
             elif q == QMessageBox.Ignore:
                 setAlc(conn, alc, 255, shift)
             self.testController.logSignal.emit('ALC ' + whatConn + ' IN: FAIL', 2)
-            self.testController.resSignal.emit('ALC test', self.parent.whatConn, str(self.alcInMin), 'fail',
+            self.testController.resSignal.emit('ALC test', self.testController.whatConn, str(self.alcInMin), 'fail',
                                                str(self.alcInMax), 0)
             self.testController.fillTestLogSignal.emit(self.parent, 'ALC in', 'Fail')
             return
@@ -111,15 +111,15 @@ class AlcTest(QtCore.QThread):
                     'ALC ' + whatConn + ' IN (-' + str(i) + '): ' + str(minKey) + ' <-- ' + str(minVal)[:6] + ' dBm', 1)
                 if i == 15:
                     if 100 <= minKey <= 130:
-                        self.testController.resSignal.emit('ALC IN', self.parent.whatConn, str(self.alcInMin),
+                        self.testController.resSignal.emit('ALC IN', self.testController.whatConn, str(self.alcInMin),
                                                            str(round(minVal, 1)) + ' ( in = ' + str(minKey) + ' )',
                                                            str(self.alcInMax), 1)
                     elif 85 <= minKey <= 145:
-                        self.testController.resSignal.emit('ALC IN', self.parent.whatConn, str(self.alcInMin),
+                        self.testController.resSignal.emit('ALC IN', self.testController.whatConn, str(self.alcInMin),
                                                            str(round(minVal, 1)) + ' ( in = ' + str(minKey) + ' )',
                                                            str(self.alcInMax), 2)
                     else:
-                        self.testController.resSignal.emit('ALC IN', self.parent.whatConn, str(self.alcInMin),
+                        self.testController.resSignal.emit('ALC IN', self.testController.whatConn, str(self.alcInMin),
                                                            str(round(minVal, 1)) + ' ( in = ' + str(minKey) + ' )',
                                                            str(self.alcInMax), 0)
                     self.testController.fillTestLogSignal.emit('ALC in', str(minKey))
@@ -134,7 +134,7 @@ class AlcTest(QtCore.QThread):
         setAlc(conn, alc, 255, shift)
         if ampl <= self.alcOutMin:
             self.testController.logSignal.emit('ALC ' + whatConn + ' OUT: PASS ' + str(ampl) + ' dBm', 1)
-            self.testController.resSignal.emit('ALC OUT', self.parent.whatConn, str(self.alcOutMin), str(ampl),
+            self.testController.resSignal.emit('ALC OUT', self.testController.whatConn, str(self.alcOutMin), str(ampl),
                                                str(self.alcOutMax), 1)
             self.testController.fillTestLogSignal.emit('ALC out', str(ampl))
         else:
@@ -144,11 +144,11 @@ class AlcTest(QtCore.QThread):
                 self.alcOutTest(self.parent, conn, alc, whatConn, shift)
                 return
             elif q == QMessageBox.Cancel:
-                self.parent.stopTestFlag = True
+                self.testController.stopTestFlag = True
                 setAlc(conn, alc, 255, shift)
             elif q == QMessageBox.Ignore:
                 setAlc(conn, alc, 255, shift)
-            self.testController.resSignal.emit('ALC OUT', self.parent.whatConn, str(self.alcOutMin),
+            self.testController.resSignal.emit('ALC OUT', self.testController.whatConn, str(self.alcOutMin),
                                                              str(ampl), str(self.alcOutMax), 0)
             self.testController.fillTestLogSignal.emit('ALC out', str(ampl))
             return

@@ -7,8 +7,9 @@ from PyQt5 import QtCore
 class IModTest(QtCore.QThread):
     def __init__(self, testController, parent=None):
         super(IModTest, self).__init__(parent)
+        if testController.stopTestFlag:
+            return
         testController.logSignal.emit("***** Start IMod test *****", 3)
-
         self.testController = testController
         self.mainParent = testController.getParent()
         self.sa = testController.instr.sa
@@ -81,7 +82,7 @@ class IModTest(QtCore.QThread):
                 self.mToneTest(freq, genPow)
                 return
             elif q == QMessageBox.Cancel:
-                self.parent.stopTestFlag = True
+                self.testController.stopTestFlag = True
             self.testController.resSignal.emit('Intermodulation', self.testController.whatConn, '', 'Fail', '', 0)
             self.testController.fillTestLogSignal.emit('IMod', 'Fail')
 
