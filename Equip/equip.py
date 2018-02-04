@@ -92,7 +92,10 @@ def toFloat(n):
 
 def getAvgGain(parent):
     testController = parent
-    parent = testController.getParent()
+    try:
+        parent = testController.getParent()
+    except:
+        parent = testController
     # testController.instr.sa.write("TRAC1:MODE MAXH")
     testController.instr.sa.write("CALC:MARK:CPS 1")
     gain = float(testController.instr.gen.query("POW:AMPL?"))
