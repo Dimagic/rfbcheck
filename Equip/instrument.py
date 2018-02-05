@@ -1,6 +1,7 @@
 import visa
 import time
 
+
 class Instrument:
     def __init__(self, freq, parent):
         self.parent = parent
@@ -16,14 +17,14 @@ class Instrument:
             self.initGenerator(freq)
             self.initNetwork(freq)
 
-    def sendQerySa(self, q):
-        return self.sa.query(q)
-
-    def sendQeryGen(self, q):
-        return self.gen.query(q)
-
-    def sendQeryNa(self, q):
-        return self.na.query(q)
+    # def sendQerySa(self, q):
+    #     return self.sa.query(q)
+    #
+    # def sendQeryGen(self, q):
+    #     return self.gen.query(q)
+    #
+    # def sendQeryNa(self, q):
+    #     return self.na.query(q)
 
     def initAnalyser(self, freq):
         try:
@@ -32,7 +33,7 @@ class Instrument:
             self.sa.write(":SYST:PRES")
             self.sa.write(":SENSE:FREQ:center " + str(freq) + " MHz")
             self.sa.write(":SENSE:FREQ:span 3 MHz")
-            self.sa.write("DISP:WIND:TRAC:Y:RLEV:OFFS 30")
+            self.sa.write("DISP:WIND:TRAC:Y:RLEV:OFFS " + str(int(self.parent.saAtten.text())))
             self.sa.write("DISP:WIND:TRAC:Y:DLIN -50 dBm")
             self.sa.write("DISP:WIND:TRAC:Y:DLIN:STAT 1")
             self.sa.write("CALC:MARK:CPS 1")
@@ -88,7 +89,7 @@ class Instrument:
         self.sa.write(":CALC:MARK:PEAK:TABL:READ GTDL")
         self.sa.write(":CALC:MARK:PEAK:TABL:STAT ON")
         time.sleep(1)
-        rx = self.sendQerySa("TRAC:MATH:PEAK?")
+        rx = self.sa.query("TRAC:MATH:PEAK?")
         tmp = ''
         arr = []
         freq = []
@@ -106,14 +107,16 @@ class Instrument:
             freq.append(arr[k])
             ampl.append(arr[k + 1])
             k = k + 2
-        return (freq, ampl)
+        return freq, ampl
+
+    def getInstrName(addr):
+        rm = visa.ResourceManager()
+        rm.timeout = 5000
+        try:
+            currInstr = rm.open_resource(addr)
+            return currInstr.query('*IDN?')
+        except Exception as e:
+            print(str(e))
+            return None
 
 
-def getInstrName(addr):
-    rm = visa.ResourceManager()
-    rm.timeout = 5000
-    try:
-        currInstr = rm.open_resource(addr)
-        return (currInstr.query('*IDN?'))
-    except Exception as e:
-        return None

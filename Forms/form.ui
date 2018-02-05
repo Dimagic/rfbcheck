@@ -936,13 +936,13 @@
      <attribute name="title">
       <string>Settings</string>
      </attribute>
-     <widget class="QGroupBox" name="groupBox_9">
+     <widget class="QGroupBox" name="instrumentsGroupBox">
       <property name="geometry">
        <rect>
         <x>10</x>
         <y>10</y>
         <width>541</width>
-        <height>151</height>
+        <height>171</height>
        </rect>
       </property>
       <property name="title">
@@ -952,36 +952,13 @@
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>90</y>
-         <width>181</width>
-         <height>22</height>
+         <y>110</y>
+         <width>191</width>
+         <height>21</height>
         </rect>
        </property>
-      </widget>
-      <widget class="QLabel" name="currSaLbl">
-       <property name="geometry">
-        <rect>
-         <x>60</x>
-         <y>20</y>
-         <width>211</width>
-         <height>16</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>TextLabel</string>
-       </property>
-      </widget>
-      <widget class="QLabel" name="currGenLbl">
-       <property name="geometry">
-        <rect>
-         <x>60</x>
-         <y>40</y>
-         <width>211</width>
-         <height>16</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>TextLabel</string>
+       <property name="mouseTracking">
+        <bool>true</bool>
        </property>
       </widget>
       <widget class="QRadioButton" name="setSaRadio">
@@ -1004,7 +981,7 @@
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>40</y>
+         <y>50</y>
          <width>51</width>
          <height>17</height>
         </rect>
@@ -1017,7 +994,7 @@
        <property name="geometry">
         <rect>
          <x>210</x>
-         <y>90</y>
+         <y>110</y>
          <width>51</width>
          <height>20</height>
         </rect>
@@ -1033,7 +1010,7 @@
        <property name="geometry">
         <rect>
          <x>310</x>
-         <y>90</y>
+         <y>110</y>
          <width>61</width>
          <height>20</height>
         </rect>
@@ -1049,7 +1026,7 @@
        <property name="geometry">
         <rect>
          <x>270</x>
-         <y>90</y>
+         <y>110</y>
          <width>31</width>
          <height>20</height>
         </rect>
@@ -1062,20 +1039,7 @@
        <property name="geometry">
         <rect>
          <x>380</x>
-         <y>90</y>
-         <width>31</width>
-         <height>20</height>
-        </rect>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="saAtten">
-       <property name="geometry">
-        <rect>
-         <x>20</x>
-         <y>190</y>
+         <y>110</y>
          <width>31</width>
          <height>20</height>
         </rect>
@@ -1088,7 +1052,7 @@
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>60</y>
+         <y>80</y>
          <width>51</width>
          <height>17</height>
         </rect>
@@ -1097,24 +1061,11 @@
         <string>NA:</string>
        </property>
       </widget>
-      <widget class="QLabel" name="currNaLbl">
-       <property name="geometry">
-        <rect>
-         <x>60</x>
-         <y>59</y>
-         <width>211</width>
-         <height>16</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>TextLabel</string>
-       </property>
-      </widget>
       <widget class="QPushButton" name="setInstrBtn">
        <property name="geometry">
         <rect>
-         <x>10</x>
-         <y>120</y>
+         <x>110</x>
+         <y>140</y>
          <width>91</width>
          <height>23</height>
         </rect>
@@ -1123,75 +1074,27 @@
         <string>Set</string>
        </property>
       </widget>
-      <widget class="QLabel" name="currSaNameLbl">
-       <property name="geometry">
-        <rect>
-         <x>280</x>
-         <y>20</y>
-         <width>241</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>TextLabel</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-       </property>
-      </widget>
-      <widget class="QLabel" name="currGenNameLbl">
-       <property name="geometry">
-        <rect>
-         <x>280</x>
-         <y>40</y>
-         <width>241</width>
-         <height>20</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>TextLabel</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-       </property>
-      </widget>
-      <widget class="QLabel" name="currNaNameLbl">
-       <property name="geometry">
-        <rect>
-         <x>280</x>
-         <y>60</y>
-         <width>231</width>
-         <height>20</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>TextLabel</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-       </property>
-      </widget>
       <widget class="QLabel" name="label2">
        <property name="geometry">
         <rect>
          <x>420</x>
-         <y>90</y>
-         <width>61</width>
+         <y>110</y>
+         <width>71</width>
          <height>20</height>
         </rect>
        </property>
        <property name="text">
-        <string>NA atten.:</string>
+        <string>NA atten. P1:</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
        </property>
       </widget>
-      <widget class="QLineEdit" name="naAtten">
+      <widget class="QLineEdit" name="naAtten1">
        <property name="geometry">
         <rect>
-         <x>490</x>
-         <y>90</y>
+         <x>500</x>
+         <y>110</y>
          <width>31</width>
          <height>20</height>
         </rect>
@@ -1200,12 +1103,99 @@
         <set>Qt::AlignCenter</set>
        </property>
       </widget>
+      <widget class="QWidget" name="layoutWidget">
+       <property name="geometry">
+        <rect>
+         <x>80</x>
+         <y>80</y>
+         <width>451</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <item>
+         <widget class="QLabel" name="currNaLbl">
+          <property name="text">
+           <string>TextLabel</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="currNaNameLbl">
+          <property name="text">
+           <string>TextLabel</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="layoutWidget">
+       <property name="geometry">
+        <rect>
+         <x>80</x>
+         <y>50</y>
+         <width>451</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <item>
+         <widget class="QLabel" name="currGenLbl">
+          <property name="text">
+           <string>TextLabel</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="currGenNameLbl">
+          <property name="text">
+           <string>TextLabel</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="layoutWidget">
+       <property name="geometry">
+        <rect>
+         <x>80</x>
+         <y>20</y>
+         <width>451</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <layout class="QHBoxLayout" name="horizontalLayout_3">
+        <item>
+         <widget class="QLabel" name="currSaLbl">
+          <property name="text">
+           <string>TextLabel</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="currSaNameLbl">
+          <property name="text">
+           <string>TextLabel</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
       <widget class="Line" name="line">
        <property name="geometry">
         <rect>
          <x>60</x>
-         <y>30</y>
-         <width>461</width>
+         <y>40</y>
+         <width>471</width>
          <height>16</height>
         </rect>
        </property>
@@ -1213,17 +1203,98 @@
         <enum>Qt::Horizontal</enum>
        </property>
       </widget>
-      <widget class="Line" name="line">
+      <widget class="Line" name="line_2">
        <property name="geometry">
         <rect>
          <x>60</x>
-         <y>50</y>
-         <width>461</width>
+         <y>70</y>
+         <width>471</width>
          <height>16</height>
         </rect>
        </property>
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="updateInstrBtn">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>140</y>
+         <width>91</width>
+         <height>23</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Update</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="saStat">
+       <property name="geometry">
+        <rect>
+         <x>60</x>
+         <y>20</y>
+         <width>16</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>saStat</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="genStat">
+       <property name="geometry">
+        <rect>
+         <x>60</x>
+         <y>50</y>
+         <width>21</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>genStat</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="naStat">
+       <property name="geometry">
+        <rect>
+         <x>60</x>
+         <y>80</y>
+         <width>21</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>naStat</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label2_2">
+       <property name="geometry">
+        <rect>
+         <x>420</x>
+         <y>140</y>
+         <width>71</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>NA atten. P2:</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="naAtten2">
+       <property name="geometry">
+        <rect>
+         <x>500</x>
+         <y>140</y>
+         <width>31</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
        </property>
       </widget>
      </widget>
@@ -1231,7 +1302,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>160</y>
+        <y>180</y>
         <width>221</width>
         <height>151</height>
        </rect>
@@ -1279,44 +1350,18 @@
        </layout>
       </widget>
      </widget>
-     <widget class="QGroupBox" name="groupBox_11">
+     <widget class="QGroupBox" name="calibrationGroupBox">
       <property name="geometry">
        <rect>
-        <x>10</x>
-        <y>320</y>
-        <width>201</width>
-        <height>151</height>
+        <x>560</x>
+        <y>60</y>
+        <width>241</width>
+        <height>121</height>
        </rect>
       </property>
       <property name="title">
        <string>Calibration</string>
       </property>
-      <widget class="QPushButton" name="calibrationBtn">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>100</y>
-         <width>81</width>
-         <height>31</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Calibration</string>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="clearCalBtn">
-       <property name="geometry">
-        <rect>
-         <x>100</x>
-         <y>100</y>
-         <width>81</width>
-         <height>31</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Clear cal.table</string>
-       </property>
-      </widget>
       <widget class="QCheckBox" name="calAllBands">
        <property name="geometry">
         <rect>
@@ -1330,121 +1375,123 @@
         <string>Calibtate all bands</string>
        </property>
       </widget>
-      <widget class="QLineEdit" name="calibrStart">
-       <property name="geometry">
-        <rect>
-         <x>50</x>
-         <y>40</y>
-         <width>31</width>
-         <height>20</height>
-        </rect>
-       </property>
-       <property name="maxLength">
-        <number>4</number>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="calibrStop">
-       <property name="geometry">
-        <rect>
-         <x>50</x>
-         <y>70</y>
-         <width>31</width>
-         <height>20</height>
-        </rect>
-       </property>
-       <property name="maxLength">
-        <number>4</number>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label4">
+      <widget class="QWidget" name="layoutWidget">
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>40</y>
-         <width>31</width>
-         <height>20</height>
+         <y>50</y>
+         <width>222</width>
+         <height>22</height>
         </rect>
        </property>
-       <property name="layoutDirection">
-        <enum>Qt::LeftToRight</enum>
-       </property>
-       <property name="text">
-        <string>Start:</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-       </property>
+       <layout class="QHBoxLayout" name="horizontalLayout_5">
+        <item>
+         <widget class="QLabel" name="label4">
+          <property name="layoutDirection">
+           <enum>Qt::LeftToRight</enum>
+          </property>
+          <property name="text">
+           <string>Start:</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="calibrStart">
+          <property name="maxLength">
+           <number>4</number>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="label6">
+          <property name="layoutDirection">
+           <enum>Qt::LeftToRight</enum>
+          </property>
+          <property name="text">
+           <string>MHz</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="label5">
+          <property name="layoutDirection">
+           <enum>Qt::LeftToRight</enum>
+          </property>
+          <property name="text">
+           <string>Stop:</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="calibrStop">
+          <property name="maxLength">
+           <number>4</number>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="label7">
+          <property name="layoutDirection">
+           <enum>Qt::LeftToRight</enum>
+          </property>
+          <property name="text">
+           <string>MHz</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </widget>
-      <widget class="QLabel" name="label5">
+      <widget class="QWidget" name="layoutWidget">
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>70</y>
-         <width>31</width>
-         <height>20</height>
+         <y>80</y>
+         <width>221</width>
+         <height>25</height>
         </rect>
        </property>
-       <property name="layoutDirection">
-        <enum>Qt::LeftToRight</enum>
-       </property>
-       <property name="text">
-        <string>Stop:</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label6">
-       <property name="geometry">
-        <rect>
-         <x>90</x>
-         <y>40</y>
-         <width>21</width>
-         <height>20</height>
-        </rect>
-       </property>
-       <property name="layoutDirection">
-        <enum>Qt::LeftToRight</enum>
-       </property>
-       <property name="text">
-        <string>MHz</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label7">
-       <property name="geometry">
-        <rect>
-         <x>90</x>
-         <y>70</y>
-         <width>21</width>
-         <height>20</height>
-        </rect>
-       </property>
-       <property name="layoutDirection">
-        <enum>Qt::LeftToRight</enum>
-       </property>
-       <property name="text">
-        <string>MHz</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-       </property>
+       <layout class="QHBoxLayout" name="horizontalLayout_4">
+        <item>
+         <widget class="QPushButton" name="calibrationBtn">
+          <property name="text">
+           <string>Calibration</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="clearCalBtn">
+          <property name="text">
+           <string>Clear cal.table</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </widget>
      </widget>
-     <widget class="QGroupBox" name="groupBox_12">
+     <widget class="QGroupBox" name="rfbAtrGroupBox">
       <property name="geometry">
        <rect>
-        <x>240</x>
-        <y>160</y>
-        <width>311</width>
+        <x>560</x>
+        <y>10</y>
+        <width>241</width>
         <height>51</height>
        </rect>
       </property>
@@ -1454,7 +1501,7 @@
       <widget class="QPushButton" name="newRfbBtn">
        <property name="geometry">
         <rect>
-         <x>220</x>
+         <x>150</x>
          <y>20</y>
          <width>81</width>
          <height>23</height>
@@ -1464,25 +1511,12 @@
         <string>New/Edit</string>
        </property>
       </widget>
-      <widget class="QLabel" name="label8">
-       <property name="geometry">
-        <rect>
-         <x>40</x>
-         <y>20</y>
-         <width>46</width>
-         <height>13</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>RFB type:</string>
-       </property>
-      </widget>
       <widget class="QComboBox" name="editRfbCombo">
        <property name="geometry">
         <rect>
-         <x>100</x>
+         <x>10</x>
          <y>20</y>
-         <width>111</width>
+         <width>131</width>
          <height>22</height>
         </rect>
        </property>
@@ -1494,8 +1528,8 @@
       </property>
       <property name="geometry">
        <rect>
-        <x>10</x>
-        <y>480</y>
+        <x>250</x>
+        <y>310</y>
         <width>75</width>
         <height>23</height>
        </rect>
@@ -1580,7 +1614,7 @@
   <tabstop>saAtten</tabstop>
   <tabstop>setNaRadio</tabstop>
   <tabstop>setInstrBtn</tabstop>
-  <tabstop>naAtten</tabstop>
+  <tabstop>naAtten1</tabstop>
   <tabstop>testSetDsaFull</tabstop>
   <tabstop>testSetDsaShort</tabstop>
   <tabstop>calibrationBtn</tabstop>

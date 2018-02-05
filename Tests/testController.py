@@ -131,13 +131,13 @@ class TestContoller(QtCore.QThread):
     def getComConn(self):
         baud = 57600
         port = "COM1"
-        self.currParent.movie.setMovie(None)
         try:
             self.ser = serial.Serial(port, baud, timeout=0.5)
             if self.ser.isOpen():
                 self.ser.write(binascii.unhexlify('AAAA543022556677403D01'))
                 rx = binascii.hexlify(self.ser.readline())
                 band = int(rx[26:34], 16) / 1000
+                print(band)
                 self.comMovieSignal.emit(str(self.ser.port), str(self.ser.baudrate))
                 self.logSignal.emit("Connected to port " + str(self.ser.port), 0)
                 self.haveConn = True
@@ -145,15 +145,10 @@ class TestContoller(QtCore.QThread):
             self.haveConn = False
             self.logSignal.emit('Connection problem: ' + str(e), 1)
             self.comMovieSignal.emit('', '')
-            self.msgSignal.emit('c', 'Connection problem 3', str(e), 1)
+            self.msgSignal.emit('c', 'Connection problem', str(e), 1)
             if self.ser is not None:
                 if self.ser.isOpen():
                     self.ser.close()
-        # finally:
-        #     if self.haveConn:
-        #         self.currParent.movie.setVisible(True)
-        #     else:
-        #         self.currParent.movie.setVisible(False)
 
     def getParent(self):
         return self.currParent

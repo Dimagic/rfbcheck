@@ -29,8 +29,10 @@ class IModTest(QtCore.QThread):
         try:
             self.mToneTest(freq, genPow)
         except Exception as e:
-            testController.msgSignal.emit('w', 'mToneTest error', str(e), 1)
-            return
+            q = self.mainParent.sendMsg('w', 'mToneTest error', str(e), 1)
+            if q == QMessageBox.Ok:
+                testController.stopTestFlag = True
+                return
 
     def mToneTest(self, freq, genPow):
         setAmplTo(self.testController.ser, cmd, self.gen, genPow, self.testController)
@@ -51,13 +53,13 @@ class IModTest(QtCore.QThread):
         self.gen.write(":OUTP:MOD:STAT ON")
         time.sleep(2)
         n2 = getAvgGain(self.testController)
-        # print(n1, n2)
         self.testController.useCorrection = True
         freq, ampl = self.instrument.getPeakTable()
         delta = abs(abs(ampl[0]) - abs(ampl[len(ampl) - 1]))
         if len(freq) > 3:
-            self.mainParent.sendMsg('Intermodulation FAIL: to many peaks', 2)
-            haveFail = True
+            q = self.mainParent.sendMsg('Intermodulation FAIL: to many peaks', 2)
+            if q == QMessageBox.Ok:
+                haveFail = True
         if delta > 0.7:
             self.testController.logSignal.emit('Delta between peaks FAIL: ' + str(round(delta, 3)) + " dBm", 3)
             self.testController.logSignal.emit(str(freq[0] / 1000) + " MHz " + str(ampl[0]) + " dBm", 3)

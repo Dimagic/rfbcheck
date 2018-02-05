@@ -4,8 +4,6 @@ import ast
 from Equip.equip import toFloat
 
 
-
-
 class Journal():
     parent = None
     def __init__(self,parent):

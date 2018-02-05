@@ -13,7 +13,7 @@ from PyQt5 import QtCore, QtWidgets, QtGui
 from PyQt5.QtWidgets import QTableWidgetItem, QAbstractItemView, QLabel
 import threading
 
-version = '0.2.4'
+version = '0.2.5'
 
 
 class TestTime(threading.Thread):
@@ -36,6 +36,11 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
         self.failImg = QtGui.QPixmap('Img/fail.png')
         self.warnImg = QtGui.QPixmap('Img/warning.png')
         self.connectMovie = QMovie('Img/connect2.gif')
+        self.greenLedMovie = QMovie('Img/greenLed.gif')
+        self.redLedMovie = QMovie('Img/redLed.gif')
+
+        self.instrAddrCombo.setMouseTracking(True)
+        self.instrAddrCombo.installEventFilter(self)
 
         self.testLogDl = {}
         self.testLogUl = {}
@@ -64,14 +69,11 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
                     'UL DSA1', 'UL DSA2', 'UL DSA3', 'DSA pow', 'ALC IN pow']
 
         self.radioInstrChecked()
-        listInstr = self.getInstrAddr()
-        if listInstr is not None:
-            if len(listInstr) < 2:
-                self.sendLog('Problem of instruments initialisation', 2)
-            for i in listInstr:
-                self.instrAddrCombo.addItem(str(i))
         self.getCurrInstrAddr()
+        self.getInstrAddr()
+
         self.setInstrBtn.clicked.connect(self.setCurrInstrAddr)
+        self.updateInstrBtn.clicked.connect(self.getInstrAddr)
         self.journalUpdateBtn.clicked.connect(self.journalUpdateBtnClick)
         self.tableJournal.clicked.connect(self.getSelectedRow)
         self.printReportBtn.clicked.connect(self.printReportBtnClicked)
@@ -188,11 +190,8 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
                 conn.close()
                 self.sendMsg('q', 'Complete', 'Clearing calibration table complete.', 1)
             except sqlite3.DatabaseError as err:
-                self.sendMsg('c', 'Querry error', str(err), 0)
+                self.sendMsg('c', 'Query error', str(err), 0)
                 conn.close()
-
-    def connectComBtnClick(self):
-        pass
 
     def rfbIsChecked(self):
         while self.tableSettings.rowCount() > 0:
@@ -287,10 +286,26 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
         return msg.exec_()
 
     def getInstrAddr(self):
-        try:
-            return visa.ResourceManager().list_resources()
-        except Exception as e:
-            self.sendMsg('c', 'Instr. init error', str(e), 1)
+        rm = visa.ResourceManager()
+        rm.timeout = 500
+        listInstr = rm.list_resources()
+        self.instrAddrCombo.clear()
+        for i in listInstr:
+            self.instrAddrCombo.addItem(str(i))
+        ledLbl = [self.saStat, self.genStat, self.naStat]
+        adrLbl = [self.currSaLbl, self.currGenLbl, self.currNaLbl]
+        for j in adrLbl:
+            i = adrLbl.index(j)
+            try:
+                currInstr = rm.open_resource(j.text())
+                currInstr.query('*IDN?')
+                self.greenLedMovie.setScaledSize(QSize(13, 13))
+                ledLbl[i].setMovie(self.greenLedMovie)
+                self.greenLedMovie.start()
+            except:
+                self.redLedMovie.setScaledSize(QSize(13, 13))
+                ledLbl[i].setMovie(self.redLedMovie)
+                self.redLedMovie.start()
 
     def getConnDb(self):
         try:
@@ -303,19 +318,22 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
     def getCurrInstrAddr(self):
         conn, cursor = self.getConnDb()
         rows = cursor.execute("select address, useAtten, fullName from instruments where name = 'SA'").fetchall()
+        print(rows)
         for row in rows:
             self.currSaLbl.setText(str(row[0]))
             self.saAtten.setText(str(row[1]))
             self.currSaNameLbl.setText(str(row[2]))
         rows = cursor.execute("select address, useAtten, fullName from instruments where name = 'GEN'").fetchall()
+        print(rows)
         for row in rows:
             self.currGenLbl.setText(str(row[0]))
             self.genAtten.setText(str(row[1]))
             self.currGenNameLbl.setText(str(row[2]))
         rows = cursor.execute("select address, useAtten, fullName from instruments where name = 'NA'").fetchall()
+        print(rows)
         for row in rows:
             self.currNaLbl.setText(str(row[0]))
-            self.genAtten.setText(str(row[1]))
+            self.naAtten1.setText(str(row[1]))
             self.currNaNameLbl.setText(str(row[2]))
         conn.close()
 
@@ -323,45 +341,51 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
         if self.setSaRadio.isChecked():
             self.saAtten.setEnabled(True)
             self.genAtten.setEnabled(False)
-            self.naAtten.setEnabled(False)
+            self.naAtten1.setEnabled(False)
+            self.naAtten2.setEnabled(False)
         if self.setGenRadio.isChecked():
             self.saAtten.setEnabled(False)
             self.genAtten.setEnabled(True)
-            self.naAtten.setEnabled(False)
+            self.naAtten1.setEnabled(False)
+            self.naAtten2.setEnabled(False)
         if self.setNaRadio.isChecked():
             self.saAtten.setEnabled(False)
             self.genAtten.setEnabled(False)
-            self.naAtten.setEnabled(True)
+            self.naAtten1.setEnabled(True)
+            self.naAtten2.setEnabled(True)
 
     def setCurrInstrAddr(self):
         conn, cursor = self.getConnDb()
+        allIntst = [self.instrAddrCombo.itemText(i) for i in range(self.instrAddrCombo.count())]
+        for i in allIntst:
+            print(i)
         try:
+            checkedInstr = visa.ResourceManager().open_resource(self.instrAddrCombo.currentText()).query('*IDN?')
             if self.setSaRadio.isChecked():
-                self.currSaNameLbl.setText(getInstrName(self.instrAddrCombo.currentText()))
+                self.currSaNameLbl.setText(checkedInstr)
                 cursor.execute("update instruments set address = :n, useAtten = :n2, fullName = :n3 where name = 'SA'",
                                {'n': self.instrAddrCombo.currentText(), 'n2': int(self.saAtten.text()),
                                 'n3': self.currSaNameLbl.text()})
-
             elif self.setGenRadio.isChecked():
-                self.currGenNameLbl.setText(getInstrName(self.instrAddrCombo.currentText()))
+                self.currGenNameLbl.setText(checkedInstr)
                 cursor.execute("update instruments set address = :n, useAtten = :n2, fullName = :n3 where name = 'GEN'",
                                {'n': self.instrAddrCombo.currentText(), 'n2': int(self.genAtten.text()),
                                 'n3': self.currGenNameLbl.text()})
-
             elif self.setNaRadio.isChecked():
-                self.currNaNameLbl.setText(getInstrName(self.instrAddrCombo.currentText()))
+                self.currNaNameLbl.setText(checkedInstr)
                 cursor.execute("update instruments set address = :n, useAtten = :n2, fullName = :n3 where name = 'NA'",
-                               {'n': self.instrAddrCombo.currentText(), 'n2': 0, 'n3': self.currNaNameLbl.text()})
-            else:
-                pass
-                # TODO: ERROR (set current instrument address)
+                               {'n': self.instrAddrCombo.currentText(), 'n2': int(self.naAtten1.text()), 'n3': self.currNaNameLbl.text()})
+
             conn.commit()
+            conn.close()
+            self.sendMsg('i', 'Save changes', 'Done', 1)
+            self.getCurrInstrAddr()
         except Exception as e:
             conn.close()
-            self.sendMsg('w', "Warning", str(e), 1)
-        else:
-            conn.close()
-            self.getCurrInstrAddr()
+            self.sendMsg('c', 'Save instr. settings error', str(e), 1)
+        # else:
+        #     conn.close()
+        #     self.getCurrInstrAddr()
 
     def checkAttenValue(self):
         try:
@@ -369,10 +393,21 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
                 self.saAtten.setText('0')
             else:
                 int(self.saAtten.text())
+
             if self.genAtten.text() == '':
                 self.genAtten.setText('0')
             else:
                 int(self.genAtten.text())
+
+            if self.naAtten1.text() == '':
+                self.naAtten1.setText('0')
+            else:
+                int(self.naAtten1.text())
+
+            if self.naAtten2.text() == '':
+                self.naAtten2.setText('0')
+            else:
+                int(self.naAtten2.text())
         except Exception as e:
             self.sendMsg('w', 'Warning', 'Incorrect value of attenuator', 1)
 
@@ -385,15 +420,13 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
             if row is not None and row[0] != self.rfbTypeCombo.currentText():
                 self.sendMsg('w', 'Warning',
                              'SN: ' + str(self.rfbSN.text()) + ' already exist. RFB type: ' + str(row[0]), 1)
-                # self.startTestBtn.setText("Start")
                 return False
             else:
                 return True
         except sqlite3.DatabaseError as err:
-            self.sendMsg('c', 'Querry error', str(err), 1)
+            self.sendMsg('c', 'Query error', str(err), 1)
             conn.close()
 
-    # Run tests ----------------------------------------------------------------
     def startThreadTest(self):
         if self.calibrLbl.text() == 'False':
             self.sendMsg('w', 'Warning', 'Need to do the calibration', 1)
@@ -432,6 +465,11 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
         self.rfbTypeCombo.setEnabled(False)
         self.rfbSN.setEnabled(False)
         self.testsGroupBox.setEnabled(False)
+        self.instrumentsGroupBox.setEnabled(False)
+        self.rfbAtrGroupBox.setEnabled(False)
+        self.calibrationGroupBox.setEnabled(False)
+        self.instrAddrCombo.setMouseTracking(False)
+
         self.startTestBtn.setText('Stop')
         self.tt = Thread(name='testTimer', target=TestTime, args=(self,))
         self.tt.start()
@@ -443,6 +481,10 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
         self.rfbTypeCombo.setEnabled(True)
         self.rfbSN.setEnabled(True)
         self.testsGroupBox.setEnabled(True)
+        self.instrumentsGroupBox.setEnabled(True)
+        self.rfbAtrGroupBox.setEnabled(True)
+        self.calibrationGroupBox.setEnabled(True)
+        self.instrAddrCombo.setMouseTracking(True)
         self.startTestBtn.setText('Start')
 
     def setProgressBar(self, testName, barMax, barCurr):
@@ -502,6 +544,16 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
             self.baudLbl.setText('')
             self.portLbl.setText('')
             self.movie.setVisible(False)
+
+    def eventFilter(self, source, event):
+        # print(source, event)
+        # print(source.type())
+        if event.type() == QtCore.QEvent.MouseMove:
+            try:
+                source.setToolTip(visa.ResourceManager().open_resource(source.currentText()).query('*IDN?'))
+            except:
+                source.setToolTip('Instrument not connected')
+        return QtWidgets.QMainWindow.eventFilter(self, source, event)
 
 
 if __name__ == '__main__':
