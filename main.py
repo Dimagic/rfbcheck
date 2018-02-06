@@ -1,6 +1,3 @@
-from PyQt5.QtCore import QSize
-from PyQt5.QtGui import QMovie
-
 from Forms.form import Ui_MainWindow
 from Tests.testController import *
 from Equip.applySetFile import *
@@ -37,6 +34,7 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
         self.warnImg = QtGui.QPixmap('Img/warning.png')
         self.connectMovie = QMovie('Img/connect2.gif')
         self.greenLedMovie = QMovie('Img/greenLed.gif')
+        self.blueLedMovie = QMovie('Img/blueLed.gif')
         self.redLedMovie = QMovie('Img/redLed.gif')
 
         self.instrAddrCombo.setMouseTracking(True)
@@ -297,11 +295,16 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
         for j in adrLbl:
             i = adrLbl.index(j)
             try:
-                currInstr = rm.open_resource(j.text())
-                currInstr.query('*IDN?')
-                self.greenLedMovie.setScaledSize(QSize(13, 13))
-                ledLbl[i].setMovie(self.greenLedMovie)
-                self.greenLedMovie.start()
+                # if j.text() == '':
+                #     self.blueLedMovie.setScaledSize(QSize(13, 13))
+                #     ledLbl[i].setMovie(self.blueLedMovie)
+                #     self.blueLedMovie.start()
+                # else:
+                    currInstr = rm.open_resource(j.text())
+                    currInstr.query('*IDN?')
+                    self.greenLedMovie.setScaledSize(QSize(13, 13))
+                    ledLbl[i].setMovie(self.greenLedMovie)
+                    self.greenLedMovie.start()
             except:
                 self.redLedMovie.setScaledSize(QSize(13, 13))
                 ledLbl[i].setMovie(self.redLedMovie)
@@ -318,19 +321,16 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
     def getCurrInstrAddr(self):
         conn, cursor = self.getConnDb()
         rows = cursor.execute("select address, useAtten, fullName from instruments where name = 'SA'").fetchall()
-        print(rows)
         for row in rows:
             self.currSaLbl.setText(str(row[0]))
             self.saAtten.setText(str(row[1]))
             self.currSaNameLbl.setText(str(row[2]))
         rows = cursor.execute("select address, useAtten, fullName from instruments where name = 'GEN'").fetchall()
-        print(rows)
         for row in rows:
             self.currGenLbl.setText(str(row[0]))
             self.genAtten.setText(str(row[1]))
             self.currGenNameLbl.setText(str(row[2]))
         rows = cursor.execute("select address, useAtten, fullName from instruments where name = 'NA'").fetchall()
-        print(rows)
         for row in rows:
             self.currNaLbl.setText(str(row[0]))
             self.naAtten1.setText(str(row[1]))
@@ -354,12 +354,15 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
             self.naAtten1.setEnabled(True)
             self.naAtten2.setEnabled(True)
 
+    # TODO: do fix double instrument
     def setCurrInstrAddr(self):
         conn, cursor = self.getConnDb()
-        allIntst = [self.instrAddrCombo.itemText(i) for i in range(self.instrAddrCombo.count())]
-        for i in allIntst:
-            print(i)
+        # allIntst = [self.instrAddrCombo.itemText(i) for i in range(self.instrAddrCombo.count())]
+        # for i in allIntst:
+        #     print(i)
         try:
+            q = "update instruments set address = '', useAtten = '0', fullName = '' where address = '%s'" % (self.instrAddrCombo.currentText())
+            cursor.execute(q)
             checkedInstr = visa.ResourceManager().open_resource(self.instrAddrCombo.currentText()).query('*IDN?')
             if self.setSaRadio.isChecked():
                 self.currSaNameLbl.setText(checkedInstr)
@@ -380,6 +383,7 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
             conn.close()
             self.sendMsg('i', 'Save changes', 'Done', 1)
             self.getCurrInstrAddr()
+            self.getInstrAddr()
         except Exception as e:
             conn.close()
             self.sendMsg('c', 'Save instr. settings error', str(e), 1)
