@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'form.ui'
 #
-# Created: Mon Feb  5 15:48:44 2018
+# Created: Tue Feb  6 13:43:26 2018
 #      by: PyQt5 UI code generator 5.2.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -509,27 +509,16 @@ class Ui_MainWindow(object):
         self.applySetBtn.setObjectName("applySetBtn")
         self.mainTabWidget.addTab(self.tabSettings, "")
         MainWindow.setCentralWidget(self.centralwidget)
-        self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 840, 20))
-        self.menubar.setObjectName("menubar")
-        self.menuFile = QtWidgets.QMenu(self.menubar)
-        self.menuFile.setObjectName("menuFile")
-        self.menuEdit = QtWidgets.QMenu(self.menubar)
-        self.menuEdit.setObjectName("menuEdit")
-        MainWindow.setMenuBar(self.menubar)
-        self.statusbar = QtWidgets.QStatusBar(MainWindow)
-        self.statusbar.setObjectName("statusbar")
-        MainWindow.setStatusBar(self.statusbar)
-        self.menuChangeUser = QtWidgets.QAction(MainWindow)
-        self.menuChangeUser.setMenuRole(QtWidgets.QAction.NoRole)
-        self.menuChangeUser.setObjectName("menuChangeUser")
+        self.menuBar = QtWidgets.QMenuBar(MainWindow)
+        self.menuBar.setGeometry(QtCore.QRect(0, 0, 840, 20))
+        self.menuBar.setObjectName("menuBar")
+        MainWindow.setMenuBar(self.menuBar)
+        self.menuSelectUser = QtWidgets.QAction(MainWindow)
+        self.menuSelectUser.setMenuRole(QtWidgets.QAction.NoRole)
+        self.menuSelectUser.setObjectName("menuSelectUser")
         self.menuExit = QtWidgets.QAction(MainWindow)
-        self.menuExit.setMenuRole(QtWidgets.QAction.QuitRole)
+        self.menuExit.setMenuRole(QtWidgets.QAction.NoRole)
         self.menuExit.setObjectName("menuExit")
-        self.menuFile.addAction(self.menuChangeUser)
-        self.menuFile.addAction(self.menuExit)
-        self.menubar.addAction(self.menuFile.menuAction())
-        self.menubar.addAction(self.menuEdit.menuAction())
 
         self.retranslateUi(MainWindow)
         self.mainTabWidget.setCurrentIndex(0)
@@ -692,9 +681,7 @@ class Ui_MainWindow(object):
         self.newRfbBtn.setText(_translate("MainWindow", "New/Edit"))
         self.applySetBtn.setText(_translate("MainWindow", "Apply SetFile"))
         self.mainTabWidget.setTabText(self.mainTabWidget.indexOf(self.tabSettings), _translate("MainWindow", "Settings"))
-        self.menuFile.setTitle(_translate("MainWindow", "File"))
-        self.menuEdit.setTitle(_translate("MainWindow", "Edit"))
-        self.menuChangeUser.setText(_translate("MainWindow", "Change user"))
+        self.menuSelectUser.setText(_translate("MainWindow", "Select user"))
         self.menuExit.setText(_translate("MainWindow", "Exit"))
 
 

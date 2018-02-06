@@ -1,4 +1,7 @@
-from Forms.form import Ui_MainWindow
+from PyQt5.uic import loadUi
+
+from Equip.selectUser import SelectUser
+from Forms.mainwindow import Ui_MainWindow
 from Tests.testController import *
 from Equip.applySetFile import *
 from Equip.calibration import *
@@ -7,7 +10,7 @@ from Equip.editRFB import *
 from Equip.journal import *
 from Tests.bitAlarm_test import *
 from PyQt5 import QtCore, QtWidgets, QtGui
-from PyQt5.QtWidgets import QTableWidgetItem, QAbstractItemView, QLabel
+from PyQt5.QtWidgets import QTableWidgetItem, QAbstractItemView, QLabel, QAction
 import threading
 
 version = '0.2.5'
@@ -25,9 +28,7 @@ class TestTime(threading.Thread):
 class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
     def __init__(self, form, parent=None):
         super(mainProgram, self).__init__(parent)
-
-        self.setupUi(form)
-
+        # loadUi('Forms/mainwindow.ui', self)
         self.appIcon = QtGui.QIcon("Img/ico32_pgn_icon.ico")
         self.passImg = QtGui.QPixmap('Img/pass.png')
         self.failImg = QtGui.QPixmap('Img/fail.png')
@@ -36,6 +37,14 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
         self.greenLedMovie = QMovie('Img/greenLed.gif')
         self.blueLedMovie = QMovie('Img/blueLed.gif')
         self.redLedMovie = QMovie('Img/redLed.gif')
+
+        self.setupUi(form)
+
+        self.currentUser = None
+
+        self.menuSelectUser.triggered.connect(self.selectUser)
+        self.menuExit.triggered.connect(form.close)
+        self.menuExit.setShortcut('Ctrl+Q')
 
         self.instrAddrCombo.setMouseTracking(True)
         self.instrAddrCombo.installEventFilter(self)
@@ -130,6 +139,9 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
         self.dialog = EditRFB(self, self)
         self.dialog.setWindowIcon(self.appIcon)
         self.dialog.show()
+
+    def selectUser(self):
+        self.selectUserDialog = SelectUser(self, version)
 
     def checkTestState(self, b):
         self.sendLog(str(b.text()), 0)
