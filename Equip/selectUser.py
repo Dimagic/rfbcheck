@@ -2,20 +2,18 @@ from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QInputDialog
 from PyQt5.uic import loadUi
 
+
 class SelectUser(QtWidgets.QDialog):
-    def __init__(self, parent, version):
+    def __init__(self, parent):
         super(SelectUser, self).__init__(parent)
         self.currParent = parent
-        self.version = version
         self.dialog = loadUi('Forms/selectuser.ui', self)
         self.dialog.setWindowTitle('Select user')
         self.dialog.setWindowIcon(parent.appIcon)
         self.dialog.show()
-
         self.buttonBox.button(QtWidgets.QDialogButtonBox.Ok).clicked.connect(self.okPressed)
         self.buttonBox.button(QtWidgets.QDialogButtonBox.Cancel).clicked.connect(self.cancelPressed)
         self.addUserBtn.clicked.connect(self.addUser)
-
         self.getUsers()
 
     def getUsers(self):
@@ -50,10 +48,10 @@ class SelectUser(QtWidgets.QDialog):
         try:
             conn, cursor = self.currParent.getConnDb()
             q = "update settings set lastUser = '%s'" % (str(self.userComboBox.currentText()))
-            print(q)
             cursor.execute(q)
             conn.commit()
             conn.close()
+            self.currParent.setUser()
         except Exception as e:
             self.currParent.sendMsg('c', 'Writing new user error', str(e), 1)
         finally:

@@ -20,14 +20,16 @@ class Report:
         self.tmpStyle = []
         if rfb is not None:
             resultDict = self.getResultDict(parent, sn, date, rfb)
+            if resultDict.get('user_Dl') is None:
+                resultDict.update({'user_Dl': resultDict.get('user_Ul')})
+            if resultDict.get('user_Ul') is None:
+                resultDict.update({'user_Ul': resultDict.get('user_Dl')})
             self.generateReport(resultDict, parent)
         else:
             self.getTemplates(parent)
 
     def generateReport(self, resultDict, parent):
-        spanTemplate = []
         data = []
-        elements = []
         tmpData = []
         Story = []
 
@@ -56,12 +58,8 @@ class Report:
                         if postfix in ('_Ul', '_Dl', '_at', '_st', '_re'):
                             val = str(val.replace(m, str(resultDict.get(m.replace('#', '')))))
                         else:
-                            # if val == '#logo':
-                            #     im = Image('Img/axell_logo.jpg')
-                            #     im.drawHeight = 1.5*inch*im.drawHeight / im.drawWidth
-                            #     im.drawWidth = 1.5*inch
-                            #     val = im
-                            #     continue
+                            if '#user' in val:
+                                val = str(val.replace(m, str(resultDict.get(m.replace('#', '')))))
                             if resultDict.get(m.replace('#', '') + '_Ul') is not None:
                                 val = str(val.replace(m, str(resultDict.get(m.replace('#', '') + '_Ul'))))
                             else:
@@ -84,40 +82,24 @@ class Report:
                 self.tmpStyle.append(('VALIGN', (col, row), (col, row), self.getAligment('v', xfValue)))
                 self.tmpStyle.append(('ALIGN', (col, row), (col, row), self.getAligment('h', xfValue)))
 
-                if xfValue.get('pattern_colour_index') != None:
+                if xfValue.get('pattern_colour_index') is not None:
                     currColor = xfValue.get('pattern_colour_index')
                     self.tmpStyle.append(('BACKGROUND', (col, row), (col, row),
                                           colors.Color(red=(float(currColor[0]) / 255),
                                                        green=(float(currColor[1]) / 255),
                                                        blue=(float(currColor[2]) / 255))))
-
                 self.getBorder(xfValue, row, col)
 
         for n in spanTemplate:
             self.tmpStyle.append(('SPAN', (n[2], n[0]), (n[3] - 1, n[1] - 1)))
 
         style = TableStyle(self.tmpStyle)
-        # TODO: Get this line right instead of just copying it from the docs
-        ##        style = TableStyle([('ALIGN',(1,1),(-2,-2),'RIGHT'),
-        ##                               ('TEXTCOLOR',(1,1),(-2,-2),colors.red),
-        ##                               ('VALIGN',(0,0),(0,-1),'TOP'),
-        ##                               ('TEXTCOLOR',(0,0),(0,-1),colors.blue),
-        ##                               ('ALIGN',(0,-1),(-1,-1),'CENTER'),
-        ##                               ('VALIGN',(0,-1),(-1,-1),'MIDDLE'),
-        ##                               ('TEXTCOLOR',(0,-1),(-1,-1),colors.green),
-        ##                               ('INNERGRID', (0,0), (-1,-1), 0.25, colors.black),
-        ##                               ('BOX', (0,0), (-1,-1), 0.25, colors.black),
-        ##                              ])
-
         tWeight = []
         for i in range(0, worksheet.ncols):
             tWeight.append(600 / worksheet.ncols - 1)
-
-        # Close workbook
         workbook.release_resources()
         del workbook
 
-        # Configure style and word wrap
         s = getSampleStyleSheet()
         s = s["BodyText"]
         s.wordWrap = 'CJK'
@@ -134,7 +116,8 @@ class Report:
         except Exception as e:
             parent.sendMsg('w', 'Create report error', str(e), 1)
 
-    def getAligment(self, vh, xfValue):
+    @staticmethod
+    def getAligment(vh, xfValue):
         if vh == 'v':
             v = xfValue.get('vert_align')
             if v == 0:
@@ -182,12 +165,15 @@ class Report:
 
         return xfValue
 
-    def getResultDict(self, parent, sn, date, rfb):
+    @staticmethod
+    def getResultDict(parent, sn, date, rfb):
         resultDict = {}
         resultKeys = []
         settingsKeys = []
         atrKeys = []
         dsaResKeys = []
+
+        # resultDict.update({'user': parent.currUser})
 
         conn, cursor = parent.getConnDb()
         for n in ('test_results', 'test_settings', 'ATR', 'dsa_results'):

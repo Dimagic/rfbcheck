@@ -57,8 +57,8 @@ class GainTest(QtCore.QThread):
                 self.testController.resSignal.emit('Gain', self.whatConn, str(gainMin), str(currentGain),
                                                    str(gainMax), 0)
                 self.testController.stopTestFlag = True
-                self.testController.fillTestLogSignal.emit('Gain', str(currentGain))
-                return
+        self.testController.fillTestLogSignal.emit('Gain', str(currentGain))
+        return
 
 
 

@@ -1,8 +1,6 @@
-from PyQt5.uic import loadUi
-
-from Equip.selectUser import SelectUser
 from Forms.mainwindow import Ui_MainWindow
 from Tests.testController import *
+from Equip.selectUser import SelectUser
 from Equip.applySetFile import *
 from Equip.calibration import *
 from Equip.printReport import *
@@ -40,7 +38,8 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
 
         self.setupUi(form)
 
-        self.currentUser = None
+        self.currUser = None
+        self.setUser()
 
         self.menuSelectUser.triggered.connect(self.selectUser)
         self.menuExit.triggered.connect(form.close)
@@ -48,6 +47,9 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
 
         self.instrAddrCombo.setMouseTracking(True)
         self.instrAddrCombo.installEventFilter(self)
+        self.tableJournal.installEventFilter(self)
+
+        self.hotKey = []
 
         self.testLogDl = {}
         self.testLogUl = {}
@@ -133,15 +135,26 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
         self.newRfbBtn.clicked.connect(self.on_newRfbBtn_clicked)
 
         conn.close()
-        Journal(self)
+        self.journal = Journal(self)
+
 
     def on_newRfbBtn_clicked(self):
         self.dialog = EditRFB(self, self)
         self.dialog.setWindowIcon(self.appIcon)
         self.dialog.show()
 
+    def setUser(self):
+        try:
+            conn, cursor = self.getConnDb()
+            q = "select lastUser from settings"
+            self.currUser = cursor.execute(q).fetchone()[0]
+            conn.close()
+            form.setWindowTitle('RFBCheck %s User: %s' % (version, self.currUser))
+        except Exception as e:
+            self.sendMsg('c', 'Set user error', str(e), 1)
+
     def selectUser(self):
-        self.selectUserDialog = SelectUser(self, version)
+        SelectUser(self)
 
     def checkTestState(self, b):
         self.sendLog(str(b.text()), 0)
@@ -562,8 +575,14 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
             self.movie.setVisible(False)
 
     def eventFilter(self, source, event):
-        # print(source, event)
-        # print(source.type())
+
+        if event.type() == QtCore.QEvent.KeyPress:
+            self.hotKey.append(event.key())
+            if len(self.hotKey) > 3:
+                self.hotKey.pop(0)
+            if sum(self.hotKey) == 33554582:
+                self.journal.deleteRecords()
+                self.hotKey = []
         if event.type() == QtCore.QEvent.MouseMove:
             try:
                 source.setToolTip(visa.ResourceManager().open_resource(source.currentText()).query('*IDN?'))
@@ -577,7 +596,7 @@ if __name__ == '__main__':
     form = QtWidgets.QMainWindow()
     prog = mainProgram(form)
     form.setWindowIcon(prog.appIcon)
-    form.setWindowTitle('RFBCheck ' + version)
+    # form.setWindowTitle(prog.setUser())
     form.show()
     app.exec_()
     # sys.exit(app.exec_())

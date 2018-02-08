@@ -4,19 +4,20 @@ import ast
 from Equip.equip import toFloat
 
 
-class Journal():
+class Journal:
     parent = None
-    def __init__(self,parent):
-        Journal.parent = parent
 
-        self.current_hover = [0, 0]
+    def __init__(self, parent):
+        Journal.parent = parent
+        self.parent = parent
+        # self.current_hover = [0, 0]
         parent.tableJournal.cellEntered.connect(self.cellHover)
         self.feelJournal()
 
-    def cellHover(self, row, column):
+    @staticmethod
+    def cellHover(row, column):
         item = Journal.parent.tableJournal.item(row, column)
         QtWidgets.QToolTip.setFont(QtGui.QFont('SansSerif', 10))
-
         if column == 6:
             q = "select dsa1 from dsa_results where rfb = (select id from test_results where sn = '%s' and " \
                 "dateTest = '%s' and band_type = '%s')" % (Journal.parent.tableJournal.item(row, 1).text(),
@@ -92,8 +93,13 @@ class Journal():
                 j += 1
         conn.close()
 
-##    def getSelectedRow(parent):
-##        print('1 '+str(parent))
-##        indexes = parent.tableJournal.selectionModel().selectedRows()
-##        for index in sorted(indexes):
-##            print('Row %d is selected' % index.row())
+    def deleteRecords(self):
+        self.getSelectedRow()
+
+    def getSelectedRow(self):
+        print(self.parent.tableJournal.selectionModel().selectedRows())
+
+        indexes = self.parent.tableJournal.selectionModel().selectedRows()
+        print(indexes)
+        for index in sorted(indexes):
+            print('Row %d is selected' % index.row())

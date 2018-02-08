@@ -12,7 +12,7 @@ class WriteResult:
             if len(testLogUl) > 0:
                 self.writingToDB(self.parent, testLogUl, 'Ul', dateTest)
         except Exception as e:
-            testController.sendMsgSignal.emit('w', 'Write results to DB error', str(e), 1)
+            self.parent.sendMsg('w', 'Write results to DB error', str(e), 1)
             return
         finally:
             self.parent.testLogDl = {}
@@ -23,14 +23,14 @@ class WriteResult:
         conn, cursor = parent.getConnDb()
         try:
             cursor.execute("insert into test_results(rfb_type,sn,dateTest,band_type,gain,flatness,dsa1,dsa2,dsa3,imod,"
-                           "bit,alcin,alcout,test_status) values (:rfb_type,:sn,:dateTest,:band_type,:gain,"
-                           ":flatness,:dsa1,:dsa2,:dsa3,:imod,:bit,:alcin,:alcout,:test_status)",
+                           "bit,alcin,alcout,test_status,user) values (:rfb_type,:sn,:dateTest,:band_type,:gain,"
+                           ":flatness,:dsa1,:dsa2,:dsa3,:imod,:bit,:alcin,:alcout,:test_status, :user)",
                         {'rfb_type': parent.rfbTypeCombo.currentText(), 'sn': parent.rfbSN.text(), 'dateTest': dateTest,
                          'band_type': band, 'gain': currTestLog.get('Gain'),\
                         'flatness': currTestLog.get('Flatness'), 'dsa3': currTestLog.get('DSA 3'),
                          'dsa2': currTestLog.get('DSA 2'), 'dsa1': currTestLog.get('DSA 1'),
                         'imod': currTestLog.get('IMod'), 'bit': currTestLog.get('BIT'), 'alcin': currTestLog.get('ALC in'),
-                         'alcout': currTestLog.get('ALC out'), 'test_status': ''})
+                         'alcout': currTestLog.get('ALC out'), 'test_status': '', 'user': parent.currUser})
             conn.commit()
 
             # print(self.testController.to_DsaUlDl.keys())
@@ -53,7 +53,7 @@ class WriteResult:
             self.testController.logSignal.emit('Writing test result complete', 0)
 
         except sqlite3.DatabaseError as err:
-                self.testController.sendMsgSignal.emit('c', 'Querry error', str(err), 1)
+                self.parent.sendMsg('c', 'Querry error', str(err), 1)
                 conn.close()
         else:
                 conn.close()
