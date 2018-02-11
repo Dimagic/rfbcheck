@@ -16,7 +16,9 @@ def setAmplTo(conn, cmd, gen, ampl, parent):
     ampl = int(ampl)
     try:
         gain = getAvgGain(parent)
-        while abs(abs(gain) - abs(ampl)) > 0.03:
+        # while abs(abs(gain) - abs(ampl)) > 0.03:
+        acc = 0.03
+        while not (gain-acc <= ampl <= gain+acc):
             gen.write("POW:AMPL " + str(genPow) + " dBm")
             gain = getAvgGain(parent)
             if genPow >= -20:

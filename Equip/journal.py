@@ -45,7 +45,7 @@ class Journal:
                 toToolTip = ""
                 for k in sorted(currDict.keys()):
                     tab = ""
-                    for i in range(1,5 - len(str(k))):
+                    for i in range(1, 5 - len(str(k))):
                         tab += " "
                     if k == sorted(currDict.keys())[len(currDict.keys()) - 1]:
                         toToolTip = toToolTip + str(k) + tab + "=> " + str(currDict.get(k))

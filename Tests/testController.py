@@ -70,10 +70,10 @@ class TestContoller(QtCore.QThread):
 
         if self.whatConn is None:
             return
+
         self.logSignal.emit('START TEST', 0)
         self.instr.gen.write(":OUTP:STAT ON")
         self.stopTestFlag = False
-
         self.runTests()
 
         self.ser.close()

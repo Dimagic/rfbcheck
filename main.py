@@ -1,3 +1,4 @@
+from Equip.instrumentSettings import TestSettings
 from Forms.mainwindow import Ui_MainWindow
 from Tests.testController import *
 from Equip.selectUser import SelectUser
@@ -42,6 +43,7 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
         self.setUser()
 
         self.menuSelectUser.triggered.connect(self.selectUser)
+        self.menuTestSettings.triggered.connect(self.testSettings)
         self.menuExit.triggered.connect(form.close)
         self.menuExit.setShortcut('Ctrl+Q')
 
@@ -155,6 +157,9 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
 
     def selectUser(self):
         SelectUser(self)
+
+    def testSettings(self):
+        TestSettings(self)
 
     def checkTestState(self, b):
         self.sendLog(str(b.text()), 0)

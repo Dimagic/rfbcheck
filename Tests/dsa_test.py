@@ -25,6 +25,7 @@ class DsaTest(QtCore.QThread):
         self.sa.write(":SENSE:FREQ:center "+str(self.freq)+" MHz")
         self.gen.write(":FREQ:FIX "+str(self.freq)+" MHz")
         self.sa.write(":SENSE:FREQ:span 1 MHz")
+        self.sa.write("BAND:VID 1 KHZ")
         if self.testController.getParent().testSetDsaShort.isChecked():
             self.forDSAtest = [0, 0.5, 1, 2, 4, 8, 16, 31]
         else:
@@ -139,7 +140,7 @@ class DsaTest(QtCore.QThread):
             # q = self.testController.msgSignal.emit('w', 'Warning', '%s test fail' % dsaName, 3)
             q = self.parent.sendMsg('w', 'Warning', '%s test fail' % dsaName, 3)
             if q == QMessageBox.Retry:
-                self.dsaTest(self.ser, cmd, self.whatConn, listSet, self, dsaType)
+                self.dsaTest(listSet, dsaType)
                 return
             elif q == QMessageBox.Cancel:
                 # parent.startTestBtn.setText('Start')

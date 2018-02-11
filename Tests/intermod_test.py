@@ -38,8 +38,9 @@ class IModTest(QtCore.QThread):
         setAmplTo(self.testController.ser, cmd, self.gen, genPow, self.testController)
         self.testController.progressBarSignal.emit('Intermodulation', 0, 0)
         haveFail = False
-        self.sa.write(":SENSE:FREQ:span 3 MHz")
+        self.sa.write(":SENSE:FREQ:span 5 MHz")
         self.sa.write(":SENSE:FREQ:center " + str(freq) + " MHz")
+        self.sa.write("BAND:VID 1 KHZ")
         self.sa.write(":CALC:MARK1:STAT 0")
         self.sa.write("CALC:MARK:CPS 1")
         self.gen.write(":FREQ:FIX " + str(freq) + " MHz")
@@ -60,7 +61,7 @@ class IModTest(QtCore.QThread):
             q = self.mainParent.sendMsg('Intermodulation FAIL: to many peaks', 2)
             if q == QMessageBox.Ok:
                 haveFail = True
-        if delta > 0.7:
+        if delta > 1.5:
             self.testController.logSignal.emit('Delta between peaks FAIL: ' + str(round(delta, 3)) + " dBm", 3)
             self.testController.logSignal.emit(str(freq[0] / 1000) + " MHz " + str(ampl[0]) + " dBm", 3)
             self.testController.logSignal.emit(
@@ -82,7 +83,6 @@ class IModTest(QtCore.QThread):
             q = self.mainParent.sendMsg('w', 'Warning', 'IMod test fail', 3)
             if q == QMessageBox.Retry:
                 self.mToneTest(freq, genPow)
-                return
             elif q == QMessageBox.Cancel:
                 self.testController.stopTestFlag = True
             self.testController.resSignal.emit('Intermodulation', self.testController.whatConn, '', 'Fail', '', 0)
