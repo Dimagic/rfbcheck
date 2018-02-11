@@ -218,9 +218,12 @@ class TestContoller(QtCore.QThread):
             dlPresent = True
         if ulMustToBe and len(self.currParent.testLogUl) > 0:
             ulPresent = True
-        if self.currParent.rfbSN.text().upper() != 'XXXX':
-            if dlMustToBe == dlPresent and ulMustToBe == ulPresent:
+        if (dlMustToBe and not dlPresent) or (ulMustToBe and not ulPresent):
+            self.msgSignal.emit('i', 'RFBcheck', 'Connect second side of the RF', 1)
+        elif dlMustToBe == dlPresent and ulMustToBe == ulPresent:
+            self.msgSignal.emit('i', 'RFBcheck', 'Test complete', 1)
+            if self.currParent.rfbSN.text().upper() != 'XXXX':
                 WriteResult(self, self.currParent.testLogDl, self.currParent.testLogUl)
-                self.msgSignal.emit('i', 'RFBcheck', 'Test complete', 1)
+
 
 

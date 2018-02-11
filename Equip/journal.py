@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QTableWidgetItem, QAbstractItemView
+from PyQt5.QtWidgets import QTableWidgetItem
 from PyQt5 import QtCore, QtGui, QtWidgets
 import ast
 from Equip.equip import toFloat
@@ -61,12 +61,11 @@ class Journal:
         Journal.parent.tableJournal.setRowCount(0)
         Journal.parent.tableJournal.clear()
         headers = ['RFB', 'SN', 'Date test', 'Band', 'Gain', 'Flatnes', 'DSA 1', 'DSA 2', 'DSA 3', 'IMod', 'BIT',
-                   'ALC In', 'ALC Out']
-        # TODO: FIX QObject::connect: Cannot queue arguments of type 'Qt::Orientation'
+                   'ALC In', 'ALC Out', 'Status', 'User']
         Journal.parent.tableJournal.setHorizontalHeaderLabels(headers)
         conn, cursor = Journal.parent.getConnDb()
         dateBegin = int(str(Journal.parent.journalDateStart.date().toPyDate()).replace('-', ''))
-        dateEnd   = int(str(Journal.parent.journalDateStop.date().toPyDate()).replace('-', ''))
+        dateEnd = int(str(Journal.parent.journalDateStop.date().toPyDate()).replace('-', ''))
         q1 = "select * from test_results where cast(substr(dateTest,0,9) AS INTEGER) between %s and %s" \
              % (dateBegin, dateEnd)
         q = "select * from ("+q1+") where (rfb_type like '%"+Journal.parent.journalFilter.text()+"%' or sn like '%" + \
@@ -89,7 +88,8 @@ class Journal:
                 if toCell == 'Fail':
                     Journal.parent.tableJournal.item(numrows, j-1).setBackground(QtCore.Qt.red)
                 if j == 5:
-                    q = "select gain_dl_min, gain_dl_max, gain_ul_min, gain_ul_max from ATR where rfb_type = '%s'" % (row[1])
+                    q = "select gain_dl_min, gain_dl_max, gain_ul_min, gain_ul_max from ATR where rfb_type = '%s'" \
+                        % (row[1])
                     limits = cursor.execute(q).fetchall()[0]
                     if str(row[5]).isdigit():
                         gain = toFloat(row[5])
@@ -98,7 +98,8 @@ class Journal:
 
     def deleteRecords(self):
         sn, dateTest = self.getSelectedRow()
-        q = self.parent.sendMsg('i', 'Delete record', 'Will be remove test record for RF board %s. Are you sure?' % (sn), 2)
+        q = self.parent.sendMsg('i', 'Delete record', 'Will be remove test record for RF board %s. Are you sure?'
+                                % sn, 2)
         if q == QtWidgets.QMessageBox.Ok:
             try:
                 conn, cursor = Journal.parent.getConnDb()
