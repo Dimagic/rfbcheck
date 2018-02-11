@@ -94,7 +94,7 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
         self.rfbSN.textEdited.connect(self.startBtnEnabled)
         self.rfbSN.textChanged.connect(self.startBtnEnabled)
 
-        self.journalFilter.textEdited.connect()
+        self.journalFilter.textEdited.connect(Journal.feelJournal)
 
         self.saAtten.editingFinished.connect(self.checkAttenValue)
         self.genAtten.editingFinished.connect(self.checkAttenValue)
