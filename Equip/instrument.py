@@ -17,14 +17,14 @@ class Instrument:
             self.initGenerator(freq)
             self.initNetwork(freq)
 
-    # def sendQerySa(self, q):
-    #     return self.sa.query(q)
-    #
-    # def sendQeryGen(self, q):
-    #     return self.gen.query(q)
-    #
-    # def sendQeryNa(self, q):
-    #     return self.na.query(q)
+    def sendQerySa(self, q):
+        return self.sa.query(q)
+
+    def sendQeryGen(self, q):
+        return self.gen.query(q)
+
+    def sendQeryNa(self, q):
+        return self.na.query(q)
 
     def initAnalyser(self, freq):
         try:

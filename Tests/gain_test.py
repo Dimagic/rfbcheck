@@ -6,7 +6,7 @@ from PyQt5 import QtCore, QtGui
 
 
 class GainTest(QtCore.QThread):
-    def __init__(self, testController, mainParent, parent=None):
+    def __init__(self, testController, parent=None):
         super(GainTest, self).__init__(parent)
         if testController.stopTestFlag:
             return
@@ -15,8 +15,8 @@ class GainTest(QtCore.QThread):
         self.mainParent = testController.getParent()
         self.sa = testController.instr.sa
         self.gen = testController.instr.gen
-        self.freqDl = mainParent.listSettings[1]
-        self.freqUl = mainParent.listSettings[2]
+        self.freqDl = self.mainParent.listSettings[1]
+        self.freqUl = self.mainParent.listSettings[2]
         self.whatConn = testController.whatConn
         self.ser = self.testController.ser
         gainDlMin = self.mainParent.atrSettings.get('gain_dl_min')
@@ -46,6 +46,12 @@ class GainTest(QtCore.QThread):
                                         str(currentGain) + ' dBm', 3)
             # q = self.testController.msgSignal.emit('w', 'Warning', 'Gain test fail. Gain ' + self.whatConn + ' = ' +
             #                              str(currentGain) + ' dBm', 3)
+            #
+            # while self.mainParent.answer is None:
+            #     time.sleep(.5)
+            # else:
+            #     print(self.mainParent.answer)
+            print(q)
             if q == QMessageBox.Retry:
                 self.gainTest(freq, gainMin, gainMax)
             elif q == QMessageBox.Ignore:

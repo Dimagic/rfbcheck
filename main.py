@@ -42,6 +42,8 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
         self.currUser = None
         self.setUser()
 
+        self.answer = None
+
         self.menuSelectUser.triggered.connect(self.selectUser)
         self.menuTestSettings.triggered.connect(self.testSettings)
         self.menuExit.triggered.connect(form.close)
@@ -289,6 +291,33 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
 
     def applySetFile(self):
         applySetFile(self.rfbTypeCombo.currentText(), self)
+
+    # def sendMsg(self, icon, msgTitle, msgText, typeQestions):
+    #     # TODO: threading problem "QApplication: Object event filter cannot be in a different thread."
+    #     msg = QMessageBox()
+    #     if icon == 'q':
+    #         msg.setIcon(QMessageBox.Question)
+    #     elif icon == 'i':
+    #         msg.setIcon(QMessageBox.Information)
+    #     elif icon == 'w':
+    #         # msg.setIcon(QMessageBox.Warning)
+    #         msg = QMessageBox.warning(self, msgTitle, msgText,
+    #                                   QMessageBox.Ignore | QMessageBox.Retry | QMessageBox.Cancel)
+    #     # elif icon == 'c':
+    #     #     msg.setIcon(QMessageBox.Critical)
+    #     # msg.setText(msgText)
+    #     # msg.setWindowTitle(msgTitle)
+    #     # msg.setWindowIcon(self.appIcon)
+    #     # if typeQestions == 1:
+    #     #     msg.setStandardButtons(QMessageBox.Ok)
+    #     # elif typeQestions == 2:
+    #     #     msg.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
+    #     # elif typeQestions == 3:
+    #     #     msg.setStandardButtons(QMessageBox.Ignore | QMessageBox.Retry | QMessageBox.Cancel)
+    #
+    #     # msg.exec_()
+    #     self.answer = msg.
+
 
     def sendMsg(self, icon, msgTitle, msgText, typeQestions):
         # TODO: threading problem "QApplication: Object event filter cannot be in a different thread."

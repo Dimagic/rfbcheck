@@ -106,7 +106,7 @@ class Calibration:
                 pass
             parent.TestPrBar.setValue(int(i * 10))
             ampl = getAvgGain(parent)
-            delta = round(float(ampl + abs(float(parent.instr.sendQeryGen("POW:AMPL?")))), 2)
+            delta = round(float(ampl + abs(float(parent.instr.gen.query("POW:AMPL?")))), 2)
 
             j = int(i * 10)
             dict = [j, int(j) / 10, delta, datetime.datetime.today().strftime("%Y%m%d %H:%M:%S")]

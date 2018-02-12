@@ -4,7 +4,7 @@ from PyQt5 import QtCore
 
 
 class FlatnessTest(QtCore.QThread):
-    def __init__(self, testController, mainParent, parent=None):
+    def __init__(self, testController, parent=None):
         super(FlatnessTest, self).__init__(parent)
         testController.logSignal.emit("***** Start Flatness test *****", 3)
 
@@ -12,11 +12,11 @@ class FlatnessTest(QtCore.QThread):
         self.mainParent = testController.getParent()
         self.sa = testController.instr.sa
         self.gen = testController.instr.gen
-        self.freqDl = mainParent.listSettings[1]
-        self.freqUl = mainParent.listSettings[2]
-        self.whatConn = testController.whatConn
-        self.atrSettings = mainParent.atrSettings
-        self.listSettings = mainParent.listSettings
+        self.freqDl = self.mainParent.listSettings[1]
+        self.freqUl = self.mainParent.listSettings[2]
+        self.whatConn = self.testController.whatConn
+        self.atrSettings = self.mainParent.atrSettings
+        self.listSettings = self.mainParent.listSettings
         self.ser = testController.ser
         self.gainDict = {}
 

@@ -1,5 +1,5 @@
 import serial
-from PyQt5 import QtCore, QtGui
+from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import QSize
 from PyQt5.QtGui import QMovie
 from PyQt5.QtWidgets import QMessageBox
@@ -86,17 +86,17 @@ class TestContoller(QtCore.QThread):
         if self.currParent.checkGainTest.isChecked():
             if self.stopTestFlag:
                 return
-            GainTest(self, self.currParent)
+            GainTest(self)
 
         if self.currParent.checkGainTest.isChecked():
             if self.stopTestFlag:
                 return
-            FlatnessTest(self, self.currParent)
+            FlatnessTest(self)
 
         if self.currParent.checkDsaTest.isChecked():
             if self.stopTestFlag:
                 return
-            DsaTest(self, self.currParent)
+            DsaTest(self)
 
         if self.currParent.checkImTest.isChecked():
             if self.stopTestFlag:
@@ -224,6 +224,4 @@ class TestContoller(QtCore.QThread):
             self.msgSignal.emit('i', 'RFBcheck', 'Test complete', 1)
             if self.currParent.rfbSN.text().upper() != 'XXXX':
                 WriteResult(self, self.currParent.testLogDl, self.currParent.testLogUl)
-
-
 

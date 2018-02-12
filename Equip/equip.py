@@ -16,7 +16,6 @@ def setAmplTo(conn, cmd, gen, ampl, parent):
     ampl = int(ampl)
     try:
         gain = getAvgGain(parent)
-        # while abs(abs(gain) - abs(ampl)) > 0.03:
         acc = 0.03
         while not (gain-acc <= ampl <= gain+acc):
             gen.write("POW:AMPL " + str(genPow) + " dBm")
@@ -27,9 +26,7 @@ def setAmplTo(conn, cmd, gen, ampl, parent):
                 parent.sendLog("Gain problem", 2)
                 parent.stopTestFlag = True
                 return
-            # steep = 0
             delta = abs(abs(gain) - abs(ampl))
-            # print(delta)
             if delta <= 0.5:
                 steep = 0.01
             elif delta <= 2:
@@ -40,11 +37,9 @@ def setAmplTo(conn, cmd, gen, ampl, parent):
                 genPow += steep
             else:
                 genPow -= steep
-
             parent.progressBarSignal.emit('Set ampl. to ' + str(ampl) + ' dB', 0, 0)  # if err/////
-
     except Exception as e:
-        parent.msgSignal.emit('c', 'Set amlitude error', str(e), 1)
+        parent.msgSignal.emit('c', 'Set amplitude error', str(e), 1)
         return
     parent.logSignal.emit('Current ampl: ' + str(round(gain, 2)) + ' dBm', 0)
     parent.useCorrection = True
@@ -117,6 +112,8 @@ def getAvgGain(parent):
 
     # testController.instr.sa.write("TRAC1:MODE WRIT")
     if testController.useCorrection:
+        print(sum(gainArr) / len(gainArr))
+        print(sum(gainArr) / len(gainArr) - saToGen - genToSa)
         return sum(gainArr) / len(gainArr) - saToGen - genToSa
     else:
         return sum(gainArr) / len(gainArr)

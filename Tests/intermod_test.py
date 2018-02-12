@@ -70,7 +70,7 @@ class IModTest(QtCore.QThread):
         self.gen.write(":OUTP:MOD:STAT OFF")
         time.sleep(1)
         d = n1 - n2
-        if abs(abs(d) - 3) > 0.6:
+        if abs(abs(d) - 3) > 1:
             self.testController.logSignal.emit('Falling per tone(dBc) FAIL: ' + str(round(d, 3)), 2)
             haveFail = True
         else:
