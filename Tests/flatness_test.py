@@ -26,7 +26,7 @@ class FlatnessTest(QtCore.QThread):
         elif testController.whatConn == "Ul":
             self.flatnessTest(self.listSettings[2], self.atrSettings.get('flat_ul_max'))
         else:
-            self.testController.msgSignal.emit("w", "Warning", "Flatness_test Dl/Ul", 1)
+            self.testController.sendMsg("w", "Warning", "Flatness_test Dl/Ul", 1)
         testController.instr.sa.write("TRAC1:MODE WRIT")
 
     def flatnessTest(self, freq, flat):
@@ -80,7 +80,7 @@ class FlatnessTest(QtCore.QThread):
         if currFlat <= flat and (minGain > -50 and maxGain > -50):
             self.testController.resSignal.emit('Flatness', self.testController.whatConn, '0', str(currFlat), str(flat), 1)
         else:
-            q = self.mainParent.sendMsg('w', 'Warning', 'Flatness test fail: ' + str(currFlat) + ' dB', 3)
+            q = self.testController.sendMsg('w', 'Warning', 'Flatness test fail: ' + str(currFlat) + ' dB', 3)
             if q == QMessageBox.Retry:
                 self.testController.instr.sa.write("TRAC1:CLE:ALL")
                 self.flatnessTest(freq, flat)

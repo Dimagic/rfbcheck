@@ -82,7 +82,7 @@ class AlcTest(QtCore.QThread):
         self.parent.TestPrBar.setValue(161)
 
         if len(table) == 0:
-            q = self.mainParent.sendMsg('w', 'Warning', 'ALC In test fail', 3)
+            q = self.testController.sendMsg('w', 'Warning', 'ALC In test fail', 3)
             if q == QMessageBox.Retry:
                 self.alcInTest(self, conn, alc, whatConn, shift)
             elif q == QMessageBox.Cancel:
@@ -139,7 +139,7 @@ class AlcTest(QtCore.QThread):
             self.testController.fillTestLogSignal.emit('ALC out', str(ampl))
         else:
             self.testController.logSignal.emit('ALC ' + whatConn + ' OUT: FAIL ' + str(ampl) + ' dBm', 2)
-            q = self.mainParent.sendMsg('w', 'Warning', 'ALC Out test. Gain: ' + str(ampl) + ' dBm', 3)
+            q = self.testController.sendMsg('w', 'Warning', 'ALC Out test. Gain: ' + str(ampl) + ' dBm', 3)
             if q == QMessageBox.Retry:
                 self.alcOutTest(self.parent, conn, alc, whatConn, shift)
                 return

@@ -1,8 +1,6 @@
-from numpy.distutils.fcompiler import none
-
 from Equip.equip import *
 from PyQt5.QtWidgets import QMessageBox
-from PyQt5 import QtCore, QtGui
+from PyQt5 import QtCore
 
 
 class GainTest(QtCore.QThread):
@@ -42,23 +40,15 @@ class GainTest(QtCore.QThread):
         if gainMin <= currentGain <= gainMax:
             self.testController.resSignal.emit('Gain', self.whatConn, str(gainMin), str(currentGain), str(gainMax), 1)
         else:
-            q = self.mainParent.sendMsg('w', 'Warning', 'Gain test fail. Gain ' + self.whatConn + ' = ' +
-                                        str(currentGain) + ' dBm', 3)
-            # q = self.testController.msgSignal.emit('w', 'Warning', 'Gain test fail. Gain ' + self.whatConn + ' = ' +
-            #                              str(currentGain) + ' dBm', 3)
-            #
-            # while self.mainParent.answer is None:
-            #     time.sleep(.5)
-            # else:
-            #     print(self.mainParent.answer)
-            print(q)
+            q = self.testController.sendMsg('w', 'Warning', 'Gain test fail. Gain ' + self.whatConn + ' = ' +
+                                            str(currentGain) + ' dBm', 3)
             if q == QMessageBox.Retry:
                 self.gainTest(freq, gainMin, gainMax)
             elif q == QMessageBox.Ignore:
-                    self.testController.resSignal.emit('Gain', self.whatConn, str(gainMin), str(currentGain),
-                                                       str(gainMax), 0)
-                    self.testController.fillTestLogSignal.emit('Gain', str(currentGain))
-                    return
+                self.testController.resSignal.emit('Gain', self.whatConn, str(gainMin), str(currentGain),
+                                                   str(gainMax), 0)
+                self.testController.fillTestLogSignal.emit('Gain', str(currentGain))
+                return
             elif q == QMessageBox.Cancel:
                 self.testController.resSignal.emit('Gain', self.whatConn, str(gainMin), str(currentGain),
                                                    str(gainMax), 0)

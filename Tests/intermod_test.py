@@ -23,13 +23,13 @@ class IModTest(QtCore.QThread):
             genPow = self.listSettings[4]
             freq = self.listSettings[2]
         else:
-            self.testController.msgSignal.emit('c', 'IMod test error', 'testController.whatConn = ' +
+            self.testController.sendMsg('c', 'IMod test error', 'testController.whatConn = ' +
                                                testController.whatConn, 1)
             return
         try:
             self.mToneTest(freq, genPow)
         except Exception as e:
-            q = self.mainParent.sendMsg('w', 'mToneTest error', str(e), 1)
+            q = self.testController.sendMsg('w', 'mToneTest error', str(e), 1)
             if q == QMessageBox.Ok:
                 testController.stopTestFlag = True
                 return
@@ -58,7 +58,7 @@ class IModTest(QtCore.QThread):
         freq, ampl = self.instrument.getPeakTable()
         delta = abs(abs(ampl[0]) - abs(ampl[len(ampl) - 1]))
         if len(freq) > 3:
-            q = self.mainParent.sendMsg('Intermodulation FAIL: to many peaks', 2)
+            q = self.testController.sendMsg('Intermodulation FAIL: to many peaks', 2)
             if q == QMessageBox.Ok:
                 haveFail = True
         if delta > 1.5:
@@ -80,7 +80,7 @@ class IModTest(QtCore.QThread):
             self.testController.resSignal.emit('Intermodulation', self.testController.whatConn, '', 'Pass', '', 1)
             self.testController.fillTestLogSignal.emit('IMod', 'Pass')
         else:
-            q = self.mainParent.sendMsg('w', 'Warning', 'IMod test fail', 3)
+            q = self.testController.sendMsg('w', 'Warning', 'IMod test fail', 3)
             if q == QMessageBox.Retry:
                 self.mToneTest(freq, genPow)
             elif q == QMessageBox.Cancel:

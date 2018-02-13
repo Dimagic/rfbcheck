@@ -1,9 +1,5 @@
 import serial
-from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtCore import QSize
-from PyQt5.QtGui import QMovie
-from PyQt5.QtWidgets import QMessageBox
-
+from PyQt5 import QtCore
 from Equip.writeTestResult import WriteResult
 from Tests.gain_test import GainTest
 from Tests.flatness_test import FlatnessTest
@@ -59,8 +55,7 @@ class TestContoller(QtCore.QThread):
     def run(self):
         # TODO: com port and instrument initialisation problem
         if len(self.testArr) is 0:
-            # self.sendMsg('w', "Warning", "You have to choice minimum one test", 1)
-            self.msgSignal.emit('w', "Warning", "You have to choice minimum one test", 1)
+            self.sendMsg('w', "Warning", "You have to choice minimum one test", 1)
             return
         self.getComConn()
         if self.haveConn:
@@ -145,7 +140,7 @@ class TestContoller(QtCore.QThread):
             self.haveConn = False
             self.logSignal.emit('Connection problem: ' + str(e), 1)
             self.comMovieSignal.emit('', '')
-            self.msgSignal.emit('c', 'Connection problem', str(e), 1)
+            self.sendMsg('c', 'Connection problem', str(e), 1)
             if self.ser is not None:
                 if self.ser.isOpen():
                     self.ser.close()
@@ -180,7 +175,7 @@ class TestContoller(QtCore.QThread):
                     self.stopTestFlag = True
                     return
             except Exception as e:
-                self.currParent.sendMsg('c', 'Instrument initialisation error', str(e), 1)
+                self.sendMsg('c', 'Instrument initialisation error', str(e), 1)
             self.instr.gen.write(":OUTP:STAT ON")
             time.sleep(3)
             if float(getAvgGain(self)) > -50:
@@ -218,10 +213,18 @@ class TestContoller(QtCore.QThread):
             dlPresent = True
         if ulMustToBe and len(self.currParent.testLogUl) > 0:
             ulPresent = True
-        if (dlMustToBe and not dlPresent) or (ulMustToBe and not ulPresent):
-            self.msgSignal.emit('i', 'RFBcheck', 'Connect second side of the RF', 1)
+        if ((dlMustToBe and not dlPresent) or (ulMustToBe and not ulPresent)) and  not self.stopTestFlag:
+            self.sendMsg('i', 'RFBcheck', 'Connect second side of the RF', 1)
         elif dlMustToBe == dlPresent and ulMustToBe == ulPresent:
             self.msgSignal.emit('i', 'RFBcheck', 'Test complete', 1)
             if self.currParent.rfbSN.text().upper() != 'XXXX':
                 WriteResult(self, self.currParent.testLogDl, self.currParent.testLogUl)
 
+    def sendMsg(self, icon, msgTitle, msgText, typeQestions):
+        self.msgSignal.emit(icon, msgTitle, msgText, typeQestions)
+        while self.currParent.answer is None:
+            time.sleep(.05)
+        else:
+            forReturn = self.currParent.answer
+            self.currParent.answer = None
+            return forReturn

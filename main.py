@@ -1,3 +1,6 @@
+from PyQt5.QtCore import QSize
+from PyQt5.QtGui import QMovie
+
 from Equip.instrumentSettings import TestSettings
 from Forms.mainwindow import Ui_MainWindow
 from Tests.testController import *
@@ -12,7 +15,7 @@ from PyQt5 import QtCore, QtWidgets, QtGui
 from PyQt5.QtWidgets import QTableWidgetItem, QAbstractItemView, QLabel, QAction
 import threading
 
-version = '0.2.6'
+version = '0.2.7'
 
 
 class TestTime(threading.Thread):
@@ -292,35 +295,7 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
     def applySetFile(self):
         applySetFile(self.rfbTypeCombo.currentText(), self)
 
-    # def sendMsg(self, icon, msgTitle, msgText, typeQestions):
-    #     # TODO: threading problem "QApplication: Object event filter cannot be in a different thread."
-    #     msg = QMessageBox()
-    #     if icon == 'q':
-    #         msg.setIcon(QMessageBox.Question)
-    #     elif icon == 'i':
-    #         msg.setIcon(QMessageBox.Information)
-    #     elif icon == 'w':
-    #         # msg.setIcon(QMessageBox.Warning)
-    #         msg = QMessageBox.warning(self, msgTitle, msgText,
-    #                                   QMessageBox.Ignore | QMessageBox.Retry | QMessageBox.Cancel)
-    #     # elif icon == 'c':
-    #     #     msg.setIcon(QMessageBox.Critical)
-    #     # msg.setText(msgText)
-    #     # msg.setWindowTitle(msgTitle)
-    #     # msg.setWindowIcon(self.appIcon)
-    #     # if typeQestions == 1:
-    #     #     msg.setStandardButtons(QMessageBox.Ok)
-    #     # elif typeQestions == 2:
-    #     #     msg.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
-    #     # elif typeQestions == 3:
-    #     #     msg.setStandardButtons(QMessageBox.Ignore | QMessageBox.Retry | QMessageBox.Cancel)
-    #
-    #     # msg.exec_()
-    #     self.answer = msg.
-
-
-    def sendMsg(self, icon, msgTitle, msgText, typeQestions):
-        # TODO: threading problem "QApplication: Object event filter cannot be in a different thread."
+    def sendMsg(self, icon, msgTitle, msgText, typeQuestion):
         msg = QMessageBox()
         if icon == 'q':
             msg.setIcon(QMessageBox.Question)
@@ -333,14 +308,15 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
         msg.setText(msgText)
         msg.setWindowTitle(msgTitle)
         msg.setWindowIcon(self.appIcon)
-        if typeQestions == 1:
+        if typeQuestion == 1:
             msg.setStandardButtons(QMessageBox.Ok)
-        elif typeQestions == 2:
+        elif typeQuestion == 2:
             msg.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
-        elif typeQestions == 3:
+        elif typeQuestion == 3:
             msg.setStandardButtons(QMessageBox.Ignore | QMessageBox.Retry | QMessageBox.Cancel)
+        self.answer = msg.exec_()
+        return self.answer
 
-        return msg.exec_()
 
     def getInstrAddr(self):
         rm = visa.ResourceManager()
@@ -519,6 +495,7 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
 
     def on_started(self):
         self.testIsRun = True
+        self.answer = None
         if self.testLogDl.get('SN') not in [self.rfbSN.text(), None]:
             self.testLogDl = {}
         if self.testLogUl.get('SN') not in [self.rfbSN.text(), None]:

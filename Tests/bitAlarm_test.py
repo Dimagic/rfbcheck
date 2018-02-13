@@ -57,7 +57,7 @@ class BitAlarmTest(QtCore.QThread):
             self.testController.resSignal.emit('BIT', self.testController.whatConn, '', 'Pass', '', 1)
             status = 'Pass'
         else:
-            q = self.parent.sendMsg('w', 'Warning', 'BIT alarm test fail', 3)
+            q = self.testController.sendMsg('w', 'Warning', 'BIT alarm test fail', 3)
             if q == QMessageBox.Retry:
                 self.test()
             elif q == QMessageBox.Cancel:
@@ -136,7 +136,7 @@ class BitAlarmTest(QtCore.QThread):
             f = open(file, 'r')
             f.close()
         except Exception as e:
-            self.testController.msgSignal.emit('w', 'Cont open file settings', str(e), 1)
+            self.testController.sendMsg('w', 'Cont open file settings', str(e), 1)
             return
         with open(file) as csvfile:
             reader = csv.DictReader(csvfile)

@@ -70,7 +70,7 @@ class DsaTest(QtCore.QThread):
             dsa3test = toFloat(dsa3)
 
         else:
-            self.testController.msgSignal.emit('c', 'Error', 'Incorrect DSA type', 1)
+            self.testController.sendMsg('c', 'Error', 'Incorrect DSA type', 1)
             return
 
         setDSA(self.ser, cmd, self.whatConn, dsa1test, dsa2test, dsa3test)
@@ -137,13 +137,11 @@ class DsaTest(QtCore.QThread):
             self.testController.fillTestLogSignal.emit(dsaName, 'Warning')
 
         else:
-            # q = self.testController.msgSignal.emit('w', 'Warning', '%s test fail' % dsaName, 3)
-            q = self.parent.sendMsg('w', 'Warning', '%s test fail' % dsaName, 3)
+            q = self.testController.sendMsg('w', 'Warning', '%s test fail' % dsaName, 3)
             if q == QMessageBox.Retry:
                 self.dsaTest(listSet, dsaType)
                 return
             elif q == QMessageBox.Cancel:
-                # parent.startTestBtn.setText('Start')
                 self.testController.stopTestFlag = True
             self.testController.resSignal.emit(dsaName, self.testController.whatConn, '', 'Fail', '', 0)
             self.testController.fillTestLogSignal.emit(dsaName, 'Fail')
