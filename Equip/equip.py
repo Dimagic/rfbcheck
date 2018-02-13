@@ -47,6 +47,7 @@ def setAmplTo(conn, cmd, gen, ampl, parent):
 
 
 def setAlc(conn, alc, n, shift):
+    print(conn, alc, 255, shift)
     s = str(hex(n)).replace('0x', '')
     sd = getHexStr(str(hex(n - shift)).replace('0x', ''))
     toSend = (alc + getHexStr(s) + sd).upper()
@@ -198,7 +199,7 @@ def setDSA(conn, cmd, whatConn, dsa1, dsa2, dsa3):
         toSend = cmd.setDSAUl
         d = 29
     else:
-        parent.sendLog('ERR: set DSA fail', 2)
+        # parent.sendLog('ERR: set DSA fail', 2)
         return
     sum = sumHexFloat(dsa1) + sumHexFloat(dsa2) + sumHexFloat(dsa3)
     toSend = toSend + str(floatToHex(dsa1).replace('0x', '')) + str(floatToHex(dsa2).replace('0x', '')) + str(
@@ -215,8 +216,6 @@ def setDSA(conn, cmd, whatConn, dsa1, dsa2, dsa3):
 
     toSend = (toSend + '0000' + str(sumHex)).upper()
     conn.write(binascii.unhexlify(toSend))
-    ##    print('Tx: ' + toSend)
-    ##    print('Rx: ' + str(binascii.hexlify(conn.ser.read(conn.ser.inWaiting()))))
     time.sleep(0.3)
 
 
@@ -227,7 +226,6 @@ def getCrc(line):
     sum = 0
     l = len(line)
     n = 0
-
     while n <= l - 2:
         msg = line[n:n + 2]
         sum += int(msg[0:2], 16)
@@ -238,4 +236,4 @@ def getCrc(line):
     crc = str(hex(sum % 256).replace('0x', ''))
     if len(crc) < 2:
         crc = '0' + crc
-    return (crc)
+    return crc

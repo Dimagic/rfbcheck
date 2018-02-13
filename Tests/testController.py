@@ -1,3 +1,5 @@
+import csv
+import os
 import serial
 from PyQt5 import QtCore
 from Equip.writeTestResult import WriteResult
@@ -53,6 +55,9 @@ class TestContoller(QtCore.QThread):
         self.getTests(currParent)
 
     def run(self):
+        # self.readAdemSettings()
+        # return
+
         # TODO: com port and instrument initialisation problem
         if len(self.testArr) is 0:
             self.sendMsg('w', "Warning", "You have to choice minimum one test", 1)
@@ -228,3 +233,30 @@ class TestContoller(QtCore.QThread):
             forReturn = self.currParent.answer
             self.currParent.answer = None
             return forReturn
+
+    def readAdemSettings(self):
+        # stm32f103vet6
+        try:
+            file = os.path.join(os.path.dirname(__file__), '..', 'setFiles',
+                                self.currParent.rfbTypeCombo.currentText() + '.CSV')
+            f = open(file, 'r')
+            f.close()
+        except Exception as e:
+            self.sendMsg('w', 'Cont open file settings', str(e), 1)
+            return
+
+        valuesDict = {}
+        with open(file) as csvfile:
+            reader = csv.DictReader(csvfile)
+            for row in reader:
+                keyVal = row.get('# 0 1182685875')
+                if keyVal == '# Do not delete above this line!':
+                    continue
+                # if keyVal[:4] != 'ALC_':
+                #     continue
+                lenNewArr = int(row.get(None)[3])
+                arr = row.get(None)[4:4 + lenNewArr]
+                valuesDict.update({keyVal: arr})
+
+                 # prefix = 'AAAA543022556677'
+            print(valuesDict)

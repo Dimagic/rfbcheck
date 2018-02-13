@@ -84,7 +84,7 @@ class AlcTest(QtCore.QThread):
         if len(table) == 0:
             q = self.testController.sendMsg('w', 'Warning', 'ALC In test fail', 3)
             if q == QMessageBox.Retry:
-                self.alcInTest(self, conn, alc, whatConn, shift)
+                self.alcInTest(conn, alc, whatConn, shift)
             elif q == QMessageBox.Cancel:
                 setAlc(conn, alc, 255, shift)
                 self.testController.stopTestFlag = True
