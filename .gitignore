@@ -2,3 +2,8 @@
 *.iml
 .idea
 out
+
+# venv
+venv
+
+test_report_lab.pdf
