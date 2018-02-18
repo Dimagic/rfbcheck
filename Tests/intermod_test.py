@@ -7,8 +7,6 @@ from PyQt5 import QtCore
 class IModTest(QtCore.QThread):
     def __init__(self, testController, parent=None):
         super(IModTest, self).__init__(parent)
-        if testController.stopTestFlag:
-            return
         testController.logSignal.emit("***** Start IMod test *****", 3)
         self.testController = testController
         self.mainParent = testController.getParent()
@@ -35,6 +33,8 @@ class IModTest(QtCore.QThread):
                 return
 
     def mToneTest(self, freq, genPow):
+        if self.testController.stopTestFlag:
+            return
         setAmplTo(self.testController.ser, cmd, self.gen, genPow, self.testController)
         self.testController.progressBarSignal.emit('Intermodulation', 0, 0)
         haveFail = False
