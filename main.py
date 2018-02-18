@@ -15,7 +15,7 @@ from PyQt5 import QtCore, QtWidgets, QtGui
 from PyQt5.QtWidgets import QTableWidgetItem, QAbstractItemView, QLabel, QAction
 import threading
 
-version = '0.2.7'
+version = '0.2.8'
 
 
 class TestTime(threading.Thread):
