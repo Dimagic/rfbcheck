@@ -61,26 +61,31 @@ class Instrument:
             return
 
     def initNetwork(self, freq):
-        return
-        # try:
-        #     self.na = self.rm.open_resource(self.parent.currNaLbl.text())
-        #     self.na.write(":SYST:PRES")
-        #     self.na.write(":SENS1:FREQ:CENT 806E6")
-        #     self.na.write(":SENS1:FREQ:SPAN 36E6")
-        #     self.na.write(":CALC1:PAR1:DEF S12")
-        #     self.na.write(":CALC1:MARK1 ON")
-        #     time.sleep(3)
-        #     arr = []
-        #     for i in range(788, 824):
-        #         self.na.write(":CALC1:MARK1:X " + str(i) + 'E6')
-        #         gain = self.na.query(":CALC1:MARK1:Y?")
-        #         arr.append(gain)
-        #     print(max(arr))
-        #     print(min(arr))
-        #     print(min(arr) + max(arr))
-        # except Exception as e:
-        #     self.parent.myThread.logSignal.emit("NA - "+str(e),2)
-        #     return
+        # return
+        try:
+            self.na = self.rm.open_resource(self.parent.currNaLbl.text())
+            self.na.write(":SYST:PRES")
+            self.na.write(':MMEM:LOAD "D:/RFBCheck.STA"')
+            time.sleep(2)
+            self.na.write(":SOUR1:POW:ATT 40")
+            self.na.write(":SOUR1:POW:PORT2 -45")
+
+            # self.na.write(":SENS1:FREQ:CENT 806E6")
+            # self.na.write(":SENS1:FREQ:SPAN 36E6")
+            # self.na.write(":CALC1:PAR1:DEF S12")
+            # self.na.write(":CALC1:MARK1 ON")
+            # time.sleep(3)
+            # arr = []
+            # for i in range(788, 824):
+            #     self.na.write(":CALC1:MARK1:X " + str(i) + 'E6')
+            #     gain = self.na.query(":CALC1:MARK1:Y?")
+            #     arr.append(gain)
+            # print(max(arr))
+            # print(min(arr))
+            # print(min(arr) + max(arr))
+        except Exception as e:
+            self.parent.myThread.logSignal.emit("NA - "+str(e), 2)
+            return
         # else:
         #     self.initNetwork(int(freq))
 

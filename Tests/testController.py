@@ -12,6 +12,7 @@ from Tests.alc_test import AlcTest
 from Equip.equip import *
 from Equip.instrument import *
 import Equip.commands as cmd
+from Tests.rloss_test import ReturnLossTest
 
 
 class TestContoller(QtCore.QThread):
@@ -83,6 +84,8 @@ class TestContoller(QtCore.QThread):
         self.writeResults()
 
     def runTests(self):
+        ReturnLossTest(self)
+
         if self.currParent.checkGainTest.isChecked():
             if self.stopTestFlag:
                 return
@@ -115,6 +118,7 @@ class TestContoller(QtCore.QThread):
         self.progressBarSignal.emit('Done', 100, 100)
 
     def getTests(self, currParent):
+        self.testArr.append('Return loss test')
         if currParent.checkGainTest.isChecked():
             self.testArr.append('Gain test')
         if currParent.checkGainTest.isChecked():
@@ -169,9 +173,9 @@ class TestContoller(QtCore.QThread):
         self.whatConn = None
         Dl = self.currParent.listSettings[1]
         Ul = self.currParent.listSettings[2]
+        self.progressBarSignal.emit('Check connection', 0, 0)
 
         for i in [Dl, Ul]:
-            self.progressBarSignal.emit('Check connection', 0, 0)
             if i == 0:
                 continue
             try:
@@ -181,9 +185,33 @@ class TestContoller(QtCore.QThread):
                     return
             except Exception as e:
                 self.sendMsg('c', 'Instrument initialisation error', str(e), 1)
-            self.instr.gen.write(":OUTP:STAT ON")
-            time.sleep(3)
-            if float(getAvgGain(self)) > -50:
+
+            if self.currParent.gainSA.isChecked():
+                self.instr.gen.write(":OUTP:STAT ON")
+                time.sleep(3)
+                gain = float(getAvgGain(self))
+                self.instr.gen.write(":OUTP:STAT OFF")
+                time.sleep(1)
+                if gain > -50:
+                    uldl = True
+                else:
+                    uldl = False
+            else:
+                self.instr.na.write(":SENS1:FREQ:CENT " + str(i) + "E6")
+                self.instr.na.write(":SENS1:FREQ:SPAN 30E6")
+                self.instr.na.write(":CALC1:PAR1:DEF S12")
+                self.instr.na.write(":CALC1:MARK1 ON")
+                self.instr.na.write(":CALC1:MARK1:X " + str(i) + 'E6')
+                time.sleep(2)
+                self.instr.na.write(":CALC1:MARK1:X " + str(i) + 'E6')
+                gain = self.instr.na.query(":CALC1:MARK1:Y?")
+                gain = gain[:gain.find(',')]
+                gain = round(float(gain), 2)
+                if gain > 0:
+                    uldl = True
+                else:
+                    uldl = False
+            if uldl:
                 if i == Dl:
                     self.logSignal.emit("Testing DownLink", 0)
                     self.whatConn = "Dl"
@@ -202,9 +230,8 @@ class TestContoller(QtCore.QThread):
             self.ser.close()
             self.comMovieSignal.emit('', '')
             return
-        self.instr.gen.write(":OUTP:STAT OFF")
-        time.sleep(1)
-        return self.whatConn
+        else:
+            return self.whatConn
 
     def writeResults(self):
         dlMustToBe = ulMustToBe = dlPresent = ulPresent = False

@@ -15,7 +15,7 @@ from PyQt5 import QtCore, QtWidgets, QtGui
 from PyQt5.QtWidgets import QTableWidgetItem, QAbstractItemView, QLabel, QAction
 import threading
 
-version = '0.2.8'
+version = '0.3.0'
 
 
 class TestTime(threading.Thread):
@@ -526,6 +526,8 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
         self.calibrationGroupBox.setEnabled(True)
         self.instrAddrCombo.setMouseTracking(True)
         self.startTestBtn.setText('Start')
+        self.setProgressBar('Done', 1, 1)
+
 
     def setProgressBar(self, testName, barMax, barCurr):
         if self.currTestLbl.text() != testName:

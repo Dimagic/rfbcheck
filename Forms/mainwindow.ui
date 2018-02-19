@@ -1329,16 +1329,52 @@
       <property name="title">
        <string>Test settings</string>
       </property>
-      <widget class="QWidget" name="layoutWidget">
+      <widget class="QWidget" name="">
        <property name="geometry">
         <rect>
-         <x>1</x>
-         <y>20</y>
-         <width>145</width>
-         <height>22</height>
+         <x>13</x>
+         <y>23</y>
+         <width>174</width>
+         <height>19</height>
         </rect>
        </property>
        <layout class="QGridLayout" name="gridLayout">
+        <item row="0" column="0">
+         <widget class="QLabel" name="label">
+          <property name="text">
+           <string>Gain test:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QRadioButton" name="gainSA">
+          <property name="text">
+           <string>use SA</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="2">
+         <widget class="QRadioButton" name="gainNA">
+          <property name="text">
+           <string>use NA</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>50</y>
+         <width>171</width>
+         <height>19</height>
+        </rect>
+       </property>
+       <layout class="QGridLayout" name="gridLayout_3">
         <item row="0" column="0">
          <widget class="QLabel" name="label3">
           <property name="text">
@@ -1368,6 +1404,11 @@
         </item>
        </layout>
       </widget>
+      <zorder>layoutWidget</zorder>
+      <zorder>testSetDsaFull</zorder>
+      <zorder>label</zorder>
+      <zorder>gainSA</zorder>
+      <zorder>gainNA</zorder>
      </widget>
      <widget class="QGroupBox" name="calibrationGroupBox">
       <property name="geometry">

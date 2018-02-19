@@ -13,6 +13,7 @@ class GainTest(QtCore.QThread):
         self.mainParent = testController.getParent()
         self.sa = testController.instr.sa
         self.gen = testController.instr.gen
+        self.na = testController.instr.na
         self.freqDl = self.mainParent.listSettings[1]
         self.freqUl = self.mainParent.listSettings[2]
         self.whatConn = testController.whatConn
@@ -28,14 +29,27 @@ class GainTest(QtCore.QThread):
 
     def gainTest(self, freq, gainMin, gainMax):
         self.testController.progressBarSignal.emit('Gain', 0, 0)
-        self.sa.write(":SENSE:FREQ:center " + str(freq) + " MHz")
-        self.gen.write(":FREQ:FIX " + str(freq) + " MHz")
-        self.gen.write("POW:AMPL -45 dBm")
-        time.sleep(1)
-        self.testController.useCorrection = True
-        ampl = getAvgGain(self.testController)
-        genPow = float(self.gen.query("POW:AMPL?"))
-        currentGain = round(abs(genPow) + ampl, 1)
+        if self.mainParent.gainSA.isChecked():
+            self.sa.write(":SENSE:FREQ:center " + str(freq) + " MHz")
+            self.gen.write(":FREQ:FIX " + str(freq) + " MHz")
+            self.gen.write("POW:AMPL -45 dBm")
+            time.sleep(1)
+            self.testController.useCorrection = True
+            ampl = getAvgGain(self.testController)
+            genPow = float(self.gen.query("POW:AMPL?"))
+            currentGain = round(abs(genPow) + ampl, 2)
+        else:
+            self.na.write(":SENS1:FREQ:CENT " + str(freq) + "E6")
+            self.na.write(":SENS1:FREQ:SPAN 30E6")
+            self.na.write(":CALC1:PAR1:DEF S12")
+            self.na.write(":CALC1:MARK1 ON")
+            # self.na.write(":SENS1:AVER ON")
+            time.sleep(2)
+            self.na.write(":CALC1:MARK1:X " + str(freq) + 'E6')
+            currentGain = self.na.query(":CALC1:MARK1:Y?")
+            currentGain = currentGain[:currentGain.find(',')]
+            currentGain = round(float(currentGain) + float(self.mainParent.naAtten1.text()), 2)
+
         self.testController.logSignal.emit("Gain " + self.whatConn + " = " + str(currentGain) + " dBm", 0)
         if gainMin <= currentGain <= gainMax:
             self.testController.resSignal.emit('Gain', self.whatConn, str(gainMin), str(currentGain), str(gainMax), 1)
