@@ -1,6 +1,8 @@
+# stylesheet
+import qdarkstyle
+
 from PyQt5.QtCore import QSize
 from PyQt5.QtGui import QMovie
-
 from Equip.instrumentSettings import TestSettings
 from Forms.mainwindow import Ui_MainWindow
 from Tests.testController import *
@@ -14,6 +16,7 @@ from Tests.bitAlarm_test import *
 from PyQt5 import QtCore, QtWidgets, QtGui
 from PyQt5.QtWidgets import QTableWidgetItem, QAbstractItemView, QLabel, QAction
 import threading
+import serial.tools.list_ports
 
 version = '0.3.0'
 
@@ -31,6 +34,10 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
     def __init__(self, form, parent=None):
         super(mainProgram, self).__init__(parent)
         # loadUi('Forms/mainwindow.ui', self)
+
+        # stylesheet
+        app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())
+
         self.appIcon = QtGui.QIcon("Img/ico32_pgn_icon.ico")
         self.passImg = QtGui.QPixmap('Img/pass.png')
         self.failImg = QtGui.QPixmap('Img/fail.png')
@@ -125,10 +132,15 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
         conn, cursor = self.getConnDb()
         rfbList = cursor.execute("select name from rfb_type order by name")
 
+        # Get RFB list and fill combobox
         for i in rfbList:
             self.rfbTypeCombo.addItem(str(i).replace("('", "").replace("',)", ""))
             if len(self.editRfbCombo) == 0: self.editRfbCombo.addItem('New')
             self.editRfbCombo.addItem(str(i).replace("('", "").replace("',)", ""))
+
+        # Get available COM ports
+        for i in list(serial.tools.list_ports.comports()):
+            print(i)
 
         rep = Report(None, None, None, self)
         rep.getTemplates(self)
@@ -143,7 +155,6 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
 
         conn.close()
         self.journal = Journal(self)
-
 
     def on_newRfbBtn_clicked(self):
         self.dialog = EditRFB(self, self)
@@ -286,7 +297,7 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
         return str(datetime.datetime.today().strftime("%H:%M:%S"))
 
     def startBtnEnabled(self):
-        if ((self.rfbSN.text().isdigit() == True and len(self.rfbSN.text()) >= 8)
+        if ((self.rfbSN.text().isdigit() and len(self.rfbSN.text()) >= 8)
                 or (self.rfbSN.text().upper() == 'XXXX')):
             self.startTestBtn.setEnabled(True)
         else:
@@ -317,33 +328,35 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
         self.answer = msg.exec_()
         return self.answer
 
-
     def getInstrAddr(self):
-        rm = visa.ResourceManager()
-        rm.timeout = 500
-        listInstr = rm.list_resources()
-        self.instrAddrCombo.clear()
-        for i in listInstr:
-            self.instrAddrCombo.addItem(str(i))
-        ledLbl = [self.saStat, self.genStat, self.naStat]
-        adrLbl = [self.currSaLbl, self.currGenLbl, self.currNaLbl]
-        for j in adrLbl:
-            i = adrLbl.index(j)
-            try:
-                # if j.text() == '':
-                #     self.blueLedMovie.setScaledSize(QSize(13, 13))
-                #     ledLbl[i].setMovie(self.blueLedMovie)
-                #     self.blueLedMovie.start()
-                # else:
+        try:
+            rm = visa.ResourceManager()
+            rm.timeout = 500
+            listInstr = rm.list_resources()
+            self.instrAddrCombo.clear()
+            for i in listInstr:
+                self.instrAddrCombo.addItem(str(i))
+            ledLbl = [self.saStat, self.genStat, self.naStat]
+            adrLbl = [self.currSaLbl, self.currGenLbl, self.currNaLbl]
+            for j in adrLbl:
+                i = adrLbl.index(j)
+                try:
                     currInstr = rm.open_resource(j.text())
                     currInstr.query('*IDN?')
                     self.greenLedMovie.setScaledSize(QSize(13, 13))
                     ledLbl[i].setMovie(self.greenLedMovie)
                     self.greenLedMovie.start()
-            except:
-                self.redLedMovie.setScaledSize(QSize(13, 13))
-                ledLbl[i].setMovie(self.redLedMovie)
-                self.redLedMovie.start()
+                except:
+                    self.redLedMovie.setScaledSize(QSize(13, 13))
+                    ledLbl[i].setMovie(self.redLedMovie)
+                    self.redLedMovie.start()
+        except Exception as e:
+            self.redLedMovie.setScaledSize(QSize(13, 13))
+            self.saStat.setMovie(self.redLedMovie)
+            self.genStat.setMovie(self.redLedMovie)
+            self.naStat.setMovie(self.redLedMovie)
+            self.redLedMovie.start()
+            self.sendMsg('c', 'Instrument init. error', str(e), 1)
 
     def getConnDb(self):
         try:
