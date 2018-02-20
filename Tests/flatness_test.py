@@ -1,4 +1,5 @@
 from Equip.equip import *
+
 from PyQt5.QtWidgets import QMessageBox
 from PyQt5 import QtCore
 
@@ -12,6 +13,7 @@ class FlatnessTest(QtCore.QThread):
         self.mainParent = testController.getParent()
         self.sa = testController.instr.sa
         self.gen = testController.instr.gen
+        self.na = testController.instr.gen
         self.freqDl = self.mainParent.listSettings[1]
         self.freqUl = self.mainParent.listSettings[2]
         self.whatConn = self.testController.whatConn
@@ -20,40 +22,42 @@ class FlatnessTest(QtCore.QThread):
         self.ser = testController.ser
         self.gainDict = {}
 
-        testController.instr.sa.write("TRAC1:MODE MAXH")
-        if testController.whatConn == "Dl":
-            self.flatnessTest(self.listSettings[1], self.atrSettings.get('flat_dl_max'))
-        elif testController.whatConn == "Ul":
-            self.flatnessTest(self.listSettings[2], self.atrSettings.get('flat_ul_max'))
+        self.rfBands = {'band_dl_1': self.atrSettings.get('freq_band_dl_1'),
+                        'band_ul_1': self.atrSettings.get('freq_band_ul_1'),
+                        'band_dl_2': self.atrSettings.get('freq_band_dl_2'),
+                        'band_ul_2': self.atrSettings.get('freq_band_ul_2')}
+
+        if self.mainParent.gainSA.isChecked():
+            testController.instr.sa.write("TRAC1:MODE MAXH")
+            if testController.whatConn == "Dl":
+                self.flatnessTest(self.listSettings[1], self.atrSettings.get('flat_dl_max'))
+            elif testController.whatConn == "Ul":
+                self.flatnessTest(self.listSettings[2], self.atrSettings.get('flat_ul_max'))
+            testController.instr.sa.write("TRAC1:MODE WRIT")
         else:
-            self.testController.sendMsg("w", "Warning", "Flatness_test Dl/Ul", 1)
-        testController.instr.sa.write("TRAC1:MODE WRIT")
+            self.flatnessTestNa()
 
     def flatnessTest(self, freq, flat):
-        rfBands = {'band_dl_1': self.atrSettings.get('freq_band_dl_1'),
-                   'band_ul_1': self.atrSettings.get('freq_band_ul_1'),
-                   'band_dl_2': self.atrSettings.get('freq_band_dl_2'),
-                   'band_ul_2': self.atrSettings.get('freq_band_ul_2')}
-        if rfBands.get('band_dl_2').find('@') == -1 and rfBands.get('band_ul_2').find('@') == -1:
+        if self.rfBands.get('band_dl_2').find('@') == -1 and self.rfBands.get('band_ul_2').find('@') == -1:
             self.testController.logSignal.emit("RFB has one range of frequency", 0)
 
             if self.whatConn == 'Dl':
-                start, stop = strToFreq(rfBands.get('band_dl_1'))
+                start, stop = strToFreq(self.rfBands.get('band_dl_1'))
                 self.getFlatness(start, stop)
             else:
-                start, stop = strToFreq(rfBands.get('band_ul_1'))
+                start, stop = strToFreq(self.rfBands.get('band_ul_1'))
                 self.getFlatness(start, stop)
         else:
             self.testController.logSignal.emit("RFB has two ranges of frequency", 0)
-            for k in rfBands.keys():
-                if rfBands.get(k).find('@') == -1:
+            for k in self.rfBands.keys():
+                if self.rfBands.get(k).find('@') == -1:
                     continue
-                start, stop = strToFreq(rfBands.get(k))
+                start, stop = strToFreq(self.rfBands.get(k))
                 if self.testController.whatConn == 'Dl':
-                    if k.find('_dl_') != -1 and rfBands.get(k).find('@') != -1:
+                    if k.find('_dl_') != -1 and self.rfBands.get(k).find('@') != -1:
                         self.getFlatness(start, stop)
                 else:
-                    if k.find('_ul_') != -1 and rfBands.get(k).find('@') != -1:
+                    if k.find('_ul_') != -1 and self.rfBands.get(k).find('@') != -1:
                         self.getFlatness(start, stop)
         minGain = maxGain = None
         minFreq = maxFreq = None
@@ -120,3 +124,42 @@ class FlatnessTest(QtCore.QThread):
 
         self.sa.write("CALC:MARK1:STAT 0")
         self.sa.write("CALC:MARK:CPS 1")
+
+    def flatnessTestNa(self):
+        peakPos = {}
+        peakNeg = {}
+        for i in self.rfBands:
+            if self.testController.whatConn.upper() in i.upper():
+                start, stop = strToFreq(self.rfBands.get(i))
+                print(start, stop)
+                # self.na.write(":CALC1:PAR1:DEF S12")
+
+                self.na.write(":SENS1:FREQ:STAR " + str(start) + "E6")
+                self.na.write(":SENS1:FREQ:STOP " + str(stop) + "E6")
+                print('Done')
+                # self.na.write(":CALC1:MARK1 ON")
+                # self.na.write(":SENS1:AVER ON")
+                # time.sleep(2)
+                # self.na.write(":CALC1:MARK1:FUNC:TYPE PEAK")
+                # self.na.write(":CALC1:MARK1:FUNC:PEXC .5")
+                # self.na.write(":CALC1:MARK1:FUNC:PPOL POS")
+                # self.na.write(":CALC1:MARK1:FUNC:EXEC")
+        #         time.sleep(.2)
+        #         freqPeak = self.na.query(":CALC1:MARK1:X?")
+        #         time.sleep(.2)
+        #         valuePeak = self.na.query(":CALC1:MARK1:Y?")
+        #         time.sleep(.2)
+        #         peakPos.update({freqPeak: valuePeak})
+        #
+        #         self.na.write(":CALC1:MARK1:FUNC:PPOL NEG")
+        #         self.na.write(":CALC1:MARK1:FUNC:EXEC")
+        #         time.sleep(.2)
+        #         freqPeak = self.na.query(":CALC1:MARK1:X?")
+        #         time.sleep(.2)
+        #         valuePeak = self.na.query(":CALC1:MARK1:Y?")
+        #         time.sleep(.2)
+        #         peakNeg.update({freqPeak: valuePeak})
+        # print(peakPos)
+        # print(peakNeg)
+
+

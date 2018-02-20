@@ -2,6 +2,8 @@ import csv
 import os
 import serial
 from PyQt5 import QtCore
+from PyQt5.QtWidgets import QMessageBox
+
 from Equip.writeTestResult import WriteResult
 from Tests.gain_test import GainTest
 from Tests.flatness_test import FlatnessTest
@@ -234,20 +236,7 @@ class TestContoller(QtCore.QThread):
             return self.whatConn
 
     def writeResults(self):
-        dlMustToBe = ulMustToBe = dlPresent = ulPresent = False
-        if self.currParent.atrSettings.get('freq_band_dl_1').find('@') != -1 or self.currParent.atrSettings.get(
-                'freq_band_dl_2').find('@') != -1:
-            dlMustToBe = True
-        if self.currParent.atrSettings.get('freq_band_ul_1').find('@') != -1 or self.currParent.atrSettings.get(
-                'freq_band_ul_2').find('@') != -1:
-            ulMustToBe = True
-        if dlMustToBe and len(self.currParent.testLogDl) > 0:
-            dlPresent = True
-        if ulMustToBe and len(self.currParent.testLogUl) > 0:
-            ulPresent = True
-        if ((dlMustToBe and not dlPresent) or (ulMustToBe and not ulPresent)) and  not self.stopTestFlag:
-            self.sendMsg('i', 'RFBcheck', 'Connect second side of the RF', 1)
-        elif dlMustToBe == dlPresent and ulMustToBe == ulPresent:
+        if self.currParent.toBeOrNotToBe():
             self.msgSignal.emit('i', 'RFBcheck', 'Test complete', 1)
             if self.currParent.rfbSN.text().upper() != 'XXXX':
                 WriteResult(self, self.currParent.testLogDl, self.currParent.testLogUl)

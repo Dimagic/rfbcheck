@@ -12,7 +12,7 @@ class Instrument:
             return None
         else:
             self.rm = visa.ResourceManager()
-            self.rm.timeout = 25000
+            self.rm.timeout = 50000
             self.initAnalyser(freq)
             self.initGenerator(freq)
             self.initNetwork(freq)

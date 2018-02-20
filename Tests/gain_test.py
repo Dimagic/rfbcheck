@@ -51,7 +51,10 @@ class GainTest(QtCore.QThread):
             currentGain = round(float(currentGain) + float(self.mainParent.naAtten1.text()), 2)
 
         self.testController.logSignal.emit("Gain " + self.whatConn + " = " + str(currentGain) + " dBm", 0)
-        if gainMin <= currentGain <= gainMax:
+        if (currentGain > gainMax) and (currentGain - gainMax <= 5):
+            self.testController.resSignal.emit('Gain', self.whatConn, str(gainMin), str(currentGain),
+                                              str(gainMax), 2)
+        elif gainMin <= currentGain <= gainMax:
             self.testController.resSignal.emit('Gain', self.whatConn, str(gainMin), str(currentGain), str(gainMax), 1)
         else:
             q = self.testController.sendMsg('w', 'Warning', 'Gain test fail. Gain ' + self.whatConn + ' = ' +
@@ -65,7 +68,7 @@ class GainTest(QtCore.QThread):
                 return
             elif q == QMessageBox.Cancel:
                 self.testController.resSignal.emit('Gain', self.whatConn, str(gainMin), str(currentGain),
-                                                   str(gainMax), 0)
+                                                       str(gainMax), 0)
                 self.testController.stopTestFlag = True
         self.testController.fillTestLogSignal.emit('Gain', str(currentGain))
         return

@@ -18,7 +18,7 @@ from PyQt5.QtWidgets import QTableWidgetItem, QAbstractItemView, QLabel, QAction
 import threading
 import serial.tools.list_ports
 
-version = '0.3.0'
+version = '0.3.1'
 
 
 class TestTime(threading.Thread):
@@ -36,7 +36,7 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
         # loadUi('Forms/mainwindow.ui', self)
 
         # stylesheet
-        app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())
+        # app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())
 
         self.appIcon = QtGui.QIcon("Img/ico32_pgn_icon.ico")
         self.passImg = QtGui.QPixmap('Img/pass.png')
@@ -170,6 +170,12 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
             form.setWindowTitle('RFBCheck %s User: %s' % (version, self.currUser))
         except Exception as e:
             self.sendMsg('c', 'Set user error', str(e), 1)
+
+    def loadSettings(self):
+        pass
+
+    def writeSettings(self):
+        pass
 
     def selectUser(self):
         SelectUser(self)
@@ -346,10 +352,15 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
                     self.greenLedMovie.setScaledSize(QSize(13, 13))
                     ledLbl[i].setMovie(self.greenLedMovie)
                     self.greenLedMovie.start()
+                    if j == self.currNaLbl:
+                        self.gainNA.setEnabled(True)
                 except:
                     self.redLedMovie.setScaledSize(QSize(13, 13))
                     ledLbl[i].setMovie(self.redLedMovie)
                     self.redLedMovie.start()
+                    if j == self.currNaLbl:
+                        self.gainNA.setEnabled(False)
+                        self.gainSA.setChecked(True)
         except Exception as e:
             self.redLedMovie.setScaledSize(QSize(13, 13))
             self.saStat.setMovie(self.redLedMovie)
@@ -519,10 +530,10 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
         self.rfbSN.setEnabled(False)
         self.testsGroupBox.setEnabled(False)
         self.instrumentsGroupBox.setEnabled(False)
+        self.testSettingsGroupBox.setEnabled(False)
         self.rfbAtrGroupBox.setEnabled(False)
         self.calibrationGroupBox.setEnabled(False)
         self.instrAddrCombo.setMouseTracking(False)
-
         self.startTestBtn.setText('Stop')
         self.tt = Thread(name='testTimer', target=TestTime, args=(self,))
         self.tt.start()
@@ -535,12 +546,18 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
         self.rfbSN.setEnabled(True)
         self.testsGroupBox.setEnabled(True)
         self.instrumentsGroupBox.setEnabled(True)
+        self.testSettingsGroupBox.setEnabled(True)
         self.rfbAtrGroupBox.setEnabled(True)
         self.calibrationGroupBox.setEnabled(True)
         self.instrAddrCombo.setMouseTracking(True)
         self.startTestBtn.setText('Start')
-        self.setProgressBar('Done', 1, 1)
+        self.setProgressBar('Done', 100, 100)
 
+        x = len(self.testLogDl) + len(self.testLogUl) + len(self.to_DsaUlDl)
+        if not self.toBeOrNotToBe() and x != 0:
+            q = self.sendMsg('i', 'RFBcheck', 'Connect second side of the RF and press Ok', 2)
+            if q == QMessageBox.Ok:
+                self.startThreadTest()
 
     def setProgressBar(self, testName, barMax, barCurr):
         if self.currTestLbl.text() != testName:
@@ -600,8 +617,25 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
             self.portLbl.setText('')
             self.movie.setVisible(False)
 
-    def eventFilter(self, source, event):
+    def toBeOrNotToBe(self):
+        dlMustToBe = ulMustToBe = dlPresent = ulPresent = False
+        if self.atrSettings.get('freq_band_dl_1').find('@') != -1 or \
+                self.atrSettings.get('freq_band_dl_2').find('@') != -1:
+            dlMustToBe = True
+        if self.atrSettings.get('freq_band_ul_1').find('@') != -1 or \
+                self.atrSettings.get('freq_band_ul_2').find('@') != -1:
+            ulMustToBe = True
+        if dlMustToBe and len(self.testLogDl) > 0:
+            dlPresent = True
+        if ulMustToBe and len(self.testLogUl) > 0:
+            ulPresent = True
 
+        if (dlMustToBe != dlPresent) or (ulMustToBe != ulPresent):
+            return False
+        elif dlMustToBe == dlPresent and ulMustToBe == ulPresent:
+            return True
+
+    def eventFilter(self, source, event):
         if event.type() == QtCore.QEvent.KeyPress:
             self.hotKey.append(event.key())
             if len(self.hotKey) > 3:
