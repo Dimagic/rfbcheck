@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'mainwindow.ui'
 #
-# Created: Tue Feb 20 16:11:37 2018
+# Created: Wed Feb 21 11:12:30 2018
 #      by: PyQt5 UI code generator 5.2.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -695,8 +695,11 @@ class Ui_MainWindow(object):
         self.menuSelectUser.setObjectName("menuSelectUser")
         self.menuTestSettings = QtWidgets.QAction(MainWindow)
         self.menuTestSettings.setObjectName("menuTestSettings")
+        self.menuComPort = QtWidgets.QAction(MainWindow)
+        self.menuComPort.setObjectName("menuComPort")
         self.menuFile.addAction(self.menuSelectUser)
         self.menuFile.addAction(self.menuExit)
+        self.menuSettings.addAction(self.menuComPort)
         self.menuSettings.addAction(self.menuTestSettings)
         self.menuBar.addAction(self.menuFile.menuAction())
         self.menuBar.addAction(self.menuSettings.menuAction())
@@ -873,6 +876,7 @@ class Ui_MainWindow(object):
         self.menuExit.setText(_translate("MainWindow", "Exit"))
         self.menuSelectUser.setText(_translate("MainWindow", "Select user"))
         self.menuTestSettings.setText(_translate("MainWindow", "Instrument settings"))
+        self.menuComPort.setText(_translate("MainWindow", "COM port"))
 
 
 if __name__ == "__main__":

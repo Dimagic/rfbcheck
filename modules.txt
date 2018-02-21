@@ -1,0 +1,4 @@
+qdarkstyle
+PyQt5
+pyserial
+pyvisa

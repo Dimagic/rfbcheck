@@ -1747,6 +1747,7 @@
     <property name="title">
      <string>Settings</string>
     </property>
+    <addaction name="menuComPort"/>
     <addaction name="menuTestSettings"/>
    </widget>
    <addaction name="menuFile"/>
@@ -1765,6 +1766,11 @@
   <action name="menuTestSettings">
    <property name="text">
     <string>Instrument settings</string>
+   </property>
+  </action>
+  <action name="menuComPort">
+   <property name="text">
+    <string>COM port</string>
    </property>
   </action>
  </widget>

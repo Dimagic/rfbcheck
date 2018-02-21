@@ -24,9 +24,9 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>100</y>
+     <y>80</y>
      <width>241</width>
-     <height>241</height>
+     <height>261</height>
     </rect>
    </property>
    <column>
@@ -51,58 +51,6 @@
      </font>
     </property>
    </column>
-  </widget>
-  <widget class="QLabel" name="label">
-   <property name="geometry">
-    <rect>
-     <x>30</x>
-     <y>10</y>
-     <width>31</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>RFB:</string>
-   </property>
-   <property name="alignment">
-    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label_2">
-   <property name="geometry">
-    <rect>
-     <x>30</x>
-     <y>40</y>
-     <width>31</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Adem:</string>
-   </property>
-   <property name="alignment">
-    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-   </property>
-  </widget>
-  <widget class="QComboBox" name="ademCombo">
-   <property name="geometry">
-    <rect>
-     <x>70</x>
-     <y>40</y>
-     <width>111</width>
-     <height>22</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="rfbName">
-   <property name="geometry">
-    <rect>
-     <x>70</x>
-     <y>10</y>
-     <width>111</width>
-     <height>20</height>
-    </rect>
-   </property>
   </widget>
   <widget class="QPushButton" name="closeBtn">
    <property name="geometry">
@@ -130,39 +78,13 @@
     <string>Save</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="newAdem">
-   <property name="geometry">
-    <rect>
-     <x>70</x>
-     <y>70</y>
-     <width>111</width>
-     <height>20</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label_3">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>70</y>
-     <width>61</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>New adem:</string>
-   </property>
-   <property name="alignment">
-    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-   </property>
-  </widget>
   <widget class="QTableWidget" name="tableTestSettings">
    <property name="geometry">
     <rect>
      <x>260</x>
-     <y>100</y>
+     <y>80</y>
      <width>241</width>
-     <height>241</height>
+     <height>261</height>
     </rect>
    </property>
    <property name="sizePolicy">
@@ -194,6 +116,114 @@
     </property>
    </column>
   </widget>
+  <widget class="QWidget" name="">
+   <property name="geometry">
+    <rect>
+     <x>40</x>
+     <y>10</y>
+     <width>411</width>
+     <height>53</height>
+    </rect>
+   </property>
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="0" column="0">
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>RFB:</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="rfbName"/>
+      </item>
+     </layout>
+    </item>
+    <item row="0" column="1">
+     <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <item>
+       <widget class="QLabel" name="label_2">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>        Adem:</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QComboBox" name="ademCombo">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>133</width>
+          <height>16777215</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item row="1" column="0">
+     <widget class="QPushButton" name="showAllBtn">
+      <property name="text">
+       <string>Show all</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="1">
+     <layout class="QHBoxLayout" name="horizontalLayout_3">
+      <item>
+       <widget class="QLabel" name="label_3">
+        <property name="text">
+         <string>New adem:</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="newAdem">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+   </layout>
+  </widget>
+  <zorder>tableAtrSettings</zorder>
+  <zorder>label</zorder>
+  <zorder>label_2</zorder>
+  <zorder>ademCombo</zorder>
+  <zorder>rfbName</zorder>
+  <zorder>closeBtn</zorder>
+  <zorder>saveBtn</zorder>
+  <zorder>newAdem</zorder>
+  <zorder>label_3</zorder>
+  <zorder>tableTestSettings</zorder>
+  <zorder>showAllBtn</zorder>
+  <zorder>newAdem</zorder>
  </widget>
  <resources/>
  <connections/>

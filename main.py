@@ -16,7 +16,7 @@ from Tests.bitAlarm_test import *
 from PyQt5 import QtCore, QtWidgets, QtGui
 from PyQt5.QtWidgets import QTableWidgetItem, QAbstractItemView, QLabel, QAction
 import threading
-import serial.tools.list_ports
+
 
 version = '0.3.1'
 
@@ -55,6 +55,7 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
         self.answer = None
 
         self.menuSelectUser.triggered.connect(self.selectUser)
+        self.menuComPort.triggered.connect(self.selectComPort)
         self.menuTestSettings.triggered.connect(self.testSettings)
         self.menuExit.triggered.connect(form.close)
         self.menuExit.setShortcut('Ctrl+Q')
@@ -91,9 +92,10 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
         self.col = ['RFB type', 'DL c.freq', 'UL c.freq', 'DL IM pow', 'UL IM pow', 'DL DSA1', 'DL DSA2', 'DL DSA3',
                     'UL DSA1', 'UL DSA2', 'UL DSA3', 'DSA pow', 'ALC IN pow']
 
+        # self.radioInstrChecked()
+        # self.getCurrInstrAddr()
+        # self.getInstrAddr()
         self.radioInstrChecked()
-        self.getCurrInstrAddr()
-        self.getInstrAddr()
 
         self.setInstrBtn.clicked.connect(self.setCurrInstrAddr)
         self.updateInstrBtn.clicked.connect(self.getInstrAddr)
@@ -138,10 +140,6 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
             if len(self.editRfbCombo) == 0: self.editRfbCombo.addItem('New')
             self.editRfbCombo.addItem(str(i).replace("('", "").replace("',)", ""))
 
-        # Get available COM ports
-        for i in list(serial.tools.list_ports.comports()):
-            print(i)
-
         rep = Report(None, None, None, self)
         rep.getTemplates(self)
 
@@ -179,6 +177,9 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
 
     def selectUser(self):
         SelectUser(self)
+
+    def selectComPort(self):
+        SelectComPort(self)
 
     def testSettings(self):
         TestSettings(self)
@@ -397,6 +398,12 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
         conn.close()
 
     def radioInstrChecked(self):
+        self.getCurrInstrAddr()
+        self.getInstrAddr()
+        radioArr = {self.currSaLbl.text(): self.setSaRadio,
+                    self.currGenLbl.text(): self.setGenRadio,
+                    self.currNaLbl.text(): self.setNaRadio}
+
         if self.setSaRadio.isChecked():
             self.saAtten.setEnabled(True)
             self.genAtten.setEnabled(False)
@@ -412,6 +419,18 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
             self.genAtten.setEnabled(False)
             self.naAtten1.setEnabled(True)
             self.naAtten2.setEnabled(True)
+
+        allItems = [self.instrAddrCombo.itemText(i) for i in range(self.instrAddrCombo.count())]
+        for i in radioArr:
+            if radioArr.get(i).isChecked():
+                for x, j in enumerate(allItems):
+                    if j == i:
+                        try:
+                            self.instrAddrCombo.setCurrentIndex(x)
+                        except:
+                            self.instrAddrCombo.setCurrentIndex(0)
+
+
 
     # TODO: do fix double instrument
     def setCurrInstrAddr(self):

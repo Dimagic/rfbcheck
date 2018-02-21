@@ -12,8 +12,9 @@ def applySetFile(setFile, parent):
     addrTx = '556677'
     addrToSend = range(12333,12336,1)# 12320 12336
     namePar = '# 0 1182685875'
-    sizeData = {'CHAR8':8,'FLOAT32':32,'INT16':16,'RawData':8,'STRING_ARRAY':16,'UCHAR8':8,'UINT16':16,'ULONG32':32}
-    conn,cursor = parent.getConnDb()
+    sizeData = {'CHAR8': 8, 'FLOAT32': 32, 'INT16': 16, 'RawData': 8,
+                'STRING_ARRAY': 16, 'UCHAR8': 8, 'UINT16': 16, 'ULONG32': 32}
+    conn, cursor = parent.getConnDb()
 
     try:
         file = os.path.join(os.path.dirname(__file__),'..','setFiles',setFile + '.CSV')

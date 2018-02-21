@@ -28,6 +28,7 @@ class EditRFB(QtWidgets.QDialog,Ui_RFBedit):
 
         self.ui.saveBtn.clicked.connect(self.saveBtnClicked)
         self.ui.closeBtn.clicked.connect(self.closeBtnClicked)
+        self.ui.showAllBtn.clicked.connect(self.showAllBtnClicked)
 
         self.ui.newAdem.textChanged.connect(self.isThisNewAdem)
         self.ui.rfbName.textChanged.connect(self.isThisNewRfb)
@@ -35,7 +36,7 @@ class EditRFB(QtWidgets.QDialog,Ui_RFBedit):
         self.ui.rfbName.setText(self.parent.editRfbCombo.currentText())
         if self.ui.rfbName.text() != 'New':
             self.ui.rfbName.setEnabled(False)
-            self.ui.ademCombo.setEnabled(False)
+            # self.ui.ademCombo.setEnabled(False)
 
         self.getSettings('ATR')
         self.initTableSettings('ATR')
@@ -66,10 +67,11 @@ class EditRFB(QtWidgets.QDialog,Ui_RFBedit):
 
 
     def isThisNewAdem(self):
-        if len(self.ui.newAdem.text().replace(' ','')) > 0:
-            self.ui.ademCombo.setEnabled(False)
-        else:
-            self.ui.ademCombo.setEnabled(True)
+        pass
+        # if len(self.ui.newAdem.text().replace(' ','')) > 0:
+        #     self.ui.ademCombo.setEnabled(False)
+        # else:
+        #     self.ui.ademCombo.setEnabled(True)
 
     def initTableSettings(self,table):
         if table == 'ATR':
@@ -106,6 +108,12 @@ class EditRFB(QtWidgets.QDialog,Ui_RFBedit):
                 currTable.setItem(row, 1, item)
 
         #self.ui.tableAtrSettings.resizeColumnsToContents()
+
+    def showAllBtnClicked(self):
+        pass
+        # self.dialog = EditRFB(self, self)
+        # self.dialog.setWindowIcon(self.appIcon)
+        # self.dialog.show()
 
     def saveBtnClicked(self):
 

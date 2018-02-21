@@ -1,9 +1,9 @@
 # IntellijIdea files
 *.iml
-.idea
+.idea/
 out
 
 # venv
-venv
+.venv/
 
 test_report_lab.pdf

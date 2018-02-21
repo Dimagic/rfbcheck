@@ -4,6 +4,7 @@ import serial
 from PyQt5 import QtCore
 from PyQt5.QtWidgets import QMessageBox
 
+from Equip.selectComPort import SelectComPort
 from Equip.writeTestResult import WriteResult
 from Tests.gain_test import GainTest
 from Tests.flatness_test import FlatnessTest
@@ -17,7 +18,7 @@ import Equip.commands as cmd
 from Tests.rloss_test import ReturnLossTest
 
 
-class TestContoller(QtCore.QThread):
+class TestContoller(QtCore.QThread, SelectComPort):
     logSignal = QtCore.pyqtSignal(str, int)
     resSignal = QtCore.pyqtSignal(str, str, str, str, str, int)
     conSignal = QtCore.pyqtSignal()
@@ -135,10 +136,9 @@ class TestContoller(QtCore.QThread):
             self.testArr.append('AlcTest')
 
     def getComConn(self):
-        baud = 57600
-        port = "COM1"
+        port, baud = self.getCurrPortBaud()
         try:
-            self.ser = serial.Serial(port, baud, timeout=0.5)
+            self.ser = serial.Serial(port, int(baud), timeout=0.5)
             if self.ser.isOpen():
                 self.ser.write(binascii.unhexlify('AAAA543022556677403D01'))
                 rx = binascii.hexlify(self.ser.readline())
@@ -151,7 +151,10 @@ class TestContoller(QtCore.QThread):
             self.haveConn = False
             self.logSignal.emit('Connection problem: ' + str(e), 1)
             self.comMovieSignal.emit('', '')
-            self.sendMsg('c', 'Connection problem', str(e), 1)
+            self.sendMsg('c', 'Connection problem', 'Connection to\n'
+                                                    'port: ' + port + '\n'
+                                                    'baud: ' + baud + '\n'
+                                                    'Fail: ' + str(e), 1)
             if self.ser is not None:
                 if self.ser.isOpen():
                     self.ser.close()
