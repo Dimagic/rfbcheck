@@ -15,7 +15,6 @@ class SelectComPort(QtWidgets.QDialog):
         self.currentPort.setText(port)
         self.currentBaud.setText(baud)
 
-        self.dialog.show()
         self.buttonBox.button(QtWidgets.QDialogButtonBox.Ok).clicked.connect(self.okPressed)
         self.buttonBox.button(QtWidgets.QDialogButtonBox.Cancel).clicked.connect(self.cancelPressed)
 
@@ -33,9 +32,11 @@ class SelectComPort(QtWidgets.QDialog):
             for i in listCom:
                 self.portBox.addItem(i[0])
         else:
+            self.buttonBox.button(QtWidgets.QDialogButtonBox.Ok).setEnabled(False)
             self.currParent.sendMsg('w', 'Warning', 'COM ports not found', 1)
         for i in self.bauds:
             self.baudBox.addItem(str(i))
+        self.dialog.show()
 
     def getCurrPortBaud(self):
         try:
