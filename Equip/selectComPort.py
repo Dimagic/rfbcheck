@@ -1,5 +1,4 @@
 from PyQt5 import QtWidgets
-from PyQt5.QtGui import QIntValidator
 from PyQt5.uic import loadUi
 import serial.tools.list_ports
 
@@ -27,9 +26,14 @@ class SelectComPort(QtWidgets.QDialog):
         self.getPortsBauds()
 
     def getPortsBauds(self):
+        pass
         # Get available COM ports
-        for i in list(serial.tools.list_ports.comports()):
-            self.portBox.addItem(i[0])
+        listCom = list(serial.tools.list_ports.comports())
+        if len(listCom) > 0:
+            for i in listCom:
+                self.portBox.addItem(i[0])
+        else:
+            self.currParent.sendMsg('w', 'Warning', 'COM ports not found', 1)
         for i in self.bauds:
             self.baudBox.addItem(str(i))
 
