@@ -1,20 +1,70 @@
+from PyQt5 import QtWidgets
+from PyQt5.uic import loadUi
+from PyQt5.QtWidgets import QMessageBox, QSizePolicy
 from Equip.instrument import *
 from Equip.equip import *
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.figure import Figure
+import matplotlib.pyplot as plt
 from threading import Thread
 import numpy as np
+import math
 import datetime
 import sqlite3
-from PyQt5.QtWidgets import QMessageBox
 import re
 
 
-class Calibration:
+class Calibration(QtWidgets.QDialog):
+
     def __init__(self, parent):
+        super(Calibration, self).__init__(parent)
+        self.currParent = parent
+        self.dialog = loadUi('Forms/calibration.ui', self)
+        self.dialog.setWindowTitle('Calibration')
+        self.dialog.setWindowIcon(parent.appIcon)
+        m = PlotCanvas(self)
+        m.move(0, 0)
+        self.dialog.show()
+
+    def grafic(self, parent):
+        try:
+            conn, cursor = parent.getConnDb()
+            query = "select * from calGenToSa"
+            rows = cursor.execute(query).fetchall()
+            freq = {}
+            for row in rows:
+                freq.update({row[1]: row[2]})
+        except Exception as e:
+            parent.sendMsg('c', 'DB error', e, 1)
+            return
+        startFreq = min(freq.keys())
+        stopFreq = max(freq.keys())
+
+        bars = ('A', 'B', 'C', 'D', 'E')
+        y_pos = np.arange(len(bars))
+        height = [3, 12, 5, 18, 45]
+        plt.bar(y_pos, height)
+
+        # If we have long labels, we cannot see it properly
+        # names = ("very long group name 1", "very long group name 2", "very long group name 3", "very long group name 4",
+        #          "very long group name 5")
+        # plt.xticks(y_pos, names, rotation=90)
+
+        # Thus we have to give more margin:
+        # plt.subplots_adjust(bottom=0.4)
+
+        # It's the same concept if you need more space for your titles
+        # plt.title("This is\na very very\nloooooong\ntitle!")
+        # plt.subplots_adjust(top=0.7)
+        plt.show()
+
+
+    def calibration(self, parent):
         parent.currTestLbl.setText('Calibration')
         parent.useCorrection = False
         bandList = []
         try:
-            if parent.calibrStart.text().isdigit() == True and parent.calibrStop.text().isdigit() == True:
+            if parent.calibrStart.text().isdigit() and parent.calibrStop.text().isdigit():
                 start = int(parent.calibrStart.text())
                 stop = int(parent.calibrStop.text())
                 if start >= stop:
@@ -66,6 +116,7 @@ class Calibration:
 
         parent.sendMsg('i', 'Message', 'Calibration complete', 1)
         parent.useCorrection = True
+
 
     def makeCalibr(self, parent, table, attenuator, freqArr):
         startFreqFull = freqArr[0]
@@ -133,3 +184,25 @@ class Calibration:
         except Exception:
             parent.sendMsg('w', 'Error', 'Convert string: ' + curRange + ' to float fail')
             return 0, 0
+
+
+class PlotCanvas(FigureCanvas):
+    def __init__(self, parent=None, width=8, height=4, dpi=100):
+        fig = Figure(figsize=(width, height), dpi=dpi)
+        # self.axes = fig.add_subplot(111)
+
+        FigureCanvas.__init__(self, fig)
+        self.setParent(parent)
+
+        FigureCanvas.setSizePolicy(self,
+                                   QSizePolicy.Expanding,
+                                   QSizePolicy.Expanding)
+        FigureCanvas.updateGeometry(self)
+        self.plot()
+
+    def plot(self):
+        data = [math.sin(i) for i in range(1000)]
+        ax = self.figure.add_subplot(111)
+        ax.bar(data, data)
+        # ax.set_title('PyQt Matplotlib Example')
+        self.draw()

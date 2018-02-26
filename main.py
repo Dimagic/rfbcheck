@@ -1,18 +1,18 @@
 # stylesheet
-import qdarkstyle
+# import qdarkstyle
 
-from PyQt5.QtCore import QSize
-from PyQt5.QtGui import QMovie
-from Equip.instrumentSettings import TestSettings
 from Forms.mainwindow import Ui_MainWindow
-from Tests.testController import *
+from Equip.instrumentSettings import TestSettings
 from Equip.selectUser import SelectUser
 from Equip.applySetFile import *
 from Equip.calibration import *
 from Equip.printReport import *
 from Equip.editRFB import *
 from Equip.journal import *
+from Tests.testController import *
 from Tests.bitAlarm_test import *
+from PyQt5.QtCore import QSize
+from PyQt5.QtGui import QMovie
 from PyQt5 import QtCore, QtWidgets, QtGui
 from PyQt5.QtWidgets import QTableWidgetItem, QAbstractItemView, QLabel, QAction
 import threading
@@ -218,8 +218,9 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
         self.tableResult.setHorizontalHeaderLabels(['Test name', 'Dl/Ul', 'Min', 'Current', 'Max', 'Result'])
 
     def calibrationBtnClick(self):
-        self.t = Thread(name='calibration', target=Calibration, args=(self,))
-        self.t.start()
+        # self.t = Thread(name='calibration', target=Calibration, args=(self,))
+        # self.t.start()
+        Calibration(self)
 
     def calAllBandsCheck(self):
         if self.calAllBands.isChecked():

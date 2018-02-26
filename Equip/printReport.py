@@ -1,6 +1,5 @@
 import os
 import re
-
 import xlrd
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import (

@@ -1,4 +1,7 @@
 qdarkstyle
-PyQt5
-pyserial
+PyQt5 (exe + copy to venv)
+pyserial (for xp -> pip install pyserial==2.7)
 pyvisa
+numpy
+xlrd
+reportlab

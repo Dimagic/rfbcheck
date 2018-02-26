@@ -141,8 +141,7 @@ class AlcTest(QtCore.QThread):
             self.testController.logSignal.emit('ALC ' + whatConn + ' OUT: FAIL ' + str(ampl) + ' dBm', 2)
             q = self.testController.sendMsg('w', 'Warning', 'ALC Out test. Gain: ' + str(ampl) + ' dBm', 3)
             if q == QMessageBox.Retry:
-                self.alcOutTest(self.parent, conn, alc, whatConn, shift)
-                return
+                self.alcOutTest(conn, alc, whatConn, shift)
             elif q == QMessageBox.Cancel:
                 self.testController.stopTestFlag = True
                 setAlc(conn, alc, 255, shift)
