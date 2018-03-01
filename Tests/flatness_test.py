@@ -13,7 +13,7 @@ class FlatnessTest(QtCore.QThread):
         self.mainParent = testController.getParent()
         self.sa = testController.instr.sa
         self.gen = testController.instr.gen
-        self.na = testController.instr.gen
+        self.na = testController.instr.na
         self.freqDl = self.mainParent.listSettings[1]
         self.freqUl = self.mainParent.listSettings[2]
         self.whatConn = self.testController.whatConn
@@ -131,12 +131,47 @@ class FlatnessTest(QtCore.QThread):
         for i in self.rfBands:
             if self.testController.whatConn.upper() in i.upper():
                 start, stop = strToFreq(self.rfBands.get(i))
-                print(start, stop)
-                # self.na.write(":CALC1:PAR1:DEF S12")
 
                 self.na.write(":SENS1:FREQ:STAR " + str(start) + "E6")
                 self.na.write(":SENS1:FREQ:STOP " + str(stop) + "E6")
-                print('Done')
+                self.na.write(":SENS1:AVER ON")
+
+                self.na.write(":CALC1:MARK1 ON")
+                self.na.write(":CALC1:MARK2 ON")
+
+                self.na.write(":CALC1:MARK1:FUNC:TYPE MAX")
+
+                self.na.write(":CALC1:MARK2:FUNC:TYPE MIN")
+
+
+                # self.na.write(":CALC1:MARK:MATH:FLAT ON")
+
+                # self.na.write(":CALC1:MARK1 ON")
+                # self.na.write(":CALC1:MARK1:FUNC:TYPE MIN")
+                # self.na.write(":CALC1:MARK1:FUNC:PEXC .5")
+                # self.na.write(":CALC1:MARK1:FUNC:EXEC")
+
+                # self.na.write(":CALC2:MARK2 ON")
+                # self.na.write(":CALC2:MARK2:FUNC:TYPE MIN")
+                # self.na.write(":CALC2:MARK2:FUNC:PEXC .5")
+                # self.na.write(":CALC2:MARK2:FUNC:EXEC")
+
+                # self.na.write(":CALC1:MARK2:FUNC:TYPE PEAK")
+                # self.na.write(":CALC1:MARK2:FUNC:PEXC .5")
+                # self.na.write(":CALC1:MARK2:FUNC:PPOL POS")
+                # self.na.write(":CALC1:MARK2:FUNC:EXEC")
+                #
+                # self.na.write(":CALC1:MARK:MATH:FLAT ON")
+                # flat = list(self.na.query(":CALC1:MARK:MATH:FLAT:DATA?"))
+                # print(flat)
+
+                # self.na.write(":CALC1:PAR1:DEF S12")
+
+
+                # self.na.write(":CALC1:MARK:MATH:FLAT ON")
+                # flat = self.na.query(":CALC1:MARK:MATH:FLAT:DATA?")
+                # print(flat)
+
                 # self.na.write(":CALC1:MARK1 ON")
                 # self.na.write(":SENS1:AVER ON")
                 # time.sleep(2)

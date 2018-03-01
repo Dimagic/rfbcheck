@@ -278,4 +278,4 @@ class TestContoller(QtCore.QThread, SelectComPort):
                 valuesDict.update({keyVal: arr})
 
                  # prefix = 'AAAA543022556677'
-            print(valuesDict)
+            # print(valuesDict)

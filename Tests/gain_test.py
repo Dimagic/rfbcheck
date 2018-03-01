@@ -43,7 +43,7 @@ class GainTest(QtCore.QThread):
             self.na.write(":SENS1:FREQ:SPAN 30E6")
             self.na.write(":CALC1:PAR1:DEF S12")
             self.na.write(":CALC1:MARK1 ON")
-            # self.na.write(":SENS1:AVER ON")
+            self.na.write(":SENS1:AVER ON")
             time.sleep(2)
             self.na.write(":CALC1:MARK1:X " + str(freq) + 'E6')
             currentGain = self.na.query(":CALC1:MARK1:Y?")

@@ -201,7 +201,7 @@ class PlotCanvas(FigureCanvas):
         self.plot()
 
     def plot(self):
-        data = [math.sin(i) for i in range(1000)]
+        data = [i%2 for i in range(100)]
         ax = self.figure.add_subplot(111)
         ax.bar(data, data)
         # ax.set_title('PyQt Matplotlib Example')
