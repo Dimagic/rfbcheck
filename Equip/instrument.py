@@ -41,7 +41,8 @@ class Instrument:
             self.sa.write("BAND:VID 5 KHZ")
             self.sa.write(":CAL:AUTO ON")
         except Exception as e:
-            self.parent.myThread.logSignal.emit("SA - " + str(e), 2)
+            self.parent.myThread.logSignal.emit(str(self.parent.currSaNameLbl.text()) + " - not connected", -1)
+            self.parent.myThread.logSignal.emit(str(e), -1)
             return
 
     def initGenerator(self, freq):
@@ -57,7 +58,8 @@ class Instrument:
             self.gen.write(":RAD:MTON:ARB:SET:TABL:PHAS:INIT RAND")
             self.gen.write(":RAD:MTON:ARB:STAT 1")
         except Exception as e:
-            self.parent.myThread.logSignal.emit("Gen - " + str(e), 2)
+            self.parent.myThread.logSignal.emit(str(self.parent.currGenNameLbl.text()) + " - not connected", -1)
+            self.parent.myThread.logSignal.emit(str(e), -1)
             return
 
     def initNetwork(self, freq):
@@ -84,10 +86,9 @@ class Instrument:
             # print(min(arr))
             # print(min(arr) + max(arr))
         except Exception as e:
-            self.parent.myThread.logSignal.emit("NA - "+str(e), 2)
+            self.parent.myThread.logSignal.emit(str(self.parent.currNaNameLbl.text()) + " - not connected", -1)
+            self.parent.myThread.logSignal.emit(str(e), -1)
             return
-        # else:
-        #     self.initNetwork(int(freq))
 
     def getPeakTable(self):
         self.sa.write(":CALC:MARK:PEAK:SORT FREQ")

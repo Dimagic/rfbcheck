@@ -143,13 +143,13 @@ class TestContoller(QtCore.QThread, SelectComPort):
                 self.ser.write(binascii.unhexlify('AAAA543022556677403D01'))
                 rx = binascii.hexlify(self.ser.readline())
                 band = int(rx[26:34], 16) / 1000
-                print(band)
+                # print(band)
                 self.comMovieSignal.emit(str(self.ser.port), str(self.ser.baudrate))
                 self.logSignal.emit("Connected to port " + str(self.ser.port), 0)
                 self.haveConn = True
         except Exception as e:
             self.haveConn = False
-            self.logSignal.emit('Connection problem: ' + str(e), 1)
+            self.logSignal.emit('Connection problem: ' + str(e), -1)
             self.comMovieSignal.emit('', '')
             self.sendMsg('c', 'Connection problem', 'Connection to\n'
                                                     'port: ' + port + '\n'

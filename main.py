@@ -185,7 +185,7 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
         TestSettings(self)
 
     def checkTestState(self, b):
-        self.sendLog(str(b.text()), 0)
+        self.sendLog(str(b.text()), 1)
 
     def journalUpdateBtnClick(self):
         Journal(self)
@@ -254,7 +254,7 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
         rows = cursor.execute("select * from rfb_type where name = :n",
                               {'n': self.rfbTypeCombo.currentText()}).fetchall()
         for row in rows:
-            self.sendLog("For RFB " + row[1] + " need to use ADEM - " + row[2], 0)
+            self.sendLog("For RFB " + row[1] + " need to use ADEM - " + row[2], 1)
         self.col = ['RFB type', 'DL c.freq', 'UL c.freq', 'DL IM pow', 'UL IM pow', 'DL DSA1', 'DL DSA2', 'DL DSA3',
                     'UL DSA1', 'UL DSA2', 'UL DSA3', 'DSA pow', 'ALC IN pow']
         rows = cursor.execute("select * from test_settings where rfb_type = :n",
@@ -290,7 +290,7 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
             self.dateCalibrLbl.setText(None)
             return
         else:
-            self.sendLog('Loading ATR settings for ' + self.atrSettings.get('rfb_type') + ' complite', 0)
+            self.sendLog('Loading ATR settings for ' + self.atrSettings.get('rfb_type') + ' complite', 1)
         conn.close()
         try:
             calibrationCheck(self)
@@ -377,7 +377,7 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
             cursor = conn.cursor()
             return conn, cursor
         except Exception as e:
-            self.sendLog(str(e), 2)
+            self.sendLog(str(e), 1)
 
     def getCurrInstrAddr(self):
         conn, cursor = self.getConnDb()
@@ -578,6 +578,11 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
             q = self.sendMsg('i', 'RFBcheck', 'Connect second side of the RF and press Ok', 2)
             if q == QMessageBox.Ok:
                 self.startThreadTest()
+            if q == QMessageBox.Cancel:
+                # clear result dictionary
+                self.testLogDl = {}
+                self.testLogUl = {}
+                self.to_DsaUlDl = {}
 
     def setProgressBar(self, testName, barMax, barCurr):
         if self.currTestLbl.text() != testName:
@@ -613,7 +618,9 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
     def sendLog(self, msg, clr):
         self.listLog.addItem(msg)
         numrows = len(self.listLog)
-        self.listLog.item(numrows - 1).setBackground(QtCore.Qt.white)
+        if clr == -1:
+            # self.listLog.item(numrows - 1).setBackground(QtCore.Qt.red)
+            self.listLog.item(numrows - 1).setForeground(QtCore.Qt.red)
         self.listLog.scrollToBottom()
 
     def fillTestLog(self, key, val):
