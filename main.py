@@ -598,7 +598,15 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
 
     def tableResultAddItem(self, mesname, dlul, mesmin, mes, mesmax, status):
         numrows = self.tableResult.rowCount()
-        self.tableResult.insertRow(numrows)
+        findRow = False
+        for i in range(numrows):
+            if self.tableResult.item(i, 0).text() == mesname and \
+                    self.tableResult.item(i, 1).text() == dlul:
+                numrows = i
+                findRow = True
+                break
+        if not findRow or self.tableResult.rowCount() == 0:
+            self.tableResult.insertRow(numrows)
         self.tableResult.setItem(numrows, 0, QTableWidgetItem(mesname))
         self.tableResult.setItem(numrows, 1, QTableWidgetItem(dlul))
         self.tableResult.setItem(numrows, 2, QTableWidgetItem(mesmin))

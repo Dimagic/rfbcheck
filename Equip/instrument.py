@@ -71,6 +71,7 @@ class Instrument:
             time.sleep(2)
             self.na.write(":SOUR1:POW:ATT 40")
             self.na.write(":SOUR1:POW:PORT2 -45")
+            self.na.write(":CALC1:PAR1:DEF S12")
 
             # self.na.write(":SENS1:FREQ:CENT 806E6")
             # self.na.write(":SENS1:FREQ:SPAN 36E6")

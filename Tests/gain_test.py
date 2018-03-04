@@ -41,7 +41,6 @@ class GainTest(QtCore.QThread):
         else:
             self.na.write(":SENS1:FREQ:CENT " + str(freq) + "E6")
             self.na.write(":SENS1:FREQ:SPAN 30E6")
-            self.na.write(":CALC1:PAR1:DEF S12")
             self.na.write(":CALC1:MARK1 ON")
             self.na.write(":SENS1:AVER ON")
             time.sleep(2)

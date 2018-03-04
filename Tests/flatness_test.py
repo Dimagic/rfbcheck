@@ -27,15 +27,19 @@ class FlatnessTest(QtCore.QThread):
                         'band_dl_2': self.atrSettings.get('freq_band_dl_2'),
                         'band_ul_2': self.atrSettings.get('freq_band_ul_2')}
 
-        if self.mainParent.gainSA.isChecked():
-            testController.instr.sa.write("TRAC1:MODE MAXH")
-            if testController.whatConn == "Dl":
+        testController.instr.sa.write("TRAC1:MODE MAXH")
+        if testController.whatConn == "Dl":
+            if self.mainParent.gainSA.isChecked():
                 self.flatnessTest(self.listSettings[1], self.atrSettings.get('flat_dl_max'))
-            elif testController.whatConn == "Ul":
+            else:
+                self.flatnessTestNa(self.atrSettings.get('flat_dl_max'))
+        elif testController.whatConn == "Ul":
+            if self.mainParent.gainSA.isChecked():
                 self.flatnessTest(self.listSettings[2], self.atrSettings.get('flat_ul_max'))
-            testController.instr.sa.write("TRAC1:MODE WRIT")
-        else:
-            self.flatnessTestNa()
+            else:
+                self.flatnessTestNa(self.atrSettings.get('flat_ul_max'))
+        testController.instr.sa.write("TRAC1:MODE WRIT")
+
 
     def flatnessTest(self, freq, flat):
         if self.rfBands.get('band_dl_2').find('@') == -1 and self.rfBands.get('band_ul_2').find('@') == -1:
@@ -80,6 +84,7 @@ class FlatnessTest(QtCore.QThread):
         self.testController.logSignal.emit("MAX = " + str(genPow - maxGain) + " dBm on freq = " + str(maxFreq) + " MHz",
                                            0)
         currFlat = round(abs(minGain - maxGain), 1)
+
         self.testController.logSignal.emit("Flatness = " + str(currFlat) + " dBm", 0)
         if currFlat <= flat and (minGain > -50 and maxGain > -50):
             self.testController.resSignal.emit('Flatness', self.testController.whatConn, '0', str(currFlat), str(flat), 1)
@@ -93,6 +98,33 @@ class FlatnessTest(QtCore.QThread):
                 self.testController.stopTestFlag = True
             self.testController.resSignal.emit('Flatness', self.testController.whatConn, '0', str(currFlat), str(flat), 0)
         self.testController.fillTestLogSignal.emit('Flatness', str(currFlat))
+
+    def fillTestLog(self, flat):
+        minKey = min(self.gainDict.keys(), key=(lambda k: self.gainDict[k]))
+        maxKey = max(self.gainDict.keys(), key=(lambda k: self.gainDict[k]))
+        minGain = self.gainDict.get(minKey)
+        maxGain = self.gainDict.get(maxKey)
+        currFlat = round(maxGain - minGain, 2)
+        self.testController.logSignal.emit("Flatness = " + str(currFlat) + " dBm", 0)
+        if currFlat <= flat and (minGain > -50 and maxGain > -50):
+            self.testController.resSignal.emit('Flatness', self.testController.whatConn, '0', str(currFlat), str(flat),
+                                               1)
+        else:
+            q = self.testController.sendMsg('w', 'Warning', 'Flatness test fail: ' + str(currFlat) + ' dB', 3)
+            if q == QMessageBox.Retry:
+                self.testController.instr.sa.write("TRAC1:CLE:ALL")
+                if self.mainParent.gainSA.isChecked():
+                    self.flatnessTest(freq, flat)
+                else:
+                    self.flatnessTestNa(flat)
+                return
+            elif q == QMessageBox.Cancel:
+                self.testController.stopTestFlag = True
+            self.testController.resSignal.emit('Flatness', self.testController.whatConn, '0', str(currFlat), str(flat),
+                                               0)
+
+        self.testController.fillTestLogSignal.emit('Flatness 1', str(currFlat))
+
 
     def getFlatness(self, start, stop):
         self.testController.useCorrection = True
@@ -125,23 +157,29 @@ class FlatnessTest(QtCore.QThread):
         self.sa.write("CALC:MARK1:STAT 0")
         self.sa.write("CALC:MARK:CPS 1")
 
-    def flatnessTestNa(self):
-        peakPos = {}
-        peakNeg = {}
+    def flatnessTestNa(self, flat):
         for i in self.rfBands:
             if self.testController.whatConn.upper() in i.upper():
                 start, stop = strToFreq(self.rfBands.get(i))
-
                 self.na.write(":SENS1:FREQ:STAR " + str(start) + "E6")
                 self.na.write(":SENS1:FREQ:STOP " + str(stop) + "E6")
+                self.na.write(":CALC1:PAR1:DEF S12")
                 self.na.write(":SENS1:AVER ON")
-
                 self.na.write(":CALC1:MARK1 ON")
-                self.na.write(":CALC1:MARK2 ON")
+                time.sleep(1)
+                for j in np.arange(start, stop + 0.5, 0.5):
+                    self.na.write(":CALC1:MARK1:X " + str(j) + 'E6')
+                    curList = self.na.query(":CALC1:MARK1:Y?")
+                    currentGain = round(toFloat(curList[:curList.find(',')]),2)
+                    self.gainDict.update({j: currentGain})
+        self.fillTestLog(flat)
 
-                self.na.write(":CALC1:MARK1:FUNC:TYPE MAX")
-
-                self.na.write(":CALC1:MARK2:FUNC:TYPE MIN")
+                # self.na.write(":CALC1:MARK1 ON")
+                # self.na.write(":CALC1:MARK2 ON")
+                #
+                # self.na.write(":CALC1:MARK1:FUNC:TYPE MAX")
+                #
+                # self.na.write(":CALC1:MARK2:FUNC:TYPE MIN")
 
 
                 # self.na.write(":CALC1:MARK:MATH:FLAT ON")
