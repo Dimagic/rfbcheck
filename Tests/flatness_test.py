@@ -170,7 +170,7 @@ class FlatnessTest(QtCore.QThread):
                 for j in np.arange(start, stop + 0.5, 0.5):
                     self.na.write(":CALC1:MARK1:X " + str(j) + 'E6')
                     curList = self.na.query(":CALC1:MARK1:Y?")
-                    currentGain = round(toFloat(curList[:curList.find(',')]),2)
+                    currentGain = round(toFloat(curList[:curList.find(',')]), 2)
                     self.gainDict.update({j: currentGain})
         self.fillTestLog(flat)
 

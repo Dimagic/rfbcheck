@@ -61,7 +61,7 @@ class Journal:
         Journal.parent.tableJournal.setRowCount(0)
         Journal.parent.tableJournal.clear()
         headers = ['RFB', 'SN', 'Date test', 'Band', 'Gain', 'Flatnes', 'DSA 1', 'DSA 2', 'DSA 3', 'IMod', 'BIT',
-                   'ALC In', 'ALC Out', 'Status', 'User']
+                   'ALC In', 'ALC Out', 'RLoss','Status', 'User']
         Journal.parent.tableJournal.setHorizontalHeaderLabels(headers)
         conn, cursor = Journal.parent.getConnDb()
         dateBegin = int(str(Journal.parent.journalDateStart.date().toPyDate()).replace('-', ''))

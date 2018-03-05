@@ -87,7 +87,6 @@ class TestContoller(QtCore.QThread, SelectComPort):
         self.writeResults()
 
     def runTests(self):
-        ReturnLossTest(self)
 
         if self.currParent.checkGainTest.isChecked():
             if self.stopTestFlag:
@@ -118,10 +117,12 @@ class TestContoller(QtCore.QThread, SelectComPort):
             if self.stopTestFlag:
                 return
             AlcTest(self, self.currParent)
+
+
+        ReturnLossTest(self)
         self.progressBarSignal.emit('Done', 100, 100)
 
     def getTests(self, currParent):
-        self.testArr.append('Return loss test')
         if currParent.checkGainTest.isChecked():
             self.testArr.append('Gain test')
         if currParent.checkGainTest.isChecked():
@@ -134,6 +135,7 @@ class TestContoller(QtCore.QThread, SelectComPort):
             self.testArr.append('Alarm test')
         if currParent.checkAlcTest.isChecked():
             self.testArr.append('AlcTest')
+        self.testArr.append('Return loss test')
 
     def getComConn(self):
         port, baud = self.getCurrPortBaud()
