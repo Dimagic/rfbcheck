@@ -39,6 +39,7 @@ class ReturnLossTest(QtCore.QThread):
             self.testController.resSignal.emit('RLoss', self.testController.whatConn,
                                                '-', str(currRloss), str(rlossmax), 1)
         self.testController.fillTestLogSignal.emit('RLoss', str(currRloss))
+        self.testController.logSignal.emit("Return loss: " + str(currRloss) + " dB", 0)
 
     def getReturnLoss(self):
         rlossArr = []

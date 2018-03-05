@@ -2,8 +2,6 @@ import csv
 import os
 import serial
 from PyQt5 import QtCore
-from PyQt5.QtWidgets import QMessageBox
-
 from Equip.selectComPort import SelectComPort
 from Equip.writeTestResult import WriteResult
 from Tests.gain_test import GainTest
@@ -12,10 +10,10 @@ from Tests.dsa_test import DsaTest
 from Tests.intermod_test import IModTest
 from Tests.bitAlarm_test import BitAlarmTest
 from Tests.alc_test import AlcTest
+from Tests.rloss_test import ReturnLossTest
 from Equip.equip import *
 from Equip.instrument import *
 import Equip.commands as cmd
-from Tests.rloss_test import ReturnLossTest
 
 
 class TestContoller(QtCore.QThread, SelectComPort):
@@ -59,10 +57,6 @@ class TestContoller(QtCore.QThread, SelectComPort):
         self.getTests(currParent)
 
     def run(self):
-        # self.readAdemSettings()
-        # return
-
-        # TODO: com port and instrument initialisation problem
         if len(self.testArr) is 0:
             self.sendMsg('w', "Warning", "You have to choice minimum one test", 1)
             return
@@ -71,9 +65,11 @@ class TestContoller(QtCore.QThread, SelectComPort):
             self.whatConn = self.checkUlDl()
         else:
             return
-
         if self.whatConn is None:
             return
+        # TODO: send message if load set file is fail
+        self.readAdemSettings()
+
 
         self.logSignal.emit('START TEST', 0)
         self.instr.gen.write(":OUTP:STAT ON")
@@ -118,8 +114,10 @@ class TestContoller(QtCore.QThread, SelectComPort):
                 return
             AlcTest(self, self.currParent)
 
-
-        ReturnLossTest(self)
+        if self.currParent.checkRlossTest.isChecked():
+            if self.stopTestFlag:
+                return
+            ReturnLossTest(self)
         self.progressBarSignal.emit('Done', 100, 100)
 
     def getTests(self, currParent):
@@ -134,8 +132,9 @@ class TestContoller(QtCore.QThread, SelectComPort):
         if currParent.checkBitAlarmTest.isChecked():
             self.testArr.append('Alarm test')
         if currParent.checkAlcTest.isChecked():
-            self.testArr.append('AlcTest')
-        self.testArr.append('Return loss test')
+            self.testArr.append('Alc Test')
+        if currParent.checkRlossTest.isChecked():
+            self.testArr.append('Return loss test')
 
     def getComConn(self):
         port, baud = self.getCurrPortBaud()
