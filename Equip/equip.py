@@ -49,7 +49,7 @@ def setAmplTo(conn, cmd, gen, ampl, parent):
 
 
 def setAlc(conn, alc, n, shift):
-    print(conn, alc, 255, shift)
+    # print(conn, alc, 255, shift)
     s = str(hex(n)).replace('0x', '')
     sd = getHexStr(str(hex(n - shift)).replace('0x', ''))
     toSend = (alc + getHexStr(s) + sd).upper()
@@ -80,7 +80,7 @@ def floatToHex(n):
     try:
         return (hex(struct.unpack('<I', struct.pack('<f', toFloat(n)))[0]))
     except:
-        parent.sendLog('ERR: converting float to HEX fail', 2)
+        print('ERR: converting float to HEX fail', 2)
 
 
 def toFloat(n):
@@ -115,8 +115,8 @@ def getAvgGain(parent):
 
     # testController.instr.sa.write("TRAC1:MODE WRIT")
     if testController.useCorrection:
-        print(sum(gainArr) / len(gainArr))
-        print(sum(gainArr) / len(gainArr) - saToGen - genToSa)
+        # print(sum(gainArr) / len(gainArr))
+        # print(sum(gainArr) / len(gainArr) - saToGen - genToSa)
         return sum(gainArr) / len(gainArr) - saToGen - genToSa
     else:
         return sum(gainArr) / len(gainArr)

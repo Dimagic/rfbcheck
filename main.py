@@ -49,6 +49,9 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
 
         self.setupUi(form)
 
+        self.tableJournal.resizeEvent = self.onResize
+        self.tableResult.resizeEvent = self.onResize
+
         self.currUser = None
         self.setUser()
 
@@ -168,6 +171,15 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
             form.setWindowTitle('RFBCheck %s User: %s' % (version, self.currUser))
         except Exception as e:
             self.sendMsg('c', 'Set user error', str(e), 1)
+
+    def updateDbQuery(self, query):
+        try:
+            conn, cursor = self.getConnDb()
+            cursor.execute(query)
+            conn.commit()
+            conn.close()
+        except Exception as e:
+            self.currParent.sendMsg('c', 'Update DB query error', str(e), 1)
 
     def loadSettings(self):
         pass
@@ -431,9 +443,6 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
                         except:
                             self.instrAddrCombo.setCurrentIndex(0)
 
-
-
-    # TODO: do fix double instrument
     def setCurrInstrAddr(self):
         conn, cursor = self.getConnDb()
         # allIntst = [self.instrAddrCombo.itemText(i) for i in range(self.instrAddrCombo.count())]
@@ -441,7 +450,7 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
         #     print(i)
         try:
             q = "update instruments set address = '', useAtten = '0', fullName = '' where address = '%s'" % (self.instrAddrCombo.currentText())
-            cursor.execute(q)
+            self.updateDbQuery(q)
             checkedInstr = visa.ResourceManager().open_resource(self.instrAddrCombo.currentText()).query('*IDN?')
             if self.setSaRadio.isChecked():
                 self.currSaNameLbl.setText(checkedInstr)
@@ -538,6 +547,9 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
                     self.setProgressBar('Canceled', 100, 100)
 
     def on_started(self):
+        # TODO: For loading default set file before running tests
+        # if not self.isNeedLoadSetFile():
+        #     return
         self.testIsRun = True
         self.answer = None
         if self.testLogDl.get('SN') not in [self.rfbSN.text(), None]:
@@ -550,13 +562,17 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
         self.rfbSN.setEnabled(False)
         self.testsGroupBox.setEnabled(False)
         self.instrumentsGroupBox.setEnabled(False)
-        self.testSettingsGroupBox.setEnabled(False)
+        self.gainTestgroupBox.setEnabled(False)
+        self.dsaGroupBox.setEnabled(False)
         self.rfbAtrGroupBox.setEnabled(False)
         self.calibrationGroupBox.setEnabled(False)
         self.instrAddrCombo.setMouseTracking(False)
         self.startTestBtn.setText('Stop')
         self.tt = Thread(name='testTimer', target=TestTime, args=(self,))
         self.tt.start()
+        q = "update settings set lastRfbType = '%s', lastRfbSn = '%s'" % (str(self.rfbTypeCombo.currentText()),
+                                                                          str(self.rfbSN.text()))
+        self.updateDbQuery(q)
 
     def on_finished(self):
         Journal(self)
@@ -566,7 +582,8 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
         self.rfbSN.setEnabled(True)
         self.testsGroupBox.setEnabled(True)
         self.instrumentsGroupBox.setEnabled(True)
-        self.testSettingsGroupBox.setEnabled(True)
+        self.gainTestgroupBox.setEnabled(True)
+        self.dsaGroupBox.setEnabled(True)
         self.rfbAtrGroupBox.setEnabled(True)
         self.calibrationGroupBox.setEnabled(True)
         self.instrAddrCombo.setMouseTracking(True)
@@ -584,17 +601,31 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
                 self.testLogUl = {}
                 self.to_DsaUlDl = {}
 
+    def isNeedLoadSetFile(self):
+        try:
+            conn, cursor = self.getConnDb()
+            lastRfb = cursor.execute("select lastRfbType from settings").fetchone()[0]
+            if lastRfb != self.rfbTypeCombo.currentText():
+                q = self.sendMsg('q', 'Load set file', 'Do you want load default file\n'
+                                                       'settings for RF board %s ?' %
+                                 str(self.rfbTypeCombo.currentText()), 2)
+                if q == QMessageBox.Ok:
+                    self.sendMsg('i', 'RFBCheck', 'Will de added later', 1)
+                    # TODO: add load set file
+                return True
+        except Exception as e:
+            self.sendMsg('w', 'Load set file error', str(e), 1)
+            return False
+
     def setProgressBar(self, testName, barMax, barCurr):
         if self.currTestLbl.text() != testName:
             self.currTestLbl.setText(testName)
             self.TestPrBar.setMaximum(barMax)
             self.TestPrBar.setValue(0)
-
         self.TestPrBar.setValue(barCurr)
 
     def set_DSAtoSql(self, key, value):
         self.to_DsaUlDl.update({key: value})
-        # print(self.to_DsaUlDl)
 
     def tableResultAddItem(self, mesname, dlul, mesmin, mes, mesmax, status):
         numrows = self.tableResult.rowCount()
@@ -669,6 +700,15 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
             return False
         elif dlMustToBe == dlPresent and ulMustToBe == ulPresent:
             return True
+
+    def onResize(self, event):
+        tables = [self.tableResult, self.tableJournal]
+        for i in tables:
+            table_width = i.viewport().size().width()
+            cols = i.columnCount() or 1
+            width = table_width/cols
+            for j in range(i.columnCount()):
+                i.setColumnWidth(j, width)
 
     def eventFilter(self, source, event):
         if event.type() == QtCore.QEvent.KeyPress:

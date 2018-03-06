@@ -26,7 +26,6 @@ class BitAlarmTest(QtCore.QThread):
 
     def test(self):
         currentGain = float(self.sa.query("CALC:MARK:Y?"))
-        print(currentGain)
         if currentGain >= -50:
             gain = True
         else:
@@ -103,7 +102,6 @@ class BitAlarmTest(QtCore.QThread):
 
         self.arrAlarms = strAlarms.zfill(16)
         self.arrAlarms = self.arrAlarms[::-1]
-        print(self.arrAlarms)
         n = 0
         self.alarms = 'Alarms: '
         for i in self.arrAlarms:

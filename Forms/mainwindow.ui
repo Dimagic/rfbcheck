@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>840</width>
-    <height>711</height>
+    <width>910</width>
+    <height>720</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -21,8 +21,8 @@
   </property>
   <property name="minimumSize">
    <size>
-    <width>840</width>
-    <height>700</height>
+    <width>910</width>
+    <height>720</height>
    </size>
   </property>
   <property name="maximumSize">
@@ -1116,6 +1116,11 @@
           </column>
           <column>
            <property name="text">
+            <string>RLoss</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
             <string>Status</string>
            </property>
           </column>
@@ -1247,9 +1252,15 @@
           <rect>
            <x>10</x>
            <y>20</y>
-           <width>41</width>
-           <height>17</height>
+           <width>50</width>
+           <height>20</height>
           </rect>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>50</width>
+           <height>20</height>
+          </size>
          </property>
          <property name="text">
           <string>SA:</string>
@@ -1266,6 +1277,12 @@
            <width>51</width>
            <height>17</height>
           </rect>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>50</width>
+           <height>0</height>
+          </size>
          </property>
          <property name="text">
           <string>GEN:</string>
@@ -1335,7 +1352,7 @@
            <x>10</x>
            <y>80</y>
            <width>51</width>
-           <height>17</height>
+           <height>20</height>
           </rect>
          </property>
          <property name="text">
@@ -1384,129 +1401,6 @@
           <set>Qt::AlignCenter</set>
          </property>
         </widget>
-        <widget class="QWidget" name="layoutWidget">
-         <property name="geometry">
-          <rect>
-           <x>100</x>
-           <y>80</y>
-           <width>431</width>
-           <height>21</height>
-          </rect>
-         </property>
-         <layout class="QHBoxLayout" name="horizontalLayout">
-          <item alignment="Qt::AlignVCenter">
-           <widget class="QLabel" name="currNaLbl">
-            <property name="styleSheet">
-             <string notr="true">font: 75 9pt &quot;Times New Roman&quot;;</string>
-            </property>
-            <property name="text">
-             <string>currNaLbl</string>
-            </property>
-            <property name="textFormat">
-             <enum>Qt::RichText</enum>
-            </property>
-           </widget>
-          </item>
-          <item alignment="Qt::AlignLeft|Qt::AlignVCenter">
-           <widget class="QLabel" name="currNaNameLbl">
-            <property name="styleSheet">
-             <string notr="true">font: 75 9pt &quot;Times New Roman&quot;;</string>
-            </property>
-            <property name="text">
-             <string>currNaNameLbl</string>
-            </property>
-            <property name="textFormat">
-             <enum>Qt::RichText</enum>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-        <widget class="QWidget" name="layoutWidget">
-         <property name="geometry">
-          <rect>
-           <x>100</x>
-           <y>50</y>
-           <width>431</width>
-           <height>21</height>
-          </rect>
-         </property>
-         <layout class="QHBoxLayout" name="horizontalLayout_2">
-          <item alignment="Qt::AlignVCenter">
-           <widget class="QLabel" name="currGenLbl">
-            <property name="styleSheet">
-             <string notr="true">font: 75 9pt &quot;Times New Roman&quot;;</string>
-            </property>
-            <property name="text">
-             <string>currGenLbl</string>
-            </property>
-            <property name="textFormat">
-             <enum>Qt::RichText</enum>
-            </property>
-           </widget>
-          </item>
-          <item alignment="Qt::AlignLeft|Qt::AlignVCenter">
-           <widget class="QLabel" name="currGenNameLbl">
-            <property name="styleSheet">
-             <string notr="true">font: 75 9pt &quot;Times New Roman&quot;;</string>
-            </property>
-            <property name="text">
-             <string>currGenNameLbl</string>
-            </property>
-            <property name="textFormat">
-             <enum>Qt::RichText</enum>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-        <widget class="QWidget" name="layoutWidget">
-         <property name="geometry">
-          <rect>
-           <x>100</x>
-           <y>20</y>
-           <width>431</width>
-           <height>21</height>
-          </rect>
-         </property>
-         <layout class="QHBoxLayout" name="horizontalLayout_3">
-          <item alignment="Qt::AlignVCenter">
-           <widget class="QLabel" name="currSaLbl">
-            <property name="styleSheet">
-             <string notr="true">font: 75 9pt &quot;Times New Roman&quot;;</string>
-            </property>
-            <property name="text">
-             <string>currSaLbl</string>
-            </property>
-            <property name="textFormat">
-             <enum>Qt::RichText</enum>
-            </property>
-           </widget>
-          </item>
-          <item alignment="Qt::AlignLeft|Qt::AlignVCenter">
-           <widget class="QLabel" name="currSaNameLbl">
-            <property name="styleSheet">
-             <string notr="true">font: 75 9pt &quot;Times New Roman&quot;;</string>
-            </property>
-            <property name="text">
-             <string>currSaNameLbl</string>
-            </property>
-            <property name="textFormat">
-             <enum>Qt::RichText</enum>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
         <widget class="Line" name="line">
          <property name="geometry">
           <rect>
@@ -1551,9 +1445,15 @@
           <rect>
            <x>60</x>
            <y>20</y>
-           <width>16</width>
+           <width>20</width>
            <height>21</height>
           </rect>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>20</width>
+           <height>20</height>
+          </size>
          </property>
          <property name="text">
           <string>saStat</string>
@@ -1567,6 +1467,12 @@
            <width>21</width>
            <height>21</height>
           </rect>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>20</width>
+           <height>20</height>
+          </size>
          </property>
          <property name="text">
           <string>genStat</string>
@@ -1614,93 +1520,191 @@
           <set>Qt::AlignCenter</set>
          </property>
         </widget>
-       </widget>
-       <widget class="QGroupBox" name="testSettingsGroupBox">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>180</y>
-          <width>201</width>
-          <height>151</height>
-         </rect>
-        </property>
-        <property name="title">
-         <string>Test settings</string>
-        </property>
-        <widget class="QWidget" name="layoutWidget">
+        <widget class="QLabel" name="currSaLbl">
          <property name="geometry">
           <rect>
-           <x>13</x>
-           <y>23</y>
-           <width>174</width>
-           <height>19</height>
+           <x>101</x>
+           <y>21</y>
+           <width>111</width>
+           <height>20</height>
           </rect>
          </property>
-         <layout class="QGridLayout" name="gridLayout">
-          <item row="0" column="0">
-           <widget class="QLabel" name="label">
-            <property name="text">
-             <string>Gain test:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="QRadioButton" name="gainSA">
-            <property name="text">
-             <string>use SA</string>
-            </property>
-            <property name="checked">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="2">
-           <widget class="QRadioButton" name="gainNA">
-            <property name="text">
-             <string>use NA</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
+         <property name="minimumSize">
+          <size>
+           <width>110</width>
+           <height>20</height>
+          </size>
+         </property>
+         <property name="font">
+          <font>
+           <family>Times New Roman</family>
+           <pointsize>9</pointsize>
+           <weight>9</weight>
+           <italic>false</italic>
+           <bold>false</bold>
+          </font>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">font: 75 9pt &quot;Times New Roman&quot;;</string>
+         </property>
+         <property name="text">
+          <string>currSaLbl</string>
+         </property>
+         <property name="textFormat">
+          <enum>Qt::RichText</enum>
+         </property>
         </widget>
-        <widget class="QWidget" name="layoutWidget">
+        <widget class="QLabel" name="currSaNameLbl">
          <property name="geometry">
           <rect>
-           <x>10</x>
-           <y>50</y>
-           <width>171</width>
-           <height>19</height>
+           <x>220</x>
+           <y>21</y>
+           <width>300</width>
+           <height>20</height>
           </rect>
          </property>
-         <layout class="QGridLayout" name="gridLayout_3">
-          <item row="0" column="0">
-           <widget class="QLabel" name="label3">
-            <property name="text">
-             <string>DSA:</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="QRadioButton" name="testSetDsaFull">
-            <property name="text">
-             <string>full</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="2">
-           <widget class="QRadioButton" name="testSetDsaShort">
-            <property name="text">
-             <string>short</string>
-            </property>
-            <property name="checked">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-         </layout>
+         <property name="minimumSize">
+          <size>
+           <width>300</width>
+           <height>20</height>
+          </size>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">font: 75 9pt &quot;Times New Roman&quot;;</string>
+         </property>
+         <property name="text">
+          <string>currSaNameLbl</string>
+         </property>
+         <property name="textFormat">
+          <enum>Qt::RichText</enum>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+         </property>
+        </widget>
+        <widget class="QLabel" name="currGenNameLbl">
+         <property name="geometry">
+          <rect>
+           <x>220</x>
+           <y>51</y>
+           <width>300</width>
+           <height>20</height>
+          </rect>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>300</width>
+           <height>20</height>
+          </size>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">font: 75 9pt &quot;Times New Roman&quot;;</string>
+         </property>
+         <property name="text">
+          <string>currGenNameLbl</string>
+         </property>
+         <property name="textFormat">
+          <enum>Qt::RichText</enum>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+         </property>
+        </widget>
+        <widget class="QLabel" name="currGenLbl">
+         <property name="geometry">
+          <rect>
+           <x>101</x>
+           <y>51</y>
+           <width>110</width>
+           <height>20</height>
+          </rect>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>110</width>
+           <height>20</height>
+          </size>
+         </property>
+         <property name="font">
+          <font>
+           <family>Times New Roman</family>
+           <pointsize>9</pointsize>
+           <weight>9</weight>
+           <italic>false</italic>
+           <bold>false</bold>
+          </font>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">font: 75 9pt &quot;Times New Roman&quot;;</string>
+         </property>
+         <property name="text">
+          <string>currGenLbl</string>
+         </property>
+         <property name="textFormat">
+          <enum>Qt::RichText</enum>
+         </property>
+        </widget>
+        <widget class="QLabel" name="currNaNameLbl">
+         <property name="geometry">
+          <rect>
+           <x>220</x>
+           <y>81</y>
+           <width>300</width>
+           <height>20</height>
+          </rect>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>300</width>
+           <height>20</height>
+          </size>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">font: 75 9pt &quot;Times New Roman&quot;;</string>
+         </property>
+         <property name="text">
+          <string>currNaNameLbl</string>
+         </property>
+         <property name="textFormat">
+          <enum>Qt::RichText</enum>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+         </property>
+        </widget>
+        <widget class="QLabel" name="currNaLbl">
+         <property name="geometry">
+          <rect>
+           <x>101</x>
+           <y>81</y>
+           <width>110</width>
+           <height>20</height>
+          </rect>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>110</width>
+           <height>20</height>
+          </size>
+         </property>
+         <property name="font">
+          <font>
+           <family>Times New Roman</family>
+           <pointsize>9</pointsize>
+           <weight>9</weight>
+           <italic>false</italic>
+           <bold>false</bold>
+          </font>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">font: 75 9pt &quot;Times New Roman&quot;;</string>
+         </property>
+         <property name="text">
+          <string>currNaLbl</string>
+         </property>
+         <property name="textFormat">
+          <enum>Qt::RichText</enum>
+         </property>
         </widget>
        </widget>
        <widget class="QGroupBox" name="calibrationGroupBox">
@@ -1718,125 +1722,287 @@
         <widget class="QCheckBox" name="calAllBands">
          <property name="geometry">
           <rect>
-           <x>10</x>
+           <x>20</x>
            <y>20</y>
            <width>111</width>
            <height>17</height>
           </rect>
          </property>
+         <property name="minimumSize">
+          <size>
+           <width>111</width>
+           <height>17</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>111</width>
+           <height>17</height>
+          </size>
+         </property>
          <property name="text">
           <string>Calibtate all bands</string>
          </property>
         </widget>
-        <widget class="QWidget" name="layoutWidget">
+        <widget class="QPushButton" name="calibrationBtn">
          <property name="geometry">
           <rect>
-           <x>10</x>
-           <y>50</y>
-           <width>222</width>
-           <height>22</height>
+           <x>150</x>
+           <y>70</y>
+           <width>75</width>
+           <height>31</height>
           </rect>
          </property>
-         <layout class="QHBoxLayout" name="horizontalLayout_5">
-          <item>
-           <widget class="QLabel" name="label4">
-            <property name="layoutDirection">
-             <enum>Qt::LeftToRight</enum>
-            </property>
-            <property name="text">
-             <string>Start:</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLineEdit" name="calibrStart">
-            <property name="maxLength">
-             <number>4</number>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="label6">
-            <property name="layoutDirection">
-             <enum>Qt::LeftToRight</enum>
-            </property>
-            <property name="text">
-             <string>MHz</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="label5">
-            <property name="layoutDirection">
-             <enum>Qt::LeftToRight</enum>
-            </property>
-            <property name="text">
-             <string>Stop:</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLineEdit" name="calibrStop">
-            <property name="maxLength">
-             <number>4</number>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="label7">
-            <property name="layoutDirection">
-             <enum>Qt::LeftToRight</enum>
-            </property>
-            <property name="text">
-             <string>MHz</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-            </property>
-           </widget>
-          </item>
-         </layout>
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>75</width>
+           <height>31</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>75</width>
+           <height>31</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Calibration</string>
+         </property>
         </widget>
-        <widget class="QWidget" name="layoutWidget">
+        <widget class="QLabel" name="label5">
          <property name="geometry">
           <rect>
-           <x>10</x>
-           <y>80</y>
-           <width>221</width>
-           <height>25</height>
+           <x>21</x>
+           <y>77</y>
+           <width>28</width>
+           <height>20</height>
           </rect>
          </property>
-         <layout class="QHBoxLayout" name="horizontalLayout_4">
-          <item>
-           <widget class="QPushButton" name="calibrationBtn">
-            <property name="text">
-             <string>Calibration</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="clearCalBtn">
-            <property name="text">
-             <string>Clear cal.table</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
+         <property name="minimumSize">
+          <size>
+           <width>28</width>
+           <height>20</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>28</width>
+           <height>20</height>
+          </size>
+         </property>
+         <property name="layoutDirection">
+          <enum>Qt::LeftToRight</enum>
+         </property>
+         <property name="text">
+          <string>Stop:</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+        </widget>
+        <widget class="QLabel" name="label7">
+         <property name="geometry">
+          <rect>
+           <x>115</x>
+           <y>77</y>
+           <width>20</width>
+           <height>20</height>
+          </rect>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>20</width>
+           <height>20</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>20</width>
+           <height>20</height>
+          </size>
+         </property>
+         <property name="layoutDirection">
+          <enum>Qt::LeftToRight</enum>
+         </property>
+         <property name="text">
+          <string>MHz</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+        </widget>
+        <widget class="QLabel" name="label6">
+         <property name="geometry">
+          <rect>
+           <x>115</x>
+           <y>51</y>
+           <width>20</width>
+           <height>20</height>
+          </rect>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>20</width>
+           <height>20</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>20</width>
+           <height>20</height>
+          </size>
+         </property>
+         <property name="layoutDirection">
+          <enum>Qt::LeftToRight</enum>
+         </property>
+         <property name="text">
+          <string>MHz</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+        </widget>
+        <widget class="QLabel" name="label4">
+         <property name="geometry">
+          <rect>
+           <x>21</x>
+           <y>51</y>
+           <width>28</width>
+           <height>20</height>
+          </rect>
+         </property>
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>28</width>
+           <height>20</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>28</width>
+           <height>20</height>
+          </size>
+         </property>
+         <property name="layoutDirection">
+          <enum>Qt::LeftToRight</enum>
+         </property>
+         <property name="text">
+          <string>Start:</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+        </widget>
+        <widget class="QLineEdit" name="calibrStop">
+         <property name="geometry">
+          <rect>
+           <x>55</x>
+           <y>77</y>
+           <width>54</width>
+           <height>20</height>
+          </rect>
+         </property>
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>54</width>
+           <height>20</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>54</width>
+           <height>20</height>
+          </size>
+         </property>
+         <property name="maxLength">
+          <number>4</number>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+        </widget>
+        <widget class="QLineEdit" name="calibrStart">
+         <property name="geometry">
+          <rect>
+           <x>55</x>
+           <y>51</y>
+           <width>54</width>
+           <height>20</height>
+          </rect>
+         </property>
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>54</width>
+           <height>20</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>54</width>
+           <height>20</height>
+          </size>
+         </property>
+         <property name="maxLength">
+          <number>4</number>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+        </widget>
+        <widget class="QPushButton" name="clearCalBtn">
+         <property name="geometry">
+          <rect>
+           <x>150</x>
+           <y>32</y>
+           <width>77</width>
+           <height>31</height>
+          </rect>
+         </property>
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>77</width>
+           <height>31</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>77</width>
+           <height>31</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Clear cal.table</string>
+         </property>
         </widget>
        </widget>
        <widget class="QGroupBox" name="rfbAtrGroupBox">
@@ -1881,8 +2047,8 @@
         </property>
         <property name="geometry">
          <rect>
-          <x>10</x>
-          <y>340</y>
+          <x>720</x>
+          <y>190</y>
           <width>75</width>
           <height>23</height>
          </rect>
@@ -1890,6 +2056,150 @@
         <property name="text">
          <string>Apply SetFile</string>
         </property>
+       </widget>
+       <widget class="QGroupBox" name="gainTestgroupBox">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>180</y>
+          <width>71</width>
+          <height>65</height>
+         </rect>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>70</width>
+          <height>65</height>
+         </size>
+        </property>
+        <property name="title">
+         <string>Gain test</string>
+        </property>
+        <widget class="QRadioButton" name="gainNA">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>30</y>
+           <width>57</width>
+           <height>25</height>
+          </rect>
+         </property>
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>57</width>
+           <height>25</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>57</width>
+           <height>20</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>use NA</string>
+         </property>
+        </widget>
+        <widget class="QRadioButton" name="gainSA">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>10</y>
+           <width>56</width>
+           <height>25</height>
+          </rect>
+         </property>
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>56</width>
+           <height>25</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>56</width>
+           <height>20</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>use SA</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </widget>
+       <widget class="QGroupBox" name="dsaGroupBox">
+        <property name="geometry">
+         <rect>
+          <x>90</x>
+          <y>180</y>
+          <width>71</width>
+          <height>65</height>
+         </rect>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>70</width>
+          <height>65</height>
+         </size>
+        </property>
+        <property name="title">
+         <string>DSA</string>
+        </property>
+        <widget class="QRadioButton" name="testSetDsaShort">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>10</y>
+           <width>48</width>
+           <height>25</height>
+          </rect>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>48</width>
+           <height>25</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>short</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+        </widget>
+        <widget class="QRadioButton" name="testSetDsaFull">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>30</y>
+           <width>37</width>
+           <height>25</height>
+          </rect>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>37</width>
+           <height>25</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>full</string>
+         </property>
+        </widget>
        </widget>
       </widget>
      </widget>
@@ -1901,7 +2211,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>840</width>
+     <width>910</width>
      <height>20</height>
     </rect>
    </property>
@@ -1977,8 +2287,6 @@
   <tabstop>calibrationBtn</tabstop>
   <tabstop>clearCalBtn</tabstop>
   <tabstop>calAllBands</tabstop>
-  <tabstop>calibrStart</tabstop>
-  <tabstop>calibrStop</tabstop>
   <tabstop>newRfbBtn</tabstop>
   <tabstop>editRfbCombo</tabstop>
   <tabstop>applySetBtn</tabstop>

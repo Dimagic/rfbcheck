@@ -70,6 +70,7 @@ class Journal:
              % (dateBegin, dateEnd)
         q = "select * from ("+q1+") where (rfb_type like '%"+Journal.parent.journalFilter.text()+"%' or sn like '%" + \
             Journal.parent.journalFilter.text()+"%') order by dateTest DESC"
+        # TODO: set pass/fail for numeric data (make limits dictionary)
         rows = cursor.execute(q).fetchall()
         for row in rows:
             numrows = Journal.parent.tableJournal.rowCount()
@@ -95,6 +96,10 @@ class Journal:
                         gain = toFloat(row[5])
                 j += 1
         conn.close()
+        try:
+            self.parent.onResize
+        except Exception:
+            return
 
     def deleteRecords(self):
         sn, dateTest = self.getSelectedRow()

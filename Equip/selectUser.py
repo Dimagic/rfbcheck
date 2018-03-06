@@ -46,11 +46,13 @@ class SelectUser(QtWidgets.QDialog):
 
     def okPressed(self):
         try:
-            conn, cursor = self.currParent.getConnDb()
             q = "update settings set lastUser = '%s'" % (str(self.userComboBox.currentText()))
-            cursor.execute(q)
-            conn.commit()
-            conn.close()
+            self.currParent.updateDbQuery(q)
+            # conn, cursor = self.currParent.getConnDb()
+            # q = "update settings set lastUser = '%s'" % (str(self.userComboBox.currentText()))
+            # cursor.execute(q)
+            # conn.commit()
+            # conn.close()
             self.currParent.setUser()
         except Exception as e:
             self.currParent.sendMsg('c', 'Writing new user error', str(e), 1)

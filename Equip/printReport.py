@@ -216,7 +216,6 @@ class Report:
                 k += 1
         if resultDict.get('id_Ul') is not None:
             q = "select * from dsa_results where rfb = %s" % (resultDict.get('id_Ul'))
-            print(q)
             rows = cursor.execute(q).fetchall()
             for row in rows:
                 k = 0
@@ -230,10 +229,8 @@ class Report:
             for row in rows:
                 k = 0
                 for n in row:
-                    print(n)
                     resultDict.update({'dl_' + dsaResKeys[k] + '_re': str(n).replace('{', '').replace('}', '')})
                     k += 1
-
         conn.close()
         return resultDict
 
@@ -245,7 +242,6 @@ class Report:
         return workbook
 
     def generateHeaderTable(self, parent, resultDict):
-        print(resultDict)
         if parent.logoAxellRadio.isChecked():
             im = Image("Img/axell_logo.png", hAlign='CENTER')
             im.drawHeight = 1.2 * inch * im.drawHeight / im.drawWidth
@@ -274,7 +270,6 @@ class Report:
         #     rfb_type = resultDict.get('rfb_type_Dl')
 
         atr_name_at = str(resultDict.get('atr_name_at')).replace('\\n', '\n ')
-        print(atr_name_at)
         data = [[im, atr_name_at, 'Date: ' + str(resultDict.get('atr_date_at'))],
                 ['', '', 'Doc. p/n: ' + str(resultDict.get('atr_doc_pn_at'))],
                 ['', '', 'Rev.: ' + str(resultDict.get('atr_rev_at'))]]

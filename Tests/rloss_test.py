@@ -51,7 +51,7 @@ class ReturnLossTest(QtCore.QThread):
                 self.na.write(":SENS1:FREQ:STAR " + str(start) + "E6")
                 self.na.write(":SENS1:FREQ:STOP " + str(stop) + "E6")
                 self.na.write(":CALC1:PAR1:DEF S22")
-                self.na.write(":SENS1:AVER ON")
+                self.na.write(":SENS1:AVER OFF")
                 self.na.write(":CALC1:MARK1 ON")
                 time.sleep(2)
                 steep = 0.5

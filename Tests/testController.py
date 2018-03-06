@@ -2,8 +2,7 @@ import csv
 import os
 import serial
 from PyQt5 import QtCore
-from Equip.selectComPort import SelectComPort
-from Equip.writeTestResult import WriteResult
+
 from Tests.gain_test import GainTest
 from Tests.flatness_test import FlatnessTest
 from Tests.dsa_test import DsaTest
@@ -11,6 +10,9 @@ from Tests.intermod_test import IModTest
 from Tests.bitAlarm_test import BitAlarmTest
 from Tests.alc_test import AlcTest
 from Tests.rloss_test import ReturnLossTest
+
+from Equip.selectComPort import SelectComPort
+from Equip.writeTestResult import WriteResult
 from Equip.equip import *
 from Equip.instrument import *
 import Equip.commands as cmd
@@ -69,18 +71,21 @@ class TestContoller(QtCore.QThread, SelectComPort):
             return
         # TODO: send message if load set file is fail
         self.readAdemSettings()
-
-
         self.logSignal.emit('START TEST', 0)
         self.instr.gen.write(":OUTP:STAT ON")
         self.stopTestFlag = False
-        self.runTests()
-
-        self.ser.close()
-        self.comMovieSignal.emit('', '')
-        self.instr.gen.write(":OUTP:STAT OFF")
-        self.instr.sa.write("CALC:MARK:CPS 0")
-        self.writeResults()
+        try:
+            self.runTests()
+        except Exception as e:
+            self.stopTestFlag = True
+            self.sendMsg('c', 'Test error', str(e), 1)
+            return
+        else:
+            self.ser.close()
+            self.comMovieSignal.emit('', '')
+            self.instr.gen.write(":OUTP:STAT OFF")
+            self.instr.sa.write("CALC:MARK:CPS 0")
+            self.writeResults()
 
     def runTests(self):
 
@@ -262,7 +267,8 @@ class TestContoller(QtCore.QThread, SelectComPort):
             f = open(file, 'r')
             f.close()
         except Exception as e:
-            self.sendMsg('w', 'Cont open file settings', str(e), 1)
+            self.sendMsg('w', 'Can\'t open file settings', str(e), 1)
+            self.stopTestFlag = True
             return
 
         valuesDict = {}
@@ -277,6 +283,3 @@ class TestContoller(QtCore.QThread, SelectComPort):
                 lenNewArr = int(row.get(None)[3])
                 arr = row.get(None)[4:4 + lenNewArr]
                 valuesDict.update({keyVal: arr})
-
-                 # prefix = 'AAAA543022556677'
-            # print(valuesDict)
