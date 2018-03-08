@@ -79,6 +79,7 @@ class TestContoller(QtCore.QThread, SelectComPort):
         except Exception as e:
             self.stopTestFlag = True
             self.sendMsg('c', 'Test error', str(e), 1)
+            self.ser.close()
             return
         else:
             self.ser.close()

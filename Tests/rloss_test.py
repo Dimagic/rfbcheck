@@ -27,7 +27,6 @@ class ReturnLossTest(QtCore.QThread):
     def returnLossTest(self):
         currRloss = self.getReturnLoss()
         rlossmax = self.atrSettings.get('rloss_max')
-
         if currRloss > rlossmax:
             q = self.testController.sendMsg('i', 'RFBCheck', 'Return loss test fail: ' + str(currRloss), 3)
             if q == QMessageBox.Retry:

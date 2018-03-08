@@ -132,7 +132,7 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
         self.applySetBtn.clicked.connect(self.applySetFile)
 
         self.startTestBtn.setEnabled(False)
-        self.applySetBtn.setEnabled(False)
+        # self.applySetBtn.setEnabled(False)
 
         conn, cursor = self.getConnDb()
         rfbList = cursor.execute("select name from rfb_type order by name")
@@ -324,7 +324,8 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
             self.startTestBtn.setEnabled(False)
 
     def applySetFile(self):
-        applySetFile(self.rfbTypeCombo.currentText(), self)
+        # applySetFile(self.rfbTypeCombo.currentText(), self)
+        applySetFile(self)
 
     def sendMsg(self, icon, msgTitle, msgText, typeQuestion):
         msg = QMessageBox()
