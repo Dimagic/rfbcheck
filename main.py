@@ -18,7 +18,7 @@ from PyQt5.QtWidgets import QTableWidgetItem, QAbstractItemView, QLabel, QAction
 import threading
 
 
-version = '0.3.2'
+version = '0.3.3'
 
 
 class TestTime(threading.Thread):
@@ -81,6 +81,7 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
         self.to_DsaUlDl = {}  # results DSA test from DB
 
         self.myThread = None
+        self.setFileThread = None
         self.tt = None
 
         self.atrSettings = {}
@@ -129,7 +130,7 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
         self.calibrStop.setValidator(QtGui.QIntValidator())
 
         self.startTestBtn.clicked.connect(self.startThreadTest)
-        self.applySetBtn.clicked.connect(self.applySetFile)
+        self.applySetBtn.clicked.connect(self.startThreadLoadSet)
 
         self.startTestBtn.setEnabled(False)
         # self.applySetBtn.setEnabled(False)
@@ -197,7 +198,7 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
         TestSettings(self)
 
     def checkTestState(self, b):
-        self.sendLog(str(b.text()), 1)
+        self.sendLog(str(b.text()), 0)
 
     def journalUpdateBtnClick(self):
         Journal(self)
@@ -266,7 +267,7 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
         rows = cursor.execute("select * from rfb_type where name = :n",
                               {'n': self.rfbTypeCombo.currentText()}).fetchall()
         for row in rows:
-            self.sendLog("For RFB " + row[1] + " need to use ADEM - " + row[2], 1)
+            self.sendLog("For RFB " + row[1] + " need to use ADEM - " + row[2], 0)
         self.col = ['RFB type', 'DL c.freq', 'UL c.freq', 'DL IM pow', 'UL IM pow', 'DL DSA1', 'DL DSA2', 'DL DSA3',
                     'UL DSA1', 'UL DSA2', 'UL DSA3', 'DSA pow', 'ALC IN pow']
         rows = cursor.execute("select * from test_settings where rfb_type = :n",
@@ -302,7 +303,7 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
             self.dateCalibrLbl.setText(None)
             return
         else:
-            self.sendLog('Loading ATR settings for ' + self.atrSettings.get('rfb_type') + ' complite', 1)
+            self.sendLog('Loading ATR settings for ' + self.atrSettings.get('rfb_type') + ' complite', 0)
         conn.close()
         try:
             calibrationCheck(self)
@@ -322,10 +323,6 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
             self.startTestBtn.setEnabled(True)
         else:
             self.startTestBtn.setEnabled(False)
-
-    def applySetFile(self):
-        # applySetFile(self.rfbTypeCombo.currentText(), self)
-        applySetFile(self)
 
     def sendMsg(self, icon, msgTitle, msgText, typeQuestion):
         msg = QMessageBox()
@@ -390,7 +387,7 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
             cursor = conn.cursor()
             return conn, cursor
         except Exception as e:
-            self.sendLog(str(e), 1)
+            self.sendLog(str(e), -1)
 
     def getCurrInstrAddr(self):
         conn, cursor = self.getConnDb()
@@ -519,6 +516,42 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
         except sqlite3.DatabaseError as err:
             self.sendMsg('c', 'Query error', str(err), 1)
             conn.close()
+
+    def startThreadLoadSet(self):
+        self.setFileThread = ApplySetFile(self)
+        self.setFileThread.logSignal.connect(self.sendLog, QtCore.Qt.QueuedConnection)
+        self.setFileThread.msgSignal.connect(self.sendMsg, QtCore.Qt.QueuedConnection)
+        self.setFileThread.progressBarSignal.connect(self.setProgressBar, QtCore.Qt.QueuedConnection)
+        self.setFileThread.comMovieSignal.connect(self.setComMovie, QtCore.Qt.QueuedConnection)
+        self.setFileThread.started.connect(self.on_startedSet)
+        self.setFileThread.finished.connect(self.on_finishedSet)
+        self.setFileThread.start()
+
+    def on_startedSet(self):
+        self.testIsRun = True
+        self.rfbTypeCombo.setEnabled(False)
+        self.rfbSN.setEnabled(False)
+        self.testsGroupBox.setEnabled(False)
+        self.instrumentsGroupBox.setEnabled(False)
+        self.gainTestgroupBox.setEnabled(False)
+        self.dsaGroupBox.setEnabled(False)
+        self.rfbAtrGroupBox.setEnabled(False)
+        self.calibrationGroupBox.setEnabled(False)
+        self.instrAddrCombo.setMouseTracking(False)
+        self.tt = Thread(name='testTimer', target=TestTime, args=(self,))
+        self.tt.start()
+
+    def on_finishedSet(self):
+        self.testIsRun = False
+        self.rfbTypeCombo.setEnabled(True)
+        self.rfbSN.setEnabled(True)
+        self.testsGroupBox.setEnabled(True)
+        self.instrumentsGroupBox.setEnabled(True)
+        self.gainTestgroupBox.setEnabled(True)
+        self.dsaGroupBox.setEnabled(True)
+        self.rfbAtrGroupBox.setEnabled(True)
+        self.calibrationGroupBox.setEnabled(True)
+        self.instrAddrCombo.setMouseTracking(True)
 
     def startThreadTest(self):
         if self.calibrLbl.text() == 'False':
@@ -659,8 +692,9 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
         self.listLog.addItem(msg)
         numrows = len(self.listLog)
         if clr == -1:
-            # self.listLog.item(numrows - 1).setBackground(QtCore.Qt.red)
             self.listLog.item(numrows - 1).setForeground(QtCore.Qt.red)
+        if clr == 1:
+            self.listLog.item(numrows - 1).setForeground(QtCore.Qt.darkGreen)
         self.listLog.scrollToBottom()
 
     def fillTestLog(self, key, val):

@@ -25,7 +25,7 @@ class SelectComPort(QtWidgets.QDialog):
         self.getPortsBauds()
 
     def getPortsBauds(self):
-        pass
+        # pass
         # Get available COM ports
         listCom = list(serial.tools.list_ports.comports())
         if len(listCom) > 0:

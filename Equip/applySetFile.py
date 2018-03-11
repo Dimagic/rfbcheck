@@ -1,13 +1,13 @@
+import codecs
 import csv
 import os
-import struct
-
 import serial
 from PyQt5 import QtCore
 from Equip.equip import *
+from Equip.selectComPort import SelectComPort
 
 
-class applySetFile(QtCore.QThread):
+class ApplySetFile(QtCore.QThread, SelectComPort):
     logSignal = QtCore.pyqtSignal(str, int)
     msgSignal = QtCore.pyqtSignal(str, str, str, int)
     progressBarSignal = QtCore.pyqtSignal(str, float, float)
@@ -16,18 +16,23 @@ class applySetFile(QtCore.QThread):
     def __init__(self, currParent, parent=None):
         QtCore.QThread.__init__(self, parent)
         self.ser = None
+        self.haveConn = False
         self.currParent = currParent
         self.loadPref = 'aaaa5430'
         self.sizeData = {'CHAR8': 8, 'FLOAT32': 32, 'INT16': 16, 'RawData': 8,
-                        'STRING_ARRAY': 16, 'UCHAR8': 8, 'UINT16': 16, 'ULONG32': 32}
+                        'STRING_ARRAY': 128, 'UCHAR8': 8, 'UINT16': 16, 'ULONG32': 32}
         self.arrValue = {}
         for i, j in enumerate(range(33, 47)):
             i = i+1
             if i > 8:
                 i = 2**(i-5)
             self.arrValue.update({i: str(hex(j)).replace('0x', '')})
-        # print(self.arrValue)
+
         self.getComConn()
+        if not self.haveConn:
+            return
+
+    def run(self):
         self.readSetFile()
 
     def readSetFile(self):
@@ -40,9 +45,15 @@ class applySetFile(QtCore.QThread):
         except Exception as e:
             self.msgSignal.emit('w', 'Can`t open file settings', str(e), 1)
             return
+
+        csvfile = open(file)
+        reader = csv.DictReader(csvfile)
+        row_count = sum(1 for row in reader)
+        print(row_count)
+        csvfile.close()
+
         with open(file) as csvfile:
             reader = csv.DictReader(csvfile)
-            loadString = []
             for row in reader:
                 if str(row.get(namePar)).find("#") != -1:
                     continue
@@ -51,30 +62,36 @@ class applySetFile(QtCore.QThread):
                 lenOfData = int(row.get(None)[3])
                 addrToWrite = row.get(None)[0]
                 memVal = self.getValOfMemory(lenOfData, self.sizeData.get(typeOfData))
-                loadString = self.loadPref + str(memVal) + '556677' + addrToWrite.replace('0x', '')
-
-                if row.get(namePar).find('HEX') != -1 \
-                        or row.get(namePar) == 'FILTERS_NAMES':
-                    continue
-
-                for i in range(lenOfData):
+                toSend = self.loadPref + str(memVal) + '556677' + addrToWrite.replace('0x', '')
+                for x, i in enumerate(range(lenOfData)):
                     currVal = currData[i]
+                    if row.get(namePar) != 'FILTERS_NAMES':
+                        nbits = int(self.sizeData.get(typeOfData))
+
                     if typeOfData == 'FLOAT32':
-                        print(self.floatToHex(currVal))
-                        continue
-                    nbits = int(self.sizeData.get(typeOfData))
-                    k = hex((int(currVal) + (1 << nbits)) % (1 << nbits))
+                        k = self.floatToHex(currVal)
+                    # elif row.get(namePar).find('HEX') != -1:
+                    #     k = hex((int(currVal) + (1 << nbits)) % (1 << nbits))
+                    #     print(k)
+                    elif row.get(namePar) == 'FILTERS_NAMES':
+                        if x == 0:
+                            nbits = int(currVal) * 8
+                            continue
+                        k = binascii.hexlify(codecs.encode(currVal))
+                    else:
+                        k = hex((int(currVal) + (1 << nbits)) % (1 << nbits))
                     k = self.getcorrectHex(k, nbits)
-                    loadString += k
+                    toSend += k
                 needLen = int(self.getDictKey(self.arrValue, memVal)) + 8
-                loadString = self.getCorrectLine(loadString, needLen)
-                loadString = loadString + getCrc(loadString)
-                # print(needLen)
-                print(int(len(loadString)/2), loadString)
-                # writingBytes = parent.ser.ser.write(binascii.unhexlify(loadString))
-                print(binascii.unhexlify(loadString))
-                self.ser.write(binascii.unhexlify(loadString))
-                time.sleep(1)
+                toSend = self.getCorrectLine(toSend, needLen)
+                toSend += getCrc(toSend)
+                # print(row.get(namePar), nbits, toSend)
+                sending = self.sendParameter(row.get(namePar), addrToWrite.replace('0x', ''), toSend)
+                print(sending)
+                # if not sending:
+                #     return
+        csvfile.close()
+        self.logSignal.emit('Loading settings file complete', 0)
 
     def getDictKey(self, dict, val):
         for i, j in dict.items():
@@ -91,15 +108,15 @@ class applySetFile(QtCore.QThread):
         return self.getcorrectHex(hex((val + (1 << nbits)) % (1 << nbits)), nbits / 4)
 
     def floatToHex(self, n):
-        if '0.0' in n:
+        if n == 0:
             return '0x00000000'
         try:
             return hex(struct.unpack('<I', struct.pack('<f', self.toFloat(n)))[0])
         except Exception as e:
-            print(e)
+            self.logSignal.emit(str(e), -1)
 
     def getcorrectHex(self, line, k):
-        line = line.replace('0x', '')
+        line = str(line).replace('0x', '').replace("b'", "").replace("'", "")
         if len(line) % 2 != 0:
             line = '0' + line
         while len(line) < k/4:
@@ -117,22 +134,68 @@ class applySetFile(QtCore.QThread):
         try:
             return float(n)
         except ValueError:
-            print('ERR: converting string to float fail')
+            self.logSignal.emit('ERR: converting string to float fail', -1)
             return
 
     def getComConn(self):
-        port, baud = 'COM1', '57600'
+        port, baud = self.getCurrPortBaud()
         try:
             self.ser = serial.Serial(port, int(baud), timeout=0.5)
             if self.ser.isOpen():
                 self.ser.write(binascii.unhexlify('AAAA543022556677403D01'))
                 rx = binascii.hexlify(self.ser.readline())
+                band = int(rx[26:34], 16) / 1000
                 self.comMovieSignal.emit(str(self.ser.port), str(self.ser.baudrate))
                 self.logSignal.emit("Connected to port " + str(self.ser.port), 0)
+                self.haveConn = True
         except Exception as e:
+            self.haveConn = False
             self.logSignal.emit('Connection problem: ' + str(e), -1)
             self.comMovieSignal.emit('', '')
-            self.sendMsg('c', 'Connection problem', 'Connection to\n'
+            self.msgSignal.emit('c', 'Connection problem', 'Connection to\n'
                                                     'port: ' + port + '\n'
                                                     'baud: ' + baud + '\n'
                                                     'Fail: ' + str(e), 1)
+            if self.ser is not None:
+                if self.ser.isOpen():
+                    self.ser.close()
+
+    def sendParameter(self, namePar, addr, toSend):
+        self.ser.flushInput()
+        self.ser.flushOutput()
+
+        writingBytes = self.ser.write(binascii.unhexlify(toSend))
+        # time.sleep(writingBytes / 100 + .5)
+        outWait = int(self.ser.outWaiting())
+        inWait = int(self.ser.inWaiting())
+
+        k = 0
+        while outWait != 0:
+            if k > 15:
+                self.logSignal.emit(namePar + ':OUT ERROR', -1)
+                print('--------------------------', 0)
+                return False
+            else:
+                time.sleep(0.5)
+                outWait = int(self.ser.outWaiting())
+                k += 1
+        k = 0
+        while inWait == 0:
+            if k > 5:
+                self.logSignal.emit(namePar + ':IN ERROR', -1)
+                self.logSignal.emit('--------------------------', 0)
+                return False
+            else:
+                time.sleep(0.5)
+                inWait = int(self.ser.inWaiting())
+                k += 1
+
+        rx = str(binascii.hexlify(self.ser.read(self.ser.inWaiting()))).replace("b'", "").replace("'", "").upper()
+        if addr in rx:
+            self.logSignal.emit(namePar, 0)
+            self.logSignal.emit('Tx: ' + str(toSend)[:95].upper(), 0)
+            self.logSignal.emit('written ' + str(writingBytes) + ' bytes', 0)
+            self.logSignal.emit('Rx: ' + str(rx), 0)
+            self.logSignal.emit(namePar + ': OK', 1)
+            self.logSignal.emit('--------------------------', 0)
+            return True
