@@ -1,3 +1,4 @@
+import binascii
 from PyQt5 import QtWidgets
 from PyQt5.uic import loadUi
 import serial.tools.list_ports
@@ -10,6 +11,8 @@ class SelectComPort(QtWidgets.QDialog):
         self.dialog = loadUi('Forms/comPort.ui', self)
         self.dialog.setWindowTitle('Select port')
         self.dialog.setWindowIcon(parent.appIcon)
+        self.ser = None
+        self.haveConn = False
 
         port, baud = self.getCurrPortBaud()
         self.currentPort.setText(port)
@@ -25,7 +28,6 @@ class SelectComPort(QtWidgets.QDialog):
         self.getPortsBauds()
 
     def getPortsBauds(self):
-        # pass
         # Get available COM ports
         listCom = list(serial.tools.list_ports.comports())
         if len(listCom) > 0:

@@ -28,12 +28,11 @@ class ApplySetFile(QtCore.QThread, SelectComPort):
                 i = 2**(i-5)
             self.arrValue.update({i: str(hex(j)).replace('0x', '')})
 
-        self.getComConn()
-        if not self.haveConn:
-            return
-
     def run(self):
-        self.readSetFile()
+        self.getComConn()
+        if self.haveConn:
+            self.readSetFile()
+            # self.getParameter()
 
     def readSetFile(self):
         namePar = '# 0 1182685875'
@@ -48,13 +47,13 @@ class ApplySetFile(QtCore.QThread, SelectComPort):
 
         csvfile = open(file)
         reader = csv.DictReader(csvfile)
-        row_count = sum(1 for row in reader)
-        print(row_count)
+        row_count = sum(1 for row in reader) - 1
         csvfile.close()
 
         with open(file) as csvfile:
             reader = csv.DictReader(csvfile)
-            for row in reader:
+            for l, row in enumerate(reader):
+                self.progressBarSignal.emit('Loading set file', row_count, l)
                 if str(row.get(namePar)).find("#") != -1:
                     continue
                 currData = row.get(None)[4:]
@@ -70,9 +69,6 @@ class ApplySetFile(QtCore.QThread, SelectComPort):
 
                     if typeOfData == 'FLOAT32':
                         k = self.floatToHex(currVal)
-                    # elif row.get(namePar).find('HEX') != -1:
-                    #     k = hex((int(currVal) + (1 << nbits)) % (1 << nbits))
-                    #     print(k)
                     elif row.get(namePar) == 'FILTERS_NAMES':
                         if x == 0:
                             nbits = int(currVal) * 8
@@ -85,13 +81,12 @@ class ApplySetFile(QtCore.QThread, SelectComPort):
                 needLen = int(self.getDictKey(self.arrValue, memVal)) + 8
                 toSend = self.getCorrectLine(toSend, needLen)
                 toSend += getCrc(toSend)
-                # print(row.get(namePar), nbits, toSend)
-                sending = self.sendParameter(row.get(namePar), addrToWrite.replace('0x', ''), toSend)
-                print(sending)
-                # if not sending:
-                #     return
+                self.setParameter(row.get(namePar), addrToWrite.replace('0x', ''), toSend)
+
         csvfile.close()
-        self.logSignal.emit('Loading settings file complete', 0)
+        self.ser.close()
+        self.comMovieSignal.emit('', '')
+        self.logSignal.emit('Load settings file complete', 0)
 
     def getDictKey(self, dict, val):
         for i, j in dict.items():
@@ -143,8 +138,10 @@ class ApplySetFile(QtCore.QThread, SelectComPort):
             self.ser = serial.Serial(port, int(baud), timeout=0.5)
             if self.ser.isOpen():
                 self.ser.write(binascii.unhexlify('AAAA543022556677403D01'))
-                rx = binascii.hexlify(self.ser.readline())
-                band = int(rx[26:34], 16) / 1000
+                time.sleep(.5)
+                tx = binascii.hexlify(self.ser.readline())
+                if tx == b'':
+                    raise serial.portNotOpenError
                 self.comMovieSignal.emit(str(self.ser.port), str(self.ser.baudrate))
                 self.logSignal.emit("Connected to port " + str(self.ser.port), 0)
                 self.haveConn = True
@@ -160,12 +157,11 @@ class ApplySetFile(QtCore.QThread, SelectComPort):
                 if self.ser.isOpen():
                     self.ser.close()
 
-    def sendParameter(self, namePar, addr, toSend):
+    def setParameter(self, namePar, addr, toSend):
         self.ser.flushInput()
         self.ser.flushOutput()
 
         writingBytes = self.ser.write(binascii.unhexlify(toSend))
-        # time.sleep(writingBytes / 100 + .5)
         outWait = int(self.ser.outWaiting())
         inWait = int(self.ser.inWaiting())
 
@@ -199,3 +195,65 @@ class ApplySetFile(QtCore.QThread, SelectComPort):
             self.logSignal.emit(namePar + ': OK', 1)
             self.logSignal.emit('--------------------------', 0)
             return True
+
+    def getParameter(self):
+        namePar = '# 0 1182685875'
+        try:
+            file = os.path.join(os.path.dirname(__file__), '..', 'setFiles',
+                                self.currParent.rfbTypeCombo.currentText() + '.CSV')
+            f = open(file, 'r')
+            f.close()
+        except Exception as e:
+            self.msgSignal.emit('w', 'Can`t open file settings', str(e), 1)
+            return
+
+        csvfile = open(file)
+        reader = csv.DictReader(csvfile)
+        row_count = sum(1 for row in reader) - 1
+        csvfile.close()
+
+        with open(file) as csvfile:
+            reader = csv.DictReader(csvfile)
+            for row in reader:
+                if str(row.get(namePar)).find("#") != -1:
+                    continue
+                addr = str(hex(int(row.get(None)[0], 16) + 1)).replace("0x", "")
+
+                self.ser.flushInput()
+                self.ser.flushOutput()
+
+                outWait = int(self.ser.outWaiting())
+                inWait = int(self.ser.inWaiting())
+
+                toSend = 'AAAA543022556677'
+                toSend += addr
+                crc = getCrc(toSend)
+                toSend += crc
+                print(toSend)
+                # print(binascii.unhexlify(toSend))
+                self.ser.write(binascii.unhexlify(toSend))
+                k = 0
+                while outWait != 0:
+                    if k > 15:
+                        self.logSignal.emit(':OUT ERROR', -1)
+                        print('--------------------------', 0)
+                        return False
+                    else:
+                        time.sleep(0.5)
+                        outWait = int(self.ser.outWaiting())
+                        k += 1
+                k = 0
+                while inWait == 0:
+                    if k > 5:
+                        self.logSignal.emit(':IN ERROR', -1)
+                        self.logSignal.emit('--------------------------', 0)
+                        return False
+                    else:
+                        time.sleep(0.5)
+                        inWait = int(self.ser.inWaiting())
+                        k += 1
+
+                rx = str(binascii.hexlify(self.ser.read(self.ser.inWaiting()))).replace("b'", "").replace("'", "").upper()
+                print(rx)
+                print('--------------------------')
+

@@ -148,9 +148,10 @@ class TestContoller(QtCore.QThread, SelectComPort):
             self.ser = serial.Serial(port, int(baud), timeout=0.5)
             if self.ser.isOpen():
                 self.ser.write(binascii.unhexlify('AAAA543022556677403D01'))
-                rx = binascii.hexlify(self.ser.readline())
-                band = int(rx[26:34], 16) / 1000
-                # print(band)
+                time.sleep(.5)
+                tx = binascii.hexlify(self.ser.readline())
+                if tx == b'':
+                    raise serial.portNotOpenError
                 self.comMovieSignal.emit(str(self.ser.port), str(self.ser.baudrate))
                 self.logSignal.emit("Connected to port " + str(self.ser.port), 0)
                 self.haveConn = True

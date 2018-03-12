@@ -52,7 +52,7 @@ class AlcTest(QtCore.QThread):
         self.gen.write(":OUTP:STAT OFF")
 
     def alcInTest(self, conn, alc, whatConn, shift):
-        self.testController.logSignal.emit("***** Start ALC in test *****", 3)
+        self.testController.logSignal.emit("***** Start ALC in test *****", 0)
         setAlc(conn, alc, 255, shift)
         ampl = getAvgGain(self.testController)
         table = {}
@@ -71,12 +71,13 @@ class AlcTest(QtCore.QThread):
                     setAlc(conn, alc, i - n, shift)
                     time.sleep(1)
                     ampl = getAvgGain(self.testController)
-                    self.testController.logSignal.emit('ALC IN = ' + str(i - n) + '; meas = ' + str(ampl)[:7] + ' dBm', 1)
+                    self.testController.logSignal.emit('ALC IN = ' + str(i - n) +
+                                                       '; meas = ' + str(ampl)[:7] + ' dBm', -1)
                     if -20.0 <= ampl <= -10.0:
                         table[i + 1] = ampl
                     n += 1
                 break
-            self.testController.logSignal.emit('ALC IN = ' + str(i) + '; meas = ' + str(ampl)[:7] + ' dBm', 1)
+            self.testController.logSignal.emit('ALC IN = ' + str(i) + '; meas = ' + str(ampl)[:7] + ' dBm', 0)
             if -20.0 <= ampl <= -10.0:
                 table[i] = ampl
         self.parent.TestPrBar.setValue(161)
@@ -90,7 +91,7 @@ class AlcTest(QtCore.QThread):
                 self.testController.stopTestFlag = True
             elif q == QMessageBox.Ignore:
                 setAlc(conn, alc, 255, shift)
-            self.testController.logSignal.emit('ALC ' + whatConn + ' IN: FAIL', 2)
+            self.testController.logSignal.emit('ALC ' + whatConn + ' IN: FAIL', -1)
             self.testController.resSignal.emit('ALC test', self.testController.whatConn, str(self.alcInMin), 'fail',
                                                str(self.alcInMax), 0)
             self.testController.fillTestLogSignal.emit(self.parent, 'ALC in', 'Fail')
@@ -108,7 +109,7 @@ class AlcTest(QtCore.QThread):
                         minKey = k
 
                 self.testController.logSignal.emit(
-                    'ALC ' + whatConn + ' IN (-' + str(i) + '): ' + str(minKey) + ' <-- ' + str(minVal)[:6] + ' dBm', 1)
+                    'ALC ' + whatConn + ' IN (-' + str(i) + '): ' + str(minKey) + ' <-- ' + str(minVal)[:6] + ' dBm', 0)
                 if i == 15:
                     if 100 <= minKey <= 130:
                         self.testController.resSignal.emit('ALC IN', self.testController.whatConn, str(self.alcInMin),
@@ -128,7 +129,7 @@ class AlcTest(QtCore.QThread):
 
     def alcOutTest(self, conn, alc, whatConn, shift):
         setAlc(conn, alc, 4, shift)  # when 0 -> setAlc not work
-        self.testController.logSignal.emit("***** Start ALC out test *****", 3)
+        self.testController.logSignal.emit("***** Start ALC out test *****", 0)
         time.sleep(1)
         ampl = round(getAvgGain(self.testController), 1)
         setAlc(conn, alc, 255, shift)
@@ -138,7 +139,7 @@ class AlcTest(QtCore.QThread):
                                                str(self.alcOutMax), 1)
             self.testController.fillTestLogSignal.emit('ALC out', str(ampl))
         else:
-            self.testController.logSignal.emit('ALC ' + whatConn + ' OUT: FAIL ' + str(ampl) + ' dBm', 2)
+            self.testController.logSignal.emit('ALC ' + whatConn + ' OUT: FAIL ' + str(ampl) + ' dBm', -1)
             q = self.testController.sendMsg('w', 'Warning', 'ALC Out test. Gain: ' + str(ampl) + ' dBm', 3)
             if q == QMessageBox.Retry:
                 self.alcOutTest(conn, alc, whatConn, shift)

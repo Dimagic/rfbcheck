@@ -6,7 +6,7 @@ from PyQt5 import QtCore
 class DsaTest(QtCore.QThread):
     def __init__(self, testController, parent=None):
         super(DsaTest, self).__init__(parent)
-        testController.logSignal.emit("***** Start DSA test *****", 3)
+        testController.logSignal.emit("***** Start DSA test *****", 0)
 
         self.testController = testController
         self.parent = testController.getParent()
@@ -54,7 +54,7 @@ class DsaTest(QtCore.QThread):
             dsa3 = listSet[10]
             ampl = listSet[4]
         else:
-            self.testController.logSignal.emit("ERR - DSA test set Dl/Ul fail", 2)
+            self.testController.logSignal.emit("ERR - DSA test set Dl/Ul fail", -1)
             return
         if dsaType == 3:
             dsa1test = toFloat(dsa1) + toFloat(dsa3)
@@ -109,7 +109,7 @@ class DsaTest(QtCore.QThread):
                 d1 = curGain
             delta = round(curGain - d1 + i, 2)
             self.testController.logSignal.emit(dsaName + ': ' + str(i) + '    Gain: ' + str(curGain) +
-                                               '    Delta: ' + str(delta), 3)
+                                               '    Delta: ' + str(delta), 0)
 # if gain more then SA display line
             if dsaType == 1:
                 k = '1'

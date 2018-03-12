@@ -8,7 +8,7 @@ class GainTest(QtCore.QThread):
         super(GainTest, self).__init__(parent)
         if testController.stopTestFlag:
             return
-        testController.logSignal.emit("***** Start Gain test *****", 3)
+        testController.logSignal.emit("***** Start Gain test *****", 0)
         self.testController = testController
         self.mainParent = testController.getParent()
         self.sa = testController.instr.sa

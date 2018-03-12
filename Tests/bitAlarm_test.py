@@ -10,7 +10,7 @@ from PyQt5 import QtCore
 class BitAlarmTest(QtCore.QThread):
     def __init__(self, testController, mainParent, parent=None):
         super(BitAlarmTest, self).__init__(parent)
-        testController.logSignal.emit("***** Start BIT alarm test *****", 3)
+        testController.logSignal.emit("***** Start BIT alarm test *****", 0)
         testController.progressBarSignal.emit('BIT Alarm', 0, 0)
 
         if testController.stopTestFlag:
@@ -29,7 +29,7 @@ class BitAlarmTest(QtCore.QThread):
         if currentGain >= -50:
             gain = True
         else:
-            self.testController.logSignal.emit('No signal', 2)
+            self.testController.logSignal.emit('No signal', -1)
             return
 
         self.testController.logSignal.emit('Send IF 1.2 GHz', 0)
@@ -42,7 +42,7 @@ class BitAlarmTest(QtCore.QThread):
             wasAlarm = True
 
         n = float(self.sa.query("CALC:MARK:Y?"))
-        self.testController.logSignal.emit('BIT gain: ' + str(n), 1)
+        self.testController.logSignal.emit('BIT gain: ' + str(n), 0)
         if n < -10:  # TODO: ??????
             gain = False
 
@@ -61,7 +61,7 @@ class BitAlarmTest(QtCore.QThread):
                 self.test()
             elif q == QMessageBox.Cancel:
                 self.testController.stopTestFlag = True
-            self.testController.logSignal.emit('BIT alarm FAIL', 2)
+            self.testController.logSignal.emit('BIT alarm FAIL', -1)
             self.testController.resSignal.emit('BIT', self.testController.whatConn, '', 'Fail', '', 0)
             status = 'Fail'
         self.testController.fillTestLogSignal.emit('BIT', status)

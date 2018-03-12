@@ -7,7 +7,7 @@ from PyQt5 import QtCore
 class FlatnessTest(QtCore.QThread):
     def __init__(self, testController, parent=None):
         super(FlatnessTest, self).__init__(parent)
-        testController.logSignal.emit("***** Start Flatness test *****", 3)
+        testController.logSignal.emit("***** Start Flatness test *****", 0)
 
         self.testController = testController
         self.mainParent = testController.getParent()

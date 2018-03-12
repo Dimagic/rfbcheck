@@ -7,7 +7,7 @@ from PyQt5 import QtCore
 class IModTest(QtCore.QThread):
     def __init__(self, testController, parent=None):
         super(IModTest, self).__init__(parent)
-        testController.logSignal.emit("***** Start IMod test *****", 3)
+        testController.logSignal.emit("***** Start IMod test *****", 0)
         self.testController = testController
         self.mainParent = testController.getParent()
         self.sa = testController.instr.sa
@@ -68,16 +68,16 @@ class IModTest(QtCore.QThread):
                 self.testController.stopTestFlag = True
                 return
         if delta > 1.5:
-            self.testController.logSignal.emit('Delta between peaks FAIL: ' + str(round(delta, 3)) + " dBm", 3)
-            self.testController.logSignal.emit(str(freq[0] / 1000) + " MHz " + str(ampl[0]) + " dBm", 3)
+            self.testController.logSignal.emit('Delta between peaks FAIL: ' + str(round(delta, 3)) + " dBm", -1)
+            self.testController.logSignal.emit(str(freq[0] / 1000) + " MHz " + str(ampl[0]) + " dBm", -1)
             self.testController.logSignal.emit(
-                str(freq[len(freq) - 1] / 1000) + " MHz " + str(round(ampl[len(ampl) - 1], 3)) + " dBm", 3)
+                str(freq[len(freq) - 1] / 1000) + " MHz " + str(round(ampl[len(ampl) - 1], 3)) + " dBm", -1)
             haveFail = True
         self.gen.write(":OUTP:MOD:STAT OFF")
         time.sleep(1)
         d = n1 - n2
         if abs(abs(d) - 3) > 1:
-            self.testController.logSignal.emit('Falling per tone(dBc) FAIL: ' + str(round(d, 3)), 2)
+            self.testController.logSignal.emit('Falling per tone(dBc) FAIL: ' + str(round(d, 3)), -1)
             haveFail = True
         else:
             self.testController.logSignal.emit('Delta between peaks PASS: ' + str(round(delta, 3)) + " dBm", 1)

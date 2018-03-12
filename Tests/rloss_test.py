@@ -13,7 +13,7 @@ class ReturnLossTest(QtCore.QThread):
         if q == QMessageBox.Cancel:
             return
 
-        testController.logSignal.emit("***** Start return loss test *****", 3)
+        testController.logSignal.emit("***** Start return loss test *****", 0)
         self.testController = testController
         self.mainParent = testController.getParent()
         self.na = testController.instr.na

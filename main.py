@@ -518,11 +518,16 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
             conn.close()
 
     def startThreadLoadSet(self):
+        q = self.sendMsg("i", "Load set file", "Load default set file\n"
+                                               "for board "+self.rfbTypeCombo.currentText()+" ?", 2)
+        if q != QMessageBox.Ok:
+            return
         self.setFileThread = ApplySetFile(self)
         self.setFileThread.logSignal.connect(self.sendLog, QtCore.Qt.QueuedConnection)
         self.setFileThread.msgSignal.connect(self.sendMsg, QtCore.Qt.QueuedConnection)
         self.setFileThread.progressBarSignal.connect(self.setProgressBar, QtCore.Qt.QueuedConnection)
         self.setFileThread.comMovieSignal.connect(self.setComMovie, QtCore.Qt.QueuedConnection)
+
         self.setFileThread.started.connect(self.on_startedSet)
         self.setFileThread.finished.connect(self.on_finishedSet)
         self.setFileThread.start()
