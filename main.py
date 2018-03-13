@@ -24,6 +24,7 @@ version = '0.3.3'
 class TestTime(threading.Thread):
     def __init__(self, parent):
         startTime = datetime.datetime.now()
+        parent.startTestTime = startTime
         while parent.testIsRun:
             timeTest = datetime.datetime.now() - startTime
             parent.testTimeLbl.setText(str(timeTest)[:7])
@@ -37,6 +38,7 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
 
         # stylesheet
         # app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())
+        self.startTestTime = None
 
         self.appIcon = QtGui.QIcon("Img/ico32_pgn_icon.ico")
         self.passImg = QtGui.QPixmap('Img/pass.png')
@@ -312,7 +314,11 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
         return
 
     def connectDb(self):
-        return sqlite3.connect('rfb.db')
+        try:
+            # TODO: if file not exist
+            return sqlite3.connect('./DB/rfb.db')
+        except Exception as e:
+            self.sendMsg("c", "Opening DB error", str(e), 1)
 
     def timeNow(self):
         return str(datetime.datetime.today().strftime("%H:%M:%S"))
@@ -649,8 +655,8 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
                                                        'settings for RF board %s ?' %
                                  str(self.rfbTypeCombo.currentText()), 2)
                 if q == QMessageBox.Ok:
-                    self.sendMsg('i', 'RFBCheck', 'Will de added later', 1)
-                    # TODO: add load set file
+                    pass
+                    # self.startThreadLoadSet(False)
                 return True
         except Exception as e:
             self.sendMsg('w', 'Load set file error', str(e), 1)

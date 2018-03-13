@@ -1,4 +1,5 @@
 import csv
+import logging
 import os
 import serial
 from PyQt5 import QtCore
@@ -31,6 +32,10 @@ class TestContoller(QtCore.QThread, SelectComPort):
     def __init__(self, currParent, parent=None):
         QtCore.QThread.__init__(self, parent)
 
+        LOG_FILENAME = './rfbcheck.log'
+        logging.basicConfig(filename=LOG_FILENAME, level=logging.ERROR)
+        logging.debug('This message should go to the log file')
+
         self.currentThread = QtCore.QThread.currentThread()
         self.controller = self
         self.currParent = currParent  # main program
@@ -42,44 +47,33 @@ class TestContoller(QtCore.QThread, SelectComPort):
         self.stopTestFlag = False
         self.haveConn = False
         self.useCorrection = False
-
-        # self.connectMovie = QMovie('Img/connect2.gif')
-        # self.connectMovie.setScaledSize(QSize(30, 30))
-        # self.connectMovie.start()
-        # self.currParent.movie.setMovie(self.connectMovie)
-
-        # TODO: move testLog to main or db. main better i think
-        # try:
-        #     self.testLogDl.get('SN')
-        #     self.testLogUl.get('SN')
-        # except AttributeError:
-        #     self.testLogDl = {}
-        #     self.testLogUl = {}
-
         self.getTests(currParent)
 
     def run(self):
         if len(self.testArr) is 0:
             self.sendMsg('w', "Warning", "You have to choice minimum one test", 1)
             return
-        self.getComConn()
-        if self.haveConn:
-            self.whatConn = self.checkUlDl()
-        else:
-            return
-        if self.whatConn is None:
-            return
-        # TODO: send message if load set file is fail
-        self.readAdemSettings()
-        self.logSignal.emit('START TEST', 0)
-        self.instr.gen.write(":OUTP:STAT ON")
-        self.stopTestFlag = False
         try:
+            self.getComConn()
+            if self.haveConn:
+                self.whatConn = self.checkUlDl()
+            else:
+                return
+            if self.whatConn is None:
+                return
+            # TODO: send message if load set file is fail
+            self.readAdemSettings()
+            self.logSignal.emit('START TEST', 0)
+            self.instr.gen.write(":OUTP:STAT ON")
+            self.stopTestFlag = False
             self.runTests()
         except Exception as e:
             self.stopTestFlag = True
             self.sendMsg('c', 'Test error', str(e), 1)
+            logging.exception(str(self.currParent.startTestTime) + ": " +
+                              self.currParent.rfbTypeCombo.currentText() + " " + self.currParent.rfbSN.text())
             self.ser.close()
+            self.comMovieSignal.emit('', '')
             return
         else:
             self.ser.close()
