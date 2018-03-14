@@ -441,7 +441,7 @@
                <string/>
               </property>
               <property name="maxLength">
-               <number>10</number>
+               <number>32</number>
               </property>
               <property name="alignment">
                <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>

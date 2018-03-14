@@ -16,6 +16,7 @@ from PyQt5.QtGui import QMovie
 from PyQt5 import QtCore, QtWidgets, QtGui
 from PyQt5.QtWidgets import QTableWidgetItem, QAbstractItemView, QLabel, QAction
 import threading
+import re
 
 
 version = '0.3.3'
@@ -115,6 +116,7 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
 
         self.rfbSN.textEdited.connect(self.startBtnEnabled)
         self.rfbSN.textChanged.connect(self.startBtnEnabled)
+        # self.rfbSN.returnPressed.connect(self.getSnViaScanner)
 
         self.journalFilter.textEdited.connect(Journal.feelJournal)
 
@@ -138,10 +140,10 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
         # self.applySetBtn.setEnabled(False)
 
         conn, cursor = self.getConnDb()
-        rfbList = cursor.execute("select name from rfb_type order by name")
+        self.rfbList = cursor.execute("select name from rfb_type order by name")
 
         # Get RFB list and fill combobox
-        for i in rfbList:
+        for i in self.rfbList:
             self.rfbTypeCombo.addItem(str(i).replace("('", "").replace("',)", ""))
             if len(self.editRfbCombo) == 0: self.editRfbCombo.addItem('New')
             self.editRfbCombo.addItem(str(i).replace("('", "").replace("',)", ""))
@@ -324,6 +326,12 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
         return str(datetime.datetime.today().strftime("%H:%M:%S"))
 
     def startBtnEnabled(self):
+        try:
+            line = self.rfbSN.text()
+            if len(line) > 8 and line[len(line)-8:].isnumeric():
+                self.getSnViaScanner()
+        except Exception as e:
+            print(str(e))
         if ((self.rfbSN.text().isdigit() and len(self.rfbSN.text()) >= 8)
                 or (self.rfbSN.text().upper() == 'XXXX')):
             self.startTestBtn.setEnabled(True)
@@ -770,6 +778,25 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
             except:
                 source.setToolTip('Instrument not connected')
         return QtWidgets.QMainWindow.eventFilter(self, source, event)
+
+    def getSnViaScanner(self):
+        r = re.findall('[A-Z0-9]+', self.rfbSN.text())
+        if len(r) < 2:
+            return
+        rfType = str(r[0])
+        rfSn = str(r[len(r)-1])
+        allItems = [self.rfbTypeCombo.itemText(i) for i in range(self.rfbTypeCombo.count())]
+        isFound = False
+        for x, i in enumerate(allItems):
+            if i == rfType:
+                self.rfbTypeCombo.setCurrentIndex(x)
+                self.rfbIsChecked()
+                isFound = True
+                break
+        if isFound:
+            self.rfbSN.setText(rfSn)
+        else:
+            self.sendMsg('i', 'RFBCheck', 'RF ' + rfType + " not found", 1)
 
 
 if __name__ == '__main__':

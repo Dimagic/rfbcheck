@@ -285,3 +285,7 @@ class Report:
         for i in range(0, len(data)):
             t._argW[i] = w * inch
         return t
+
+    def printReport(self):
+        # TODO: need use powershell???
+        pass

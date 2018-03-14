@@ -198,7 +198,7 @@ class Ui_MainWindow(object):
         self.rfbSN.setMinimumSize(QtCore.QSize(120, 20))
         self.rfbSN.setMaximumSize(QtCore.QSize(120, 20))
         self.rfbSN.setText("")
-        self.rfbSN.setMaxLength(10)
+        self.rfbSN.setMaxLength(32)
         self.rfbSN.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
         self.rfbSN.setObjectName("rfbSN")
         self.horizontalLayout_9.addWidget(self.rfbSN)
