@@ -65,6 +65,7 @@ class IModTest(QtCore.QThread):
             if q == QMessageBox.Retry:
                 self.mToneTest(freq, genPow)
             if q == QMessageBox.Cancel:
+                haveFail = True
                 self.testController.stopTestFlag = True
                 return
         if delta > 1.5:
@@ -82,7 +83,8 @@ class IModTest(QtCore.QThread):
         else:
             self.testController.logSignal.emit('Delta between peaks PASS: ' + str(round(delta, 3)) + " dBm", 1)
             self.testController.logSignal.emit('Falling per tone(dBc) PASS: ' + str(round(d, 3)), 1)
-        if haveFail is False:
+
+        if not haveFail:
             self.testController.resSignal.emit('Intermodulation', self.testController.whatConn, '', 'Pass', '', 1)
             self.testController.fillTestLogSignal.emit('IMod', 'Pass')
         else:

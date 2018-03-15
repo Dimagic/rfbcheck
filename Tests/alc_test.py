@@ -57,12 +57,12 @@ class AlcTest(QtCore.QThread):
         ampl = getAvgGain(self.testController)
         table = {}
 
-        for j, i in enumerate(range(50, 161, 1)):
+        for j, i in enumerate(range(70, 161, 1)):
             setAlc(conn, alc, i, shift)
             time.sleep(0.3)
             ampl = getAvgGain(self.testController)
             self.testController.progressBarSignal.emit('ALC IN = ' + str(i) + '; meas = ' + str(ampl)[:5] + ' dBm',
-                                                       161 - 50 - 1, j)
+                                                       161 - 70 - 1, j)
             if ampl > -10 and len(table) != 0:
                 break
             if ampl > -10 and len(table) == 0:

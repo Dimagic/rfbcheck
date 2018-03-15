@@ -19,12 +19,14 @@ class Calibration(QtWidgets.QDialog):
     def __init__(self, parent):
         super(Calibration, self).__init__(parent)
         self.currParent = parent
-        self.dialog = loadUi('Forms/calibration.ui', self)
-        self.dialog.setWindowTitle('Calibration')
-        self.dialog.setWindowIcon(parent.appIcon)
-        m = PlotCanvas(self)
-        m.move(0, 0)
-        self.dialog.show()
+        # self.dialog = loadUi('Forms/calibration.ui', self)
+        # self.dialog.setWindowTitle('Calibration')
+        # self.dialog.setWindowIcon(parent.appIcon)
+        # m = PlotCanvas(self)
+        # m.move(0, 0)
+        # self.dialog.show()
+
+        self.calibration(parent)
 
     def grafic(self, parent):
         try:
@@ -57,7 +59,6 @@ class Calibration(QtWidgets.QDialog):
         # plt.title("This is\na very very\nloooooong\ntitle!")
         # plt.subplots_adjust(top=0.7)
         plt.show()
-
 
     def calibration(self, parent):
         parent.currTestLbl.setText('Calibration')

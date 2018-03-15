@@ -84,7 +84,7 @@ class EditRFB(QtWidgets.QDialog,Ui_RFBedit):
         currTable.setRowCount(0)
         currTable.setHorizontalHeaderLabels(['Settings','Value'])
 
-        for i,j in enumerate(self.listNameColumn[1:]):
+        for i, j in enumerate(self.listNameColumn[1:]):
             row = currTable.rowCount()
             currTable.insertRow(row)
             item = QTableWidgetItem(QtWidgets.QTableWidgetItem(j))
@@ -194,25 +194,26 @@ class EditRFB(QtWidgets.QDialog,Ui_RFBedit):
             conn.commit()
             conn.close()
         except Exception as e:
-            self.parent.sendMsg('w','EditRFB@insertQuery',str(e),1)
+            self.parent.sendMsg('w', 'EditRFB@insertQuery', str(e), 1)
 
-    def selectQuery(self,query):
+    def selectQuery(self, query):
         try:
-            conn,cursor = self.getConnDb()
+            conn, cursor = self.getConnDb()
             rows = cursor.execute(query).fetchall()
+            print(rows)
             conn.close()
-            return(rows)
+            return rows
         except Exception as e:
-            self.parent.sendMsg('w','EditRFB@insertQuery',str(e),1)
+            self.parent.sendMsg('w', 'EditRFB@insertQuery', str(e), 1)
 
     def checkDoubleRecords(self,table,name,value):
         query = "select count() from %s where %s = '%s'" % (table,name,value.upper())
         rows = self.selectQuery(query)
         r = re.findall('[0-9]+', str(rows[0]))
-        return(int(r[0]))
+        return int(r[0])
 
-    def getSettings(self,table):
-        query = "PRAGMA table_info(%s)" % (table)
+    def getSettings(self, table):
+        query = "PRAGMA table_info(%s)" % table
         self.listNameColumn = []
         listValue = []
         rows = self.selectQuery(query)
@@ -221,9 +222,11 @@ class EditRFB(QtWidgets.QDialog,Ui_RFBedit):
                 self.listNameColumn.append(table)
             else:
                 self.listNameColumn.append(row[1])
+
         if self.parent.editRfbCombo.currentText() == 'New':
             return
-        query = "select * from %s where %s = '%s'" % (table,self.listNameColumn[1],self.parent.editRfbCombo.currentText())
+        query = "select * from %s where %s = '%s'" % (table, self.listNameColumn[1],
+                                                      self.parent.editRfbCombo.currentText())
         rows = self.selectQuery(query)
         if rows == []:
             listValue = []

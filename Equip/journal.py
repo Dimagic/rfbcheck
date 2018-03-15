@@ -92,8 +92,19 @@ class Journal:
                     q = "select gain_dl_min, gain_dl_max, gain_ul_min, gain_ul_max from ATR where rfb_type = '%s'" \
                         % (row[1])
                     limits = cursor.execute(q).fetchall()[0]
-                    if str(row[5]).isdigit():
+                    if toFloat(row[5]):
                         gain = toFloat(row[5])
+                        if str(row[4]) == 'Dl':
+                            if not limits[0]-2 <= gain <= limits[1]+2:
+                                Journal.parent.tableJournal.item(numrows, j - 1).setBackground(QtCore.Qt.red)
+                            elif not limits[0] <= gain <= limits[1]:
+                                Journal.parent.tableJournal.item(numrows, j - 1).setBackground(QtCore.Qt.yellow)
+                        else:
+                            if not limits[2]-2 <= gain <= limits[3]+2:
+                                Journal.parent.tableJournal.item(numrows, j - 1).setBackground(QtCore.Qt.red)
+                            elif not limits[2] <= gain <= limits[3]:
+                                Journal.parent.tableJournal.item(numrows, j - 1).setBackground(QtCore.Qt.yellow)
+
                 j += 1
         conn.close()
         try:
