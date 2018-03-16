@@ -401,7 +401,7 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
             cursor = conn.cursor()
             return conn, cursor
         except Exception as e:
-            self.sendLog(str(e), -1)
+            self.sendMsg('c', 'Connection DB error', str(e), 1)
 
     def getCurrInstrAddr(self):
         conn, cursor = self.getConnDb()
@@ -645,7 +645,7 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
 
         x = len(self.testLogDl) + len(self.testLogUl) + len(self.to_DsaUlDl)
         if not self.toBeOrNotToBe() and x != 0:
-            q = self.sendMsg('i', 'RFBcheck', 'Connect second side of the RF and press Ok', 2)
+            q = self.sendMsg('i', 'RFBcheck', 'Connect second side of the RF board and press Ok', 2)
             if q == QMessageBox.Ok:
                 self.startThreadTest()
             if q == QMessageBox.Cancel:

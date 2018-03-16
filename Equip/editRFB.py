@@ -10,8 +10,7 @@ import sqlite3
 import sys
 
 
-
-class EditRFB(QtWidgets.QDialog,Ui_RFBedit):
+class EditRFB(QtWidgets.QDialog, Ui_RFBedit):
     def __init__(self, RFBedit, parent):
         super(EditRFB, self).__init__(parent)
         self.ui = Ui_RFBedit()
@@ -43,7 +42,7 @@ class EditRFB(QtWidgets.QDialog,Ui_RFBedit):
         self.getSettings('test_settings')
         self.initTableSettings('test_settings')
 
-        conn,cursor = self.getConnDb()
+        conn, cursor = self.parent.getConnDb()
         with conn:
             rows = cursor.execute("select name from adem_type").fetchall()
             for row in rows:
@@ -181,15 +180,11 @@ class EditRFB(QtWidgets.QDialog,Ui_RFBedit):
             values.append(data.get(k))
         query = "insert or replace into %s" % (currTable)
         query = query + "(" + ','.join((str(n) for n in keys)) + ") values('" + "','".join((str(k) for k in values))+ "')"
-        print(query)
         self.insertQuery(query)
-
-
-
 
     def insertQuery(self,query):
         try:
-            conn,cursor = self.getConnDb()
+            conn, cursor = self.parent.getConnDb()
             cursor.execute(query)
             conn.commit()
             conn.close()
@@ -198,9 +193,8 @@ class EditRFB(QtWidgets.QDialog,Ui_RFBedit):
 
     def selectQuery(self, query):
         try:
-            conn, cursor = self.getConnDb()
+            conn, cursor = self.parent.getConnDb()
             rows = cursor.execute(query).fetchall()
-            print(rows)
             conn.close()
             return rows
         except Exception as e:
@@ -237,15 +231,6 @@ class EditRFB(QtWidgets.QDialog,Ui_RFBedit):
         else:
             self.listTestSettings = dict(zip(self.listNameColumn,listValue))
 
-
-
-    def getConnDb(self):
-        try:
-            conn = sqlite3.connect('rfb.db')
-            cursor = conn.cursor()
-            return(conn,cursor)
-        except Exception as e:
-             self.parent.sendMsg('w','EditRFB@getConnDb',str(e),1)
 
 
 

@@ -58,16 +58,13 @@ class IModTest(QtCore.QThread):
         self.testController.useCorrection = True
         freq, ampl = self.instrument.getPeakTable()
         delta = abs(abs(ampl[0]) - abs(ampl[len(ampl) - 1]))
+        for i, j in enumerate(freq):
+            self.testController.logSignal.emit('Peak: ' + str(j/1000000) + " MHz -> " + str(ampl[i]) + " dB", 0)
         if len(freq) > 3:
-            q = self.testController.sendMsg('w', 'IMod test error', 'Intermodulation FAIL: to many peaks', 3)
-            if q == QMessageBox.Ignore:
-                haveFail = True
-            if q == QMessageBox.Retry:
-                self.mToneTest(freq, genPow)
-            if q == QMessageBox.Cancel:
-                haveFail = True
-                self.testController.stopTestFlag = True
-                return
+            self.testController.logSignal.emit('Peaks FAIL: to many peaks', -1)
+            haveFail = True
+        else:
+            self.testController.logSignal.emit('Peaks Pass', 1)
         if delta > 1.5:
             self.testController.logSignal.emit('Delta between peaks FAIL: ' + str(round(delta, 3)) + " dBm", -1)
             self.testController.logSignal.emit(str(freq[0] / 1000) + " MHz " + str(ampl[0]) + " dBm", -1)
@@ -83,7 +80,6 @@ class IModTest(QtCore.QThread):
         else:
             self.testController.logSignal.emit('Delta between peaks PASS: ' + str(round(delta, 3)) + " dBm", 1)
             self.testController.logSignal.emit('Falling per tone(dBc) PASS: ' + str(round(d, 3)), 1)
-
         if not haveFail:
             self.testController.resSignal.emit('Intermodulation', self.testController.whatConn, '', 'Pass', '', 1)
             self.testController.fillTestLogSignal.emit('IMod', 'Pass')
