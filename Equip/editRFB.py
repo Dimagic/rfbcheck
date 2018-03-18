@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+import inspect
 
 from PyQt5.QtWidgets import QTableWidgetItem
 from PyQt5.QtCore import Qt
@@ -15,6 +16,8 @@ class EditRFB(QtWidgets.QDialog, Ui_RFBedit):
         self.ui = Ui_RFBedit()
         self.ui.setupUi(self)
         self.parent = parent
+
+        # print([i for i in dir(self.ui) if not inspect.ismethod(i) and len(re.findall('__[a-zA-Z0-9_]+__', i)) == 0])
 
         self.listATRSettings = {}
         self.listTestSettings = {}
@@ -166,9 +169,14 @@ class EditRFB(QtWidgets.QDialog, Ui_RFBedit):
         adem = self.ui.newAdem.text().replace(' ', '').upper()
         if adem == '':
             adem = self.ui.ademCombo.currentText()
-        query = "insert or replace into rfb_type (name,adem) values ('%s','%s')" % \
-                (self.ui.rfbName.text().replace(' ', '').upper(), adem)
-        self.insertQuery(query)
+        try:
+            query = "update rfb_type set adem = '%s' where name = '%s'" % \
+                    (adem, self.ui.rfbName.text().replace(' ', '').upper())
+            self.insertQuery(query)
+        except:
+            query = "insert or replace into rfb_type (name,adem) values ('%s','%s')" % \
+                    (self.ui.rfbName.text().replace(' ', '').upper(), adem)
+            self.insertQuery(query)
 
         currTable = data.get('tmp')
         del data['tmp']
@@ -209,7 +217,6 @@ class EditRFB(QtWidgets.QDialog, Ui_RFBedit):
     def getSettings(self, table):
         query = "PRAGMA table_info(%s)" % table
         self.listNameColumn = []
-        listValue = []
         rows = self.selectQuery(query)
         for row in rows:
             if row[0] == 0:
@@ -222,7 +229,7 @@ class EditRFB(QtWidgets.QDialog, Ui_RFBedit):
         query = "select * from %s where %s = '%s'" % (table, self.listNameColumn[1],
                                                       self.parent.editRfbCombo.currentText())
         rows = self.selectQuery(query)
-        if rows == []:
+        if len(rows) == 0:
             listValue = []
         else:
             listValue = rows[0]
