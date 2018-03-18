@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from PyQt5 import QtCore, QtGui, QtWidgets, uic
-from PyQt5.QtWidgets import QDialog,QTableWidgetItem
+from PyQt5.QtWidgets import QTableWidgetItem
 from PyQt5.QtCore import Qt
 from Forms.RFBedit import *
 import re
@@ -32,21 +31,24 @@ class EditRFB(QtWidgets.QDialog, Ui_RFBedit):
         self.ui.newAdem.textChanged.connect(self.isThisNewAdem)
         self.ui.rfbName.textChanged.connect(self.isThisNewRfb)
 
-        self.ui.rfbName.setText(self.parent.editRfbCombo.currentText())
-        if self.ui.rfbName.text() != 'New':
-            self.ui.rfbName.setEnabled(False)
-            # self.ui.ademCombo.setEnabled(False)
-
         self.getSettings('ATR')
         self.initTableSettings('ATR')
         self.getSettings('test_settings')
         self.initTableSettings('test_settings')
 
-        conn, cursor = self.parent.getConnDb()
-        with conn:
-            rows = cursor.execute("select name from adem_type").fetchall()
-            for row in rows:
-                self.ui.ademCombo.addItem(row[0])
+        rows = self.selectQuery("select name from adem_type")
+        for row in rows:
+            self.ui.ademCombo.addItem(row[0])
+
+        self.ui.rfbName.setText(self.parent.editRfbCombo.currentText())
+        if self.ui.rfbName.text() != 'New':
+            self.ui.rfbName.setEnabled(False)
+            allAdems = [self.ui.ademCombo.itemText(i) for i in range(self.ui.ademCombo.count())]
+            q = "select adem from rfb_type where name = '%s'" % self.ui.rfbName.text()
+            currAdem = self.selectQuery(q)[0][0]
+            for i, j in enumerate(allAdems):
+                if currAdem == j:
+                    self.ui.ademCombo.setCurrentIndex(i)
 
     def keyPressEvent(self, e):
         if e.key() == Qt.Key_Escape:
@@ -56,14 +58,13 @@ class EditRFB(QtWidgets.QDialog, Ui_RFBedit):
         self.close()
 
     def isThisNewRfb(self):
-        rfb = self.ui.rfbName.text().replace(' ','').upper()
+        rfb = self.ui.rfbName.text().replace(' ', '').upper()
         item = QtWidgets.QTableWidgetItem(rfb)
         item.setFlags(QtCore.Qt.ItemIsEditable)
         self.ui.tableAtrSettings.setItem(0, 1, item)
         item = QtWidgets.QTableWidgetItem(rfb)
         item.setFlags(QtCore.Qt.ItemIsEditable)
         self.ui.tableTestSettings.setItem(0, 1, item)
-
 
     def isThisNewAdem(self):
         pass
@@ -72,7 +73,7 @@ class EditRFB(QtWidgets.QDialog, Ui_RFBedit):
         # else:
         #     self.ui.ademCombo.setEnabled(True)
 
-    def initTableSettings(self,table):
+    def initTableSettings(self, table):
         if table == 'ATR':
             currTable = self.ui.tableAtrSettings
             currList = self.listATRSettings
@@ -81,7 +82,7 @@ class EditRFB(QtWidgets.QDialog, Ui_RFBedit):
             currList = self.listTestSettings
         currTable.clear()
         currTable.setRowCount(0)
-        currTable.setHorizontalHeaderLabels(['Settings','Value'])
+        currTable.setHorizontalHeaderLabels(['Settings', 'Value'])
 
         for i, j in enumerate(self.listNameColumn[1:]):
             row = currTable.rowCount()
@@ -115,61 +116,59 @@ class EditRFB(QtWidgets.QDialog, Ui_RFBedit):
         # self.dialog.show()
 
     def saveBtnClicked(self):
-
-        if len(self.ui.newAdem.text()) != 0:                                            #
-            atrName = self.ui.newAdem.text().replace(' ','').upper()                    # If  new ADEM
-            q = self.checkDoubleRecords('adem_type','name',atrName)                     #
-            if q != 0:                                                                  #
-               self.parent.sendMsg('w','Warning','Adem '+atrName+' already present',1)
+        if len(self.ui.newAdem.text()) != 0:                                             #
+            atrName = self.ui.newAdem.text().replace(' ', '').upper()                    # If  new ADEM
+            q = self.checkDoubleRecords('adem_type', 'name', atrName)                    #
+            if q != 0:                                                                   #
+               self.parent.sendMsg('w', 'Warning', 'Adem '+atrName+' already present', 1)
                return
-            query = "insert into adem_type (name) values(%s)" % (atrName)
+            query = "insert into adem_type (name) values(%s)" % atrName
             self.insertQuery(query)
-            if self.checkDoubleRecords('adem_type','name',atrName) != 0:
-                self.parent.sendMsg('i','Done','Adem '+atrName+' writed to data base',1)
+            if self.checkDoubleRecords('adem_type', 'name', atrName) != 0:
+                self.parent.sendMsg('i', 'Done', 'Adem '+atrName+' writed to data base', 1)
 
-        if self.parent.editRfbCombo.currentText() == 'New':                             #
-            rfbName = self.ui.rfbName.text().replace(' ','')                            # If new RFB
-            q = self.checkDoubleRecords('rfb_type','name',rfbName)                      #
-            if q != 0:                                                                  #
-                self.parent.sendMsg('w','Warning','RFB '+rfbName+' already present',1)
+        if self.parent.editRfbCombo.currentText() == 'New':                              #
+            rfbName = self.ui.rfbName.text().replace(' ', '')                            # If new RFB
+            q = self.checkDoubleRecords('rfb_type', 'name', rfbName)                     #
+            if q != 0:                                                                   #
+                self.parent.sendMsg('w', 'Warning', 'RFB '+rfbName+' already present', 1)
                 return
 
-        for k in ['ATR','test_settings']:
+        for k in ['ATR', 'test_settings']:
             if k == 'ATR':
                 currTable = self.ui.tableAtrSettings
             else:
                 currTable = self.ui.tableTestSettings
             listToWrite = {}
-            listToWrite.update({'tmp':k})
+            listToWrite.update({'tmp': k})
 
-            for i in range(0,currTable.rowCount(),1):
-                #value = currTable.item(i,1).text().replace(' ','').upper()
-                value = currTable.item(i,1).text()
-                key = currTable.item(i,0).text()
+            for i in range(0, currTable.rowCount(), 1):
+                value = currTable.item(i, 1).text()
+                key = currTable.item(i, 0).text()
                 if k == 'ATR':
-                    if value == '' and key not in ["freq_band_ul_1","freq_band_dl_1","freq_band_ul_2","freq_band_dl_2"]:
-                       self.parent.sendMsg('w','Warning','Need to fill all values',1)
+                    if value == '' and key not in ["freq_band_ul_1", "freq_band_dl_1",
+                                                   "freq_band_ul_2", "freq_band_dl_2"]:
+                       self.parent.sendMsg('w', 'Warning', 'Need to fill all values', 1)
                        return
                     # check freq. expression
-                    if value != '' and key in ["freq_band_ul_1","freq_band_dl_1","freq_band_ul_2","freq_band_dl_2"]:
+                    if value != '' and key in ["freq_band_ul_1", "freq_band_dl_1", "freq_band_ul_2", "freq_band_dl_2"]:
                         r = re.findall('[0-9]+', value)
                         if len(r) != 2:
-                            self.parent.sendMsg('w','Warning','Incorrect freq. line.\n You have to use expression like "Freq@Freq"',1)
+                            self.parent.sendMsg('w', 'Warning', 'Incorrect freq. line.\n'
+                                                                ' You have to use expression like "Freq@Freq"', 1)
                             return
-                listToWrite.update({key:value})
+                listToWrite.update({key: value})
             self.writeUpdateRfb(listToWrite)
-
-        self.parent.sendMsg('i','Save...','Saving data complite',1)
-        #self.parent.self.fillRfbList()
+        self.parent.sendMsg('i', 'Save...', 'Saving data complite', 1)
         self.close()
 
-
-    def writeUpdateRfb(self,data):
-        if self.parent.editRfbCombo.currentText() == 'New':
-            adem = self.ui.newAdem.text().replace(' ','').upper()
-            if adem == '': adem = self.ui.ademCombo.currentText()
-            query = "insert into rfb_type (name,adem) values ('%s','%s')" % (self.ui.rfbName.text().replace(' ','').upper(),adem)
-            self.insertQuery(query)
+    def writeUpdateRfb(self, data):
+        adem = self.ui.newAdem.text().replace(' ', '').upper()
+        if adem == '':
+            adem = self.ui.ademCombo.currentText()
+        query = "insert or replace into rfb_type (name,adem) values ('%s','%s')" % \
+                (self.ui.rfbName.text().replace(' ', '').upper(), adem)
+        self.insertQuery(query)
 
         currTable = data.get('tmp')
         del data['tmp']
@@ -178,11 +177,12 @@ class EditRFB(QtWidgets.QDialog, Ui_RFBedit):
         values = []
         for k in keys:
             values.append(data.get(k))
-        query = "insert or replace into %s" % (currTable)
-        query = query + "(" + ','.join((str(n) for n in keys)) + ") values('" + "','".join((str(k) for k in values))+ "')"
+        query = "insert or replace into %s" % currTable
+        query = query + "(" + ','.join((str(n) for n in keys)) + ") values('" + "','".join((str(k) for k in values)) + "')"
+        print(query)
         self.insertQuery(query)
 
-    def insertQuery(self,query):
+    def insertQuery(self, query):
         try:
             conn, cursor = self.parent.getConnDb()
             cursor.execute(query)
@@ -200,8 +200,8 @@ class EditRFB(QtWidgets.QDialog, Ui_RFBedit):
         except Exception as e:
             self.parent.sendMsg('w', 'EditRFB@insertQuery', str(e), 1)
 
-    def checkDoubleRecords(self,table,name,value):
-        query = "select count() from %s where %s = '%s'" % (table,name,value.upper())
+    def checkDoubleRecords(self, table, name, value):
+        query = "select count() from %s where %s = '%s'" % (table, name, value.upper())
         rows = self.selectQuery(query)
         r = re.findall('[0-9]+', str(rows[0]))
         return int(r[0])
@@ -227,9 +227,9 @@ class EditRFB(QtWidgets.QDialog, Ui_RFBedit):
         else:
             listValue = rows[0]
         if table == 'ATR':
-            self.listATRSettings = dict(zip(self.listNameColumn,listValue))
+            self.listATRSettings = dict(zip(self.listNameColumn, listValue))
         else:
-            self.listTestSettings = dict(zip(self.listNameColumn,listValue))
+            self.listTestSettings = dict(zip(self.listNameColumn, listValue))
 
 
 
