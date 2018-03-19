@@ -119,6 +119,7 @@ class TestContoller(QtCore.QThread, SelectComPort):
                 return
             ReturnLossTest(self)
         self.progressBarSignal.emit('Done', 100, 100)
+        print(self.currParent.testLogDl)
 
     def getTests(self, currParent):
         if currParent.checkGainTest.isChecked():

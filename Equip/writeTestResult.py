@@ -34,7 +34,13 @@ class WriteResult:
                          'rloss': currTestLog.get('RLoss'), 'test_status': '', 'user': parent.currUser})
             conn.commit()
 
-            # print(self.testController.to_DsaUlDl.keys())
+            q1 = "select id from test_results where sn = '%s' and dateTest = '%s' and band_type = '%s'" % \
+                 (parent.rfbSN.text(), dateTest, band)
+            q2 = "insert into flat_result (rfb, signal) values ((%s), '%s')" % (q1, currTestLog.get('Signal'))
+            print(q2)
+            cursor.execute(q2)
+            conn.commit()
+
             if 'Ul1' in self.parent.to_DsaUlDl.keys() and band == 'Ul':
                 q = "insert into dsa_results (rfb,dsa1,dsa2,dsa3) values ((select max(id) from test_results " \
                     "where band_type = 'Ul' and sn = '%s'),'%s','%s','%s')" % (parent.rfbSN.text(),

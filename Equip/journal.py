@@ -1,7 +1,8 @@
 from PyQt5.QtWidgets import QTableWidgetItem
 from PyQt5 import QtCore, QtGui, QtWidgets
-import ast
 from Equip.equip import toFloat
+import matplotlib.pyplot as plt
+import ast
 
 
 class Journal:
@@ -11,28 +12,26 @@ class Journal:
         Journal.parent = parent
         self.parent = parent
         # self.current_hover = [0, 0]
+        parent.tableJournal.cellDoubleClicked.connect(self.tableDoubleClick)
         parent.tableJournal.cellEntered.connect(self.cellHover)
+        self.signalId = None
         self.feelJournal()
 
-    @staticmethod
-    def cellHover(row, column):
+    def cellHover(self, row, column):
         item = Journal.parent.tableJournal.item(row, column)
         QtWidgets.QToolTip.setFont(QtGui.QFont('SansSerif', 10))
-        if column == 6:
-            q = "select dsa1 from dsa_results where rfb = (select id from test_results where sn = '%s' and " \
-                "dateTest = '%s' and band_type = '%s')" % (Journal.parent.tableJournal.item(row, 1).text(),
-                                                           Journal.parent.tableJournal.item(row, 2).text(),
-                                                           Journal.parent.tableJournal.item(row, 3).text())
+        qrow = "select id from test_results where sn = '%s' and dateTest = '%s' and band_type = '%s'" % \
+               (Journal.parent.tableJournal.item(row, 1).text(),
+                Journal.parent.tableJournal.item(row, 2).text(),
+                Journal.parent.tableJournal.item(row, 3).text())
+        if column == 5:
+            q = "select id from flat_result where rfb  = (%s)" % qrow
+        elif column == 6:
+            q = "select dsa1 from dsa_results where rfb = (%s)" % qrow
         elif column == 7:
-            q = "select dsa2 from dsa_results where rfb = (select id from test_results where sn = '%s' and " \
-                "dateTest = '%s' and band_type = '%s')" % (Journal.parent.tableJournal.item(row, 1).text(),
-                                                           Journal.parent.tableJournal.item(row, 2).text(),
-                                                           Journal.parent.tableJournal.item(row, 3).text())
+            q = "select dsa2 from dsa_results where rfb = (%s)" % qrow
         elif column == 8:
-            q = "select dsa3 from dsa_results where rfb = (select id from test_results where sn = '%s' and " \
-                "dateTest = '%s' and band_type = '%s')" % (Journal.parent.tableJournal.item(row, 1).text(),
-                                                           Journal.parent.tableJournal.item(row, 2).text(),
-                                                           Journal.parent.tableJournal.item(row, 3).text())
+            q = "select dsa3 from dsa_results where rfb = (%s)" % qrow
         else:
             q = ''
 
@@ -41,6 +40,12 @@ class Journal:
             rows = cursor.execute(q).fetchone()
             conn.close()
             if rows is not None:
+                if column == 5:
+                    Journal.parent.tableJournal.setToolTip("Double click for view signal")
+                    self.signalId = rows[0]
+                    return
+                else:
+                    self.signalId = None
                 currDict = ast.literal_eval(rows[0])
                 toToolTip = ""
                 for k in sorted(currDict.keys()):
@@ -54,6 +59,7 @@ class Journal:
                 Journal.parent.tableJournal.setToolTip(toToolTip)
             else:
                 Journal.parent.tableJournal.setToolTip("Data not found")
+                self.signalId = None
         else:
             Journal.parent.tableJournal.setToolTip('')
 
@@ -134,3 +140,64 @@ class Journal:
         sn = self.parent.tableJournal.item(self.parent.tableJournal.currentRow(), 1).text()
         dateTest = self.parent.tableJournal.item(self.parent.tableJournal.currentRow(), 2).text()
         return sn, dateTest
+
+    def tableDoubleClick(self, row, column):
+        if self.signalId is None or column != 5:
+            return
+        try:
+            conn, cursor = Journal.parent.getConnDb()
+            q = "select signal from flat_result where id = %s" % self.signalId
+            rows = cursor.execute(q).fetchone()
+            keys = sorted(ast.literal_eval(rows[0]).keys())
+            signalDict = ast.literal_eval(rows[0])
+            x1 = []
+            x2 = []
+            y1 = []
+            y2 = []
+            old = None
+            for k in keys:
+                if old is None:
+                    old = k
+                    y1.append(k)
+                    x1.append(signalDict.get(k))
+                elif k - old != .5:
+                    y2.append(k)
+                    x2.append(signalDict.get(k))
+                    old = k
+                if len(y2) == 0:
+                    y1.append(k)
+                    x1.append(signalDict.get(k))
+                    old = k
+                else:
+                    y2.append(k)
+                    x2.append(signalDict.get(k))
+                    old = k
+
+            sn, dateTest = self.getSelectedRow()
+            rfb = Journal.parent.tableJournal.item(row, 0).text()
+            whatConn = Journal.parent.tableJournal.item(row, 3).text()
+            name = str(sn) + '_' + str(dateTest)
+
+            plt.figure(str(rfb) + ' ' + str(sn) + ' ' + str(whatConn))
+            if len(y2) != 0:
+                plt.subplot(211)
+            title = ('Flatness test result: %s %s %s\nDate test: %s') % \
+                    (str(rfb), str(sn), str(whatConn), str(dateTest))
+            plt.title(title)
+            plt.ylabel('gain dB')
+            plt.grid(True)
+            plt.plot(y1, x1, color="blue", linewidth=1, linestyle="-")
+            if len(y2) != 0:
+                plt.subplot(212)
+                plt.plot(y2, x2, color="blue", linewidth=1, linestyle="-")
+                plt.ylabel('gain dB')
+                plt.grid(True)
+            plt.xlabel('frequency MHz')
+            # plt.annotate('local max', xy=(2, 1), xytext=(3, 1.5),
+            #              arrowprops=dict(facecolor='black', shrink=0.05),
+            #              )
+            # plt.savefig(name + ".png")
+            plt.show()
+        except Exception as e:
+            self.parent.sendMsg('w', 'Get signal data error', str(e), 1)
+            return
