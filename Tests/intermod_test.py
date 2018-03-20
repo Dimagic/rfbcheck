@@ -33,13 +33,14 @@ class IModTest(QtCore.QThread):
                 return
 
     def mToneTest(self, freq, genPow):
+        freqForSignal = freq
         self.gen.write(":OUTP:MOD:STAT OFF")
         if self.testController.stopTestFlag:
             return
         setAmplTo(self.testController.ser, cmd, self.gen, genPow, self.testController)
         self.testController.progressBarSignal.emit('Intermodulation', 0, 0)
         haveFail = False
-        self.sa.write(":SENSE:FREQ:span 5 MHz")
+        self.sa.write(":SENSE:FREQ:span 4 MHz")
         self.sa.write(":SENSE:FREQ:center " + str(freq) + " MHz")
         self.sa.write("BAND:VID 1 KHZ")
         self.sa.write(":CALC:MARK1:STAT 0")
@@ -71,7 +72,6 @@ class IModTest(QtCore.QThread):
             self.testController.logSignal.emit(
                 str(freq[len(freq) - 1] / 1000) + " MHz " + str(round(ampl[len(ampl) - 1], 3)) + " dBm", -1)
             haveFail = True
-        self.gen.write(":OUTP:MOD:STAT OFF")
         time.sleep(1)
         d = n1 - n2
         if abs(abs(d) - 3) > 1:
@@ -84,6 +84,7 @@ class IModTest(QtCore.QThread):
             self.testController.resSignal.emit('Intermodulation', self.testController.whatConn, '', 'Pass', '', 1)
             self.testController.fillTestLogSignal.emit('IMod', 'Pass')
         else:
+            self.getSignalData(freqForSignal)
             q = self.testController.sendMsg('w', 'Warning', 'IMod test fail', 3)
             if q == QMessageBox.Retry:
                 self.mToneTest(freq, genPow)
@@ -91,6 +92,22 @@ class IModTest(QtCore.QThread):
                 self.testController.stopTestFlag = True
             self.testController.resSignal.emit('Intermodulation', self.testController.whatConn, '', 'Fail', '', 0)
             self.testController.fillTestLogSignal.emit('IMod', 'Fail')
-
+        self.gen.write(":OUTP:MOD:STAT OFF")
         self.sa.write(":CALC:MARK1:STAT 1")
         self.sa.write("CALC:MARK:CPS 0")
+
+    def getSignalData(self, freq):
+        accur = .02
+        signalDict = {}
+        self.sa.write("TRAC1:MODE MAXH")
+        self.sa.write("CALC:MARK:CPS 0")
+        time.sleep(3)
+        arrFreq = np.arange(freq - 2, freq + 2 + accur, accur)
+        for i in arrFreq:
+            # self.testController.progressBarSignal.emit('Intermodulation', 0, 0)
+            self.sa.write(":CALC1:MARK1:X " + str(i) + 'E6')
+            time.sleep(.05)
+            gain = self.sa.query(":CALC1:MARK1:Y?")
+            signalDict.update({round(i, 2): toFloat(gain)})
+        self.sa.write("TRAC1:MODE WRIT")
+        self.testController.fillTestLogSignal.emit('Imod_signal', str(signalDict))

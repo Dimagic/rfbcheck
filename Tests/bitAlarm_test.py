@@ -19,17 +19,33 @@ class BitAlarmTest(QtCore.QThread):
         self.parent = mainParent
         self.ser = testController.ser
         self.sa = testController.instr.sa
+        self.gen = testController.instr.gen
+        self.listSettings = mainParent.listSettings
         self.arrAlarms = None
         self.alarms = None
 
         self.test()
 
     def test(self):
+
+        if self.testController.whatConn == "Dl":
+            freq = self.listSettings[1]
+        elif self.testController.whatConn == "Ul":
+            freq = self.listSettings[0]
+        else:
+            self.testController.msgSignal.emit('w', 'BIT alarm test error', "Cant't get central freq.")
+            self.testController.stopTestFlag = True
+            return
+        self.sa.write("CALC:MARK:CPS 1")
+        self.gen.write(":FREQ:FIX " + str(freq) + " MHz")
+        self.gen.write(":OUTP:STAT ON")
+        time.sleep(.5)
         currentGain = float(self.sa.query("CALC:MARK:Y?"))
         if currentGain >= -50:
             gain = True
         else:
             self.testController.logSignal.emit('No signal', -1)
+            self.testController.stopTestFlag = True
             return
 
         self.testController.logSignal.emit('Send IF 1.2 GHz', 0)

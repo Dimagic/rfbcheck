@@ -8,6 +8,8 @@ class Instrument:
         self.sa = None
         self.gen = None
         self.na = None
+        self.IModTone = 1
+        self.IModToneCount = 2
         if freq == 0:
             return None
         else:
@@ -54,7 +56,7 @@ class Instrument:
             self.gen.write(":OUTP:MOD:STAT OFF")
             self.gen.write("POW:AMPL -50 dBm")
             self.gen.write(":FREQ:FIX " + str(freq) + " MHz")
-            self.gen.write(":RAD:MTON:ARB:SET:TABL 1000000 , 2")
+            self.gen.write(":RAD:MTON:ARB:SET:TABL " + str(self.IModTone * 1000000) + " , " + str(self.IModToneCount))
             self.gen.write(":RAD:MTON:ARB:SET:TABL:PHAS:INIT RAND")
             self.gen.write(":RAD:MTON:ARB:STAT 1")
         except Exception as e:

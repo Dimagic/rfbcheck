@@ -19,7 +19,7 @@ import threading
 import re
 
 
-version = '0.3.3'
+version = '0.3.4'
 
 
 class TestTime(threading.Thread):

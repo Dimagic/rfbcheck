@@ -85,6 +85,7 @@ class FlatnessTest(QtCore.QThread):
         if currFlat <= flat and (minGain > -50 and maxGain > -50):
             self.testController.resSignal.emit('Flatness', self.testController.whatConn, '0', str(currFlat), str(flat), 1)
         else:
+            self.testController.fillTestLogSignal.emit('Signal', str(self.gainDict))
             q = self.testController.sendMsg('w', 'Warning', 'Flatness test fail: ' + str(currFlat) + ' dB', 3)
             if q == QMessageBox.Retry:
                 self.testController.instr.sa.write("TRAC1:CLE:ALL")
@@ -121,7 +122,6 @@ class FlatnessTest(QtCore.QThread):
             genToSa = self.mainParent.calibrGenToSa.get(i)
             currentGain = round(float(self.sa.query("CALC:MARK1:Y?")) - saToGen - genToSa, 2)
             self.gainDict.update({i: currentGain})
-        self.testController.fillTestLogSignal.emit('Signal', str(self.gainDict))
         self.sa.write("CALC:MARK1:STAT 0")
         self.sa.write("CALC:MARK:CPS 1")
 

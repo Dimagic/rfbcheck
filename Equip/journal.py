@@ -2,6 +2,8 @@ from PyQt5.QtWidgets import QTableWidgetItem
 from PyQt5 import QtCore, QtGui, QtWidgets
 from Equip.equip import toFloat
 import matplotlib.pyplot as plt
+import matplotlib.ticker
+import numpy as np
 import ast
 
 
@@ -15,6 +17,7 @@ class Journal:
         parent.tableJournal.cellDoubleClicked.connect(self.tableDoubleClick)
         parent.tableJournal.cellEntered.connect(self.cellHover)
         self.signalId = None
+        self.flatness = None
         self.feelJournal()
 
     def cellHover(self, row, column):
@@ -26,6 +29,8 @@ class Journal:
                 Journal.parent.tableJournal.item(row, 3).text())
         if column == 5:
             q = "select id from flat_result where rfb  = (%s)" % qrow
+        elif column == 9:
+            q = "select id from imod_result where rfb  = (%s)" % qrow
         elif column == 6:
             q = "select dsa1 from dsa_results where rfb = (%s)" % qrow
         elif column == 7:
@@ -40,7 +45,7 @@ class Journal:
             rows = cursor.execute(q).fetchone()
             conn.close()
             if rows is not None:
-                if column == 5:
+                if column in [5, 9]:
                     Journal.parent.tableJournal.setToolTip("Double click for view signal")
                     self.signalId = rows[0]
                     return
@@ -98,19 +103,22 @@ class Journal:
                     q = "select gain_dl_min, gain_dl_max, gain_ul_min, gain_ul_max from ATR where rfb_type = '%s'" \
                         % (row[1])
                     limits = cursor.execute(q).fetchall()[0]
-                    if toFloat(row[5]):
-                        gain = toFloat(row[5])
-                        if str(row[4]) == 'Dl':
-                            if not limits[0]-2 <= gain <= limits[1]+2:
-                                Journal.parent.tableJournal.item(numrows, j - 1).setBackground(QtCore.Qt.red)
-                            elif not limits[0] <= gain <= limits[1]:
-                                Journal.parent.tableJournal.item(numrows, j - 1).setBackground(QtCore.Qt.yellow)
-                        else:
-                            if not limits[2]-2 <= gain <= limits[3]+2:
-                                Journal.parent.tableJournal.item(numrows, j - 1).setBackground(QtCore.Qt.red)
-                            elif not limits[2] <= gain <= limits[3]:
-                                Journal.parent.tableJournal.item(numrows, j - 1).setBackground(QtCore.Qt.yellow)
-
+                    try:
+                        if toFloat(row[5]):
+                            gain = toFloat(row[5])
+                            if str(row[4]) == 'Dl':
+                                if not limits[0]-2 <= gain <= limits[1]+2:
+                                    Journal.parent.tableJournal.item(numrows, j - 1).setBackground(QtCore.Qt.red)
+                                elif not limits[0] <= gain <= limits[1]:
+                                    Journal.parent.tableJournal.item(numrows, j - 1).setBackground(QtCore.Qt.yellow)
+                            else:
+                                if not limits[2]-2 <= gain <= limits[3]+2:
+                                    Journal.parent.tableJournal.item(numrows, j - 1).setBackground(QtCore.Qt.red)
+                                elif not limits[2] <= gain <= limits[3]:
+                                    Journal.parent.tableJournal.item(numrows, j - 1).setBackground(QtCore.Qt.yellow)
+                    except:
+                        j += 1
+                        continue
                 j += 1
         conn.close()
         try:
@@ -125,11 +133,14 @@ class Journal:
         if q == QtWidgets.QMessageBox.Ok:
             try:
                 conn, cursor = Journal.parent.getConnDb()
+                arrRemove = []
                 q1 = "select id from test_results where sn = '%s' and dateTest = '%s'" % (sn, dateTest)
-                q2 = "delete from dsa_results where rfb = (%s)" % (q1)
-                q3 = "delete from test_results where sn = '%s' and dateTest = '%s'" % (sn, dateTest)
-                cursor.execute(q2)
-                cursor.execute(q3)
+                arrRemove.append("delete from dsa_results where rfb = (%s)" % q1)
+                arrRemove.append("delete from imod_result where rfb = (%s)" % q1)
+                arrRemove.append("delete from flat_result where rfb = (%s)" % q1)
+                arrRemove.append("delete from test_results where sn = '%s' and dateTest = '%s'" % (sn, dateTest))
+                for i in arrRemove:
+                    cursor.execute(i)
                 conn.commit()
                 conn.close
                 self.feelJournal()
@@ -142,8 +153,13 @@ class Journal:
         return sn, dateTest
 
     def tableDoubleClick(self, row, column):
-        if self.signalId is None or column != 5:
-            return
+        if self.signalId:
+            if column == 5:
+                self.signalPlot(row, column)
+            if column == 9:
+                self.imodPlot(row, column)
+
+    def signalPlot(self, row, column):
         try:
             conn, cursor = Journal.parent.getConnDb()
             q = "select signal from flat_result where id = %s" % self.signalId
@@ -158,46 +174,126 @@ class Journal:
             for k in keys:
                 if old is None:
                     old = k
-                    y1.append(k)
-                    x1.append(signalDict.get(k))
+                    x1.append(k)
+                    y1.append(signalDict.get(k))
                 elif k - old != .5:
-                    y2.append(k)
-                    x2.append(signalDict.get(k))
+                    x2.append(k)
+                    y2.append(signalDict.get(k))
                     old = k
                 if len(y2) == 0:
-                    y1.append(k)
-                    x1.append(signalDict.get(k))
+                    x1.append(k)
+                    y1.append(signalDict.get(k))
                     old = k
                 else:
-                    y2.append(k)
-                    x2.append(signalDict.get(k))
+                    x2.append(k)
+                    y2.append(signalDict.get(k))
                     old = k
-
             sn, dateTest = self.getSelectedRow()
             rfb = Journal.parent.tableJournal.item(row, 0).text()
             whatConn = Journal.parent.tableJournal.item(row, 3).text()
-            name = str(sn) + '_' + str(dateTest)
-
-            plt.figure(str(rfb) + ' ' + str(sn) + ' ' + str(whatConn))
-            if len(y2) != 0:
-                plt.subplot(211)
+            locator = matplotlib.ticker.MultipleLocator(base=1)
+            plt.figure('Flatness: ' + str(rfb) + ' ' + str(sn) + ' ' + str(whatConn))
+            if len(x2) != 0:
+                axes = plt.subplot(211)
+            else:
+                axes = plt.subplot(111)
+            axes.yaxis.set_major_locator(locator)
             title = ('Flatness test result: %s %s %s\nDate test: %s') % \
                     (str(rfb), str(sn), str(whatConn), str(dateTest))
             plt.title(title)
             plt.ylabel('gain dB')
             plt.grid(True)
-            plt.plot(y1, x1, color="blue", linewidth=1, linestyle="-")
-            if len(y2) != 0:
-                plt.subplot(212)
-                plt.plot(y2, x2, color="blue", linewidth=1, linestyle="-")
+            plt.plot(x1, y1, color="blue", linewidth=1, linestyle="-")
+            self.setAnnotate(signalDict)
+            legendText = 'Flatness = %s dB' % str(self.flatness)
+            plt.legend([legendText], loc='upper left')
+            if len(x2) != 0:
+                axes = plt.subplot(212)
+                axes.yaxis.set_major_locator(locator)
+                plt.plot(x2, y2, color="blue", linewidth=1, linestyle="-")
+                self.setAnnotate(signalDict)
                 plt.ylabel('gain dB')
                 plt.grid(True)
             plt.xlabel('frequency MHz')
-            # plt.annotate('local max', xy=(2, 1), xytext=(3, 1.5),
-            #              arrowprops=dict(facecolor='black', shrink=0.05),
-            #              )
             # plt.savefig(name + ".png")
             plt.show()
         except Exception as e:
             self.parent.sendMsg('w', 'Get signal data error', str(e), 1)
             return
+
+    def imodPlot(self, row, column):
+        try:
+            conn, cursor = Journal.parent.getConnDb()
+            q = "select signal from imod_result where id = %s" % self.signalId
+            rows = cursor.execute(q).fetchone()
+            keys = sorted(ast.literal_eval(rows[0]).keys())
+            signalDict = ast.literal_eval(rows[0])
+            maxGain = signalDict.get(max(signalDict.keys(), key=(lambda k: signalDict[k])))
+            x1 = []
+            y1 = []
+            for k in keys:
+                x1.append(k)
+                y1.append(signalDict.get(k))
+            sn, dateTest = self.getSelectedRow()
+            rfb = Journal.parent.tableJournal.item(row, 0).text()
+            whatConn = Journal.parent.tableJournal.item(row, 3).text()
+            plt.figure('IMod: ' + str(rfb) + ' ' + str(sn) + ' ' + str(whatConn))
+            axes = plt.subplot(111)
+            plt.plot(x1, y1, color="blue", linewidth=1, linestyle="-")
+            if whatConn == 'Dl':
+                freq = cursor.execute("select dl_freq from test_settings where rfb_type = '" + rfb + "'").fetchone()[0]
+            else:
+                freq = cursor.execute("select ul_freq from test_settings where rfb_type = '" + rfb + "'").fetchone()[0]
+
+            for i in [-1.5, -.5, .5, 1.5]:
+                peak = signalDict.get(freq + i)
+                annText = 'Peak: %s dB\nfreq. %s MHz' % (str(peak), str(freq + i))
+                plt.annotate(annText, xy=(freq + i, peak), xycoords='data',
+                             xytext=(freq + i + .5, peak + 1), textcoords='data',
+                             size=6, va="center", ha="center",
+                             bbox=dict(boxstyle="round4", fc="w"),
+                             arrowprops=dict(arrowstyle="-|>",
+                                             connectionstyle="arc3,rad=0.2",
+                                             relpos=(0., 0.),
+                                             fc="w"))
+            plt.axhline(y=maxGain - 50, xmin=0, xmax=1, color='red', linewidth=1)
+            title = ('Intermodulation test result: %s %s %s\nDate test: %s') % \
+                    (str(rfb), str(sn), str(whatConn), str(dateTest))
+            plt.title(title)
+            plt.ylabel('gain dB')
+            plt.xlabel('frequency MHz')
+            plt.grid(True)
+            plt.show()
+            conn.close()
+        except Exception as e:
+            self.parent.sendMsg('w', 'Get IMod data error', str(e), 1)
+            return
+
+    def setAnnotate(self, signalDict):
+        minKey, minGain, maxKey, maxGain = self.getMinMaxDict(signalDict)
+        annText = 'MIN: %s dB\nfreq. %s MHz' % (str(minGain), str(minKey))
+        plt.annotate(annText, xy=(minKey, minGain), xycoords='data',
+                     xytext=(minKey, minGain + 1), textcoords='data',
+                     size=6, va="center", ha="center",
+                     bbox=dict(boxstyle="round4", fc="w"),
+                     arrowprops=dict(arrowstyle="-|>",
+                                     connectionstyle="arc3,rad=0.2",
+                                     relpos=(0., 0.),
+                                     fc="w"))
+        annText = 'MAX: %s dB\nfreq. %s MHz' % (str(maxGain), str(maxKey))
+        plt.annotate(annText, xy=(maxKey, maxGain), xycoords='data',
+                     xytext=(maxKey, maxGain - 1), textcoords='data',
+                     size=6, va="center", ha="center",
+                     bbox=dict(boxstyle="round4", fc="w"),
+                     arrowprops=dict(arrowstyle="-|>",
+                                     connectionstyle="arc3,rad=0.2",
+                                     relpos=(0., 0.),
+                                     fc="w"))
+
+    def getMinMaxDict(self, obj):
+        minKey = min(obj.keys(), key=(lambda k: obj[k]))
+        maxKey = max(obj.keys(), key=(lambda k: obj[k]))
+        minGain = obj.get(minKey)
+        maxGain = obj.get(maxKey)
+        self.flatness = abs(maxGain - minGain)
+        return minKey, minGain, maxKey, maxGain
