@@ -5,28 +5,31 @@ import struct
 import re
 
 
-def setAmplTo(conn, cmd, gen, ampl, parent):
-    parent.useCorrection = False
-    parent.logSignal.emit("Set ampl to: " + str(ampl) + " dBm", 0)
+def setAmplTo(conn, cmd, gen, ampl, testController):
+    testController.useCorrection = False
+    testController.logSignal.emit("Set ampl to: " + str(ampl) + " dBm", 0)
     setAlc(conn, cmd.setAlcInDl, 255, cmd.shiftDlIn)
     setAlc(conn, cmd.setAlcInUl, 255, cmd.shiftUlIn)
+    sa = testController.instr.sa
+    sa.write(":SENSE:FREQ:span 4 MHz")
+    sa.write(":SENSE:FREQ:center " + str(toFloat(gen.query(':FREQ:CW?')) / 1000000) + " MHz")
     gen.write(":OUTP:STAT ON")
     time.sleep(1)
     genPow = float(gen.query("POW:AMPL?"))
     ampl = int(ampl)
     try:
-        gain = getAvgGain(parent)
+        gain = getAvgGain(testController)
         acc = 0.03
         while not (gain-acc <= ampl <= gain+acc):
-            if parent.stopTestFlag:
+            if testController.stopTestFlag:
                 return
             gen.write("POW:AMPL " + str(genPow) + " dBm")
-            gain = getAvgGain(parent)
+            gain = getAvgGain(testController)
             if genPow >= -20:
-                parent.sendMsg('c', 'Error', 'Gain problem', 1)
+                testController.sendMsg('c', 'Error', 'Gain problem', 1)
                 gen.write(":OUTP:STAT OFF")
-                parent.sendLog("Gain problem", 2)
-                parent.stopTestFlag = True
+                testController.logSignal.emit("Gain problem", 2)
+                testController.stopTestFlag = True
                 return
             delta = abs(abs(gain) - abs(ampl))
             if delta <= 0.5:
@@ -39,13 +42,13 @@ def setAmplTo(conn, cmd, gen, ampl, parent):
                 genPow += steep
             else:
                 genPow -= steep
-            parent.progressBarSignal.emit('Set ampl. to ' + str(ampl) + ' dB', 0, 0)  # if err/////
+            testController.progressBarSignal.emit('Set ampl. to ' + str(ampl) + ' dB', 0, 0)  # if err/////
     except Exception as e:
-        parent.msgSignal.emit('c', 'Set amplitude error', str(e), 1)
+        testController.msgSignal.emit('c', 'Set amplitude error', str(e), 1)
         return
-    parent.logSignal.emit('Current ampl: ' + str(round(gain, 2)) + ' dBm', 0)
-    parent.useCorrection = True
-    return (round(gain, 2))
+    testController.logSignal.emit('Current ampl: ' + str(round(gain, 2)) + ' dBm', 0)
+    testController.useCorrection = True
+    return round(gain, 2)
 
 
 def setAlc(conn, alc, n, shift):

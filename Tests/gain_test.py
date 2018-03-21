@@ -1,3 +1,4 @@
+from Equip.config import Config
 from Equip.equip import *
 from PyQt5.QtWidgets import QMessageBox
 from PyQt5 import QtCore
@@ -9,6 +10,7 @@ class GainTest(QtCore.QThread):
         if testController.stopTestFlag:
             return
         testController.logSignal.emit("***** Start Gain test *****", 0)
+        self.config = Config()
         self.testController = testController
         self.mainParent = testController.getParent()
         self.sa = testController.instr.sa
@@ -32,7 +34,7 @@ class GainTest(QtCore.QThread):
         if self.mainParent.gainSA.isChecked():
             self.sa.write(":SENSE:FREQ:center " + str(freq) + " MHz")
             self.gen.write(":FREQ:FIX " + str(freq) + " MHz")
-            self.gen.write("POW:AMPL -45 dBm")
+            self.gen.write("POW:AMPL " + self.config.getConfAttr('gen_gainFlatPow') + " dBm")
             time.sleep(1)
             self.testController.useCorrection = True
             ampl = getAvgGain(self.testController)

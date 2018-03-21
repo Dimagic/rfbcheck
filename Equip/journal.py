@@ -41,9 +41,12 @@ class Journal:
             q = ''
 
         if q != '':
-            conn, cursor = Journal.parent.getConnDb()
-            rows = cursor.execute(q).fetchone()
-            conn.close()
+            try:
+                conn, cursor = Journal.parent.getConnDb()
+                rows = cursor.execute(q).fetchone()
+                conn.close()
+            except Exception:
+                pass
             if rows is not None:
                 if column in [5, 9]:
                     Journal.parent.tableJournal.setToolTip("Double click for view signal")
@@ -192,7 +195,7 @@ class Journal:
             rfb = Journal.parent.tableJournal.item(row, 0).text()
             whatConn = Journal.parent.tableJournal.item(row, 3).text()
             locator = matplotlib.ticker.MultipleLocator(base=1)
-            plt.figure('Flatness: ' + str(rfb) + ' ' + str(sn) + ' ' + str(whatConn))
+            plt.figure('Flatness ' + str(rfb) + ' ' + str(sn) + ' ' + str(whatConn))
             if len(x2) != 0:
                 axes = plt.subplot(211)
             else:
@@ -237,7 +240,7 @@ class Journal:
             sn, dateTest = self.getSelectedRow()
             rfb = Journal.parent.tableJournal.item(row, 0).text()
             whatConn = Journal.parent.tableJournal.item(row, 3).text()
-            plt.figure('IMod: ' + str(rfb) + ' ' + str(sn) + ' ' + str(whatConn))
+            plt.figure('IMod ' + str(rfb) + ' ' + str(sn) + ' ' + str(whatConn))
             axes = plt.subplot(111)
             plt.plot(x1, y1, color="blue", linewidth=1, linestyle="-")
             if whatConn == 'Dl':

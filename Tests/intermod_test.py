@@ -103,8 +103,8 @@ class IModTest(QtCore.QThread):
         self.sa.write("CALC:MARK:CPS 0")
         time.sleep(3)
         arrFreq = np.arange(freq - 2, freq + 2 + accur, accur)
-        for i in arrFreq:
-            # self.testController.progressBarSignal.emit('Intermodulation', 0, 0)
+        for j, i in enumerate(arrFreq):
+            self.testController.progressBarSignal.emit('Getting snapshot of the signal', len(arrFreq) - 1, j)
             self.sa.write(":CALC1:MARK1:X " + str(i) + 'E6')
             time.sleep(.05)
             gain = self.sa.query(":CALC1:MARK1:Y?")

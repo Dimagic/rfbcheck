@@ -15,11 +15,13 @@ from PyQt5.QtCore import QSize
 from PyQt5.QtGui import QMovie
 from PyQt5 import QtCore, QtWidgets, QtGui
 from PyQt5.QtWidgets import QTableWidgetItem, QAbstractItemView, QLabel, QAction
+from PIL import Image
+from Equip.config import *
 import threading
 import re
 
 
-version = '0.3.4'
+version = '0.3.5'
 
 
 class TestTime(threading.Thread):
@@ -35,12 +37,16 @@ class TestTime(threading.Thread):
 class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
     def __init__(self, form, parent=None):
         super(mainProgram, self).__init__(parent)
+
+        # img = Image.open('Img/connect2.gif')
+        # img.show()
         # loadUi('Forms/mainwindow.ui', self)
 
         # stylesheet
         # app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())
         self.startTestTime = None
 
+        """ Setting images """
         self.appIcon = QtGui.QIcon("Img/ico32_pgn_icon.ico")
         self.passImg = QtGui.QPixmap('Img/pass.png')
         self.failImg = QtGui.QPixmap('Img/fail.png')
@@ -50,6 +56,8 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
         self.blueLedMovie = QMovie('Img/blueLed.gif')
         self.redLedMovie = QMovie('Img/redLed.gif')
 
+
+
         self.setupUi(form)
 
         self.tableJournal.resizeEvent = self.onResize
@@ -57,9 +65,9 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
 
         self.currUser = None
         self.setUser()
-
         self.answer = None
 
+        """ Setting menu """
         self.menuSelectUser.triggered.connect(self.selectUser)
         self.menuComPort.triggered.connect(self.selectComPort)
         self.menuTestSettings.triggered.connect(self.testSettings)
@@ -81,7 +89,7 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
         self.calibrSaToGen = {}
         self.calibrGenToSa = {}
 
-        self.to_DsaUlDl = {}  # results DSA test from DB
+        self.to_DsaUlDl = {}  # results DSA test from DB """
 
         self.myThread = None
         self.setFileThread = None
@@ -99,9 +107,6 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
         self.col = ['RFB type', 'DL c.freq', 'UL c.freq', 'DL IM pow', 'UL IM pow', 'DL DSA1', 'DL DSA2', 'DL DSA3',
                     'UL DSA1', 'UL DSA2', 'UL DSA3', 'DSA pow', 'ALC IN pow']
 
-        # self.radioInstrChecked()
-        # self.getCurrInstrAddr()
-        # self.getInstrAddr()
         self.radioInstrChecked()
 
         self.setInstrBtn.clicked.connect(self.setCurrInstrAddr)
@@ -116,23 +121,17 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
 
         self.rfbSN.textEdited.connect(self.startBtnEnabled)
         self.rfbSN.textChanged.connect(self.startBtnEnabled)
-        # self.rfbSN.returnPressed.connect(self.getSnViaScanner)
-
         self.journalFilter.textEdited.connect(Journal.feelJournal)
-
         self.saAtten.editingFinished.connect(self.checkAttenValue)
         self.genAtten.editingFinished.connect(self.checkAttenValue)
-
         self.setSaRadio.clicked.connect(self.radioInstrChecked)
         self.setGenRadio.clicked.connect(self.radioInstrChecked)
         self.setNaRadio.clicked.connect(self.radioInstrChecked)
-
-        self.calibrationBtn.clicked.connect(self.calibrationBtnClick)
+        self.calibrationBtn.clicked.connect(Calibration)
         self.clearCalBtn.clicked.connect(self.clearCalibrationBtnClick)
         self.calAllBands.clicked.connect(self.calAllBandsCheck)
         self.calibrStart.setValidator(QtGui.QIntValidator())
         self.calibrStop.setValidator(QtGui.QIntValidator())
-
         self.startTestBtn.clicked.connect(self.startThreadTest)
         self.applySetBtn.clicked.connect(self.startThreadLoadSet)
 
@@ -142,7 +141,7 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
         conn, cursor = self.getConnDb()
         self.rfbList = cursor.execute("select name from rfb_type order by name")
 
-        # Get RFB list and fill combobox
+        """ Get RFB list and fill combobox """
         for i in self.rfbList:
             self.rfbTypeCombo.addItem(str(i).replace("('", "").replace("',)", ""))
             if len(self.editRfbCombo) == 0: self.editRfbCombo.addItem('New')
@@ -158,7 +157,6 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
         self.journalDateStop.setDate(QtCore.QDate.currentDate())
 
         self.newRfbBtn.clicked.connect(self.on_newRfbBtn_clicked)
-
         conn.close()
         self.journal = Journal(self)
 
@@ -487,9 +485,6 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
         except Exception as e:
             conn.close()
             self.sendMsg('c', 'Save instr. settings error', str(e), 1)
-        # else:
-        #     conn.close()
-        #     self.getCurrInstrAddr()
 
     def checkAttenValue(self):
         try:
@@ -497,17 +492,14 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
                 self.saAtten.setText('0')
             else:
                 int(self.saAtten.text())
-
             if self.genAtten.text() == '':
                 self.genAtten.setText('0')
             else:
                 int(self.genAtten.text())
-
             if self.naAtten1.text() == '':
                 self.naAtten1.setText('0')
             else:
                 int(self.naAtten1.text())
-
             if self.naAtten2.text() == '':
                 self.naAtten2.setText('0')
             else:

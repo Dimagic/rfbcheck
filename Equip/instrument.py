@@ -1,15 +1,16 @@
 import visa
 import time
+from Equip.config import Config
+from Equip.equip import toFloat
 
 
 class Instrument:
     def __init__(self, freq, parent):
         self.parent = parent
+        self.config = Config()
         self.sa = None
         self.gen = None
         self.na = None
-        self.IModTone = 1
-        self.IModToneCount = 2
         if freq == 0:
             return None
         else:
@@ -54,9 +55,10 @@ class Instrument:
             self.gen.write("*RST")
             self.gen.write(":OUTP:STAT OFF")
             self.gen.write(":OUTP:MOD:STAT OFF")
-            self.gen.write("POW:AMPL -50 dBm")
+            self.gen.write("POW:AMPL " + self.config.getConfAttr('gen_gainFlatPow') + " dBm")
             self.gen.write(":FREQ:FIX " + str(freq) + " MHz")
-            self.gen.write(":RAD:MTON:ARB:SET:TABL " + str(self.IModTone * 1000000) + " , " + str(self.IModToneCount))
+            self.gen.write(":RAD:MTON:ARB:SET:TABL " + str(toFloat(self.config.getConfAttr('gen_IModTone')) * 1000000)
+                           + ", " + str(self.config.getConfAttr('gen_IModToneCount')))
             self.gen.write(":RAD:MTON:ARB:SET:TABL:PHAS:INIT RAND")
             self.gen.write(":RAD:MTON:ARB:STAT 1")
         except Exception as e:
