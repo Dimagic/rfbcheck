@@ -20,8 +20,7 @@ from Equip.config import *
 import threading
 import re
 
-
-version = '0.3.5'
+version = '0.3.6'
 
 
 class TestTime(threading.Thread):
@@ -55,8 +54,6 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
         self.greenLedMovie = QMovie('Img/greenLed.gif')
         self.blueLedMovie = QMovie('Img/blueLed.gif')
         self.redLedMovie = QMovie('Img/redLed.gif')
-
-
 
         self.setupUi(form)
 
@@ -271,7 +268,8 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
         for row in rows:
             self.sendLog("For RFB " + row[1] + " need to use ADEM - " + row[2], 0)
         self.col = ['RFB type', 'DL c.freq', 'UL c.freq', 'DL IM pow', 'UL IM pow', 'DL DSA1', 'DL DSA2', 'DL DSA3',
-                    'UL DSA1', 'UL DSA2', 'UL DSA3', 'DSA pow', 'ALC IN pow']
+                    'UL DSA1', 'UL DSA2', 'UL DSA3', 'DSA pow', 'Dl ALC IN pow', 'Ul ALC IN pow', 'Dl ALC OUT pow',
+                    'Ul ALC OUT pow']
         rows = cursor.execute("select * from test_settings where rfb_type = :n",
                               {'n': self.rfbTypeCombo.currentText()}).fetchall()
         # TODO: if not fined setting??? need error

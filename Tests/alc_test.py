@@ -29,12 +29,18 @@ class AlcTest(QtCore.QThread):
         self.alcOutMin = self.atrSettings.get('alc_out_min')
         self.alcOutMax = self.atrSettings.get('alc_out_max')
 
-        if self.listSettings[12] != 0:
-            self.gen.write("POW:AMPL " + str(self.listSettings[12]) + " dBm")
+        if self.testController.whatConn == "Dl":
+            self.inPow = self.listSettings[12]
+            self.outPow = self.listSettings[14]
+        else:
+            self.inPow = self.listSettings[13]
+            self.outPow = self.listSettings[15]
+        if self.inPow != 0:
+            self.gen.write("POW:AMPL " + str(self.inPow) + " dBm")
             # self.gen.write(":OUTP:STAT ON")
             time.sleep(1)
         else:
-            setAmplTo(self.ser, cmd, self.gen, self.listSettings[12], self.testController)
+            setAmplTo(self.ser, cmd, self.gen, self.inPow, self.testController)
             # (conn, cmd, gen, ampl, parent)
 
         self.testController.useCorrection = False
@@ -128,6 +134,12 @@ class AlcTest(QtCore.QThread):
         setAlc(conn, alc, 255, shift)
 
     def alcOutTest(self, conn, alc, whatConn, shift):
+        if self.outPow != 0:
+            self.gen.write("POW:AMPL " + str(self.inPow) + " dBm")
+            time.sleep(1)
+        else:
+            setAmplTo(self.ser, cmd, self.gen, self.inPow, self.testController)
+
         setAlc(conn, alc, 4, shift)  # when 0 -> setAlc not work
         self.testController.logSignal.emit("***** Start ALC out test *****", 0)
         time.sleep(1)
