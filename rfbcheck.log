@@ -1,0 +1,20 @@
+ERROR:root:2018-03-19 14:26:22.375000: 400UC83400 16113244
+Traceback (most recent call last):
+  File "C:\123\RFBCheck\Tests\testController.py", line 69, in run
+    self.runTests()
+  File "C:\123\RFBCheck\Tests\testController.py", line 120, in runTests
+    ReturnLossTest(self)
+  File "C:\123\RFBCheck\Tests\rloss_test.py", line 25, in __init__
+    self.returnLossTest()
+  File "C:\123\RFBCheck\Tests\rloss_test.py", line 30, in returnLossTest
+    if currRloss > rlossmax:
+TypeError: unorderable types: float() > NoneType()
+ERROR:root:2018-03-20 17:11:50.234375: RA00057 xxxx
+Traceback (most recent call last):
+  File "C:\123\RFBCheck\Tests\testController.py", line 69, in run
+    self.runTests()
+  File "C:\123\RFBCheck\Tests\testController.py", line 110, in runTests
+    BitAlarmTest(self, self.currParent)
+  File "C:\123\RFBCheck\Tests\bitAlarm_test.py", line 23, in __init__
+    self.listSettings = self.mainParent.listSettings
+AttributeError: 'BitAlarmTest' object has no attribute 'mainParent'
