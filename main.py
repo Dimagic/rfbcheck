@@ -14,13 +14,13 @@ from Tests.bitAlarm_test import *
 from PyQt5.QtCore import QSize
 from PyQt5.QtGui import QMovie
 from PyQt5 import QtCore, QtWidgets, QtGui
-from PyQt5.QtWidgets import QTableWidgetItem, QAbstractItemView, QLabel, QAction
+from PyQt5.QtWidgets import QTableWidgetItem, QAbstractItemView, QLabel, QAction, QFileDialog
 from PIL import Image
 from Equip.config import *
 import threading
 import re
 
-version = '0.3.6'
+version = '0.3.7'
 
 
 class TestTime(threading.Thread):
@@ -522,16 +522,27 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
             conn.close()
 
     def startThreadLoadSet(self):
-        q = self.sendMsg("i", "Load set file", "Load default set file\n"
-                                               "for board "+self.rfbTypeCombo.currentText()+" ?", 2)
-        if q != QMessageBox.Ok:
+        currRFB = self.rfbTypeCombo.currentText()
+        try:
+            fileForLoad = currRFB + ".csv"
+            f = open("./setFiles/" + fileForLoad, 'r')
+            f.close()
+        except Exception:
+            fileForLoad = ""
+
+        options = QFileDialog.Options()
+        options |= QFileDialog.DontUseNativeDialog
+        fileName, _ = QFileDialog.getOpenFileName(self, "Loading file settings for " + currRFB,
+                                                  "./setFiles/" + fileForLoad,
+                                                  "CSV Files (*.csv)", options=options)
+        if not fileName:
             return
-        self.setFileThread = ApplySetFile(self)
+
+        self.setFileThread = ApplySetFile(self, fileName)
         self.setFileThread.logSignal.connect(self.sendLog, QtCore.Qt.QueuedConnection)
         self.setFileThread.msgSignal.connect(self.sendMsg, QtCore.Qt.QueuedConnection)
         self.setFileThread.progressBarSignal.connect(self.setProgressBar, QtCore.Qt.QueuedConnection)
         self.setFileThread.comMovieSignal.connect(self.setComMovie, QtCore.Qt.QueuedConnection)
-
         self.setFileThread.started.connect(self.on_startedSet)
         self.setFileThread.finished.connect(self.on_finishedSet)
         self.setFileThread.start()

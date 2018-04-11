@@ -13,11 +13,12 @@ class ApplySetFile(QtCore.QThread, SelectComPort):
     progressBarSignal = QtCore.pyqtSignal(str, float, float)
     comMovieSignal = QtCore.pyqtSignal(str, str)
 
-    def __init__(self, currParent, parent=None):
+    def __init__(self, currParent, setFile, parent=None):
         QtCore.QThread.__init__(self, parent)
         self.ser = None
         self.haveConn = False
         self.currParent = currParent
+        self.setFile = setFile
         self.loadPref = 'aaaa5430'
         self.sizeData = {'CHAR8': 8, 'FLOAT32': 32, 'INT16': 16, 'RawData': 8,
                         'STRING_ARRAY': 128, 'UCHAR8': 8, 'UINT16': 16, 'ULONG32': 32}
@@ -36,21 +37,21 @@ class ApplySetFile(QtCore.QThread, SelectComPort):
 
     def readSetFile(self):
         namePar = '# 0 1182685875'
-        try:
-            file = os.path.join(os.path.dirname(__file__), '..', 'setFiles',
-                                self.currParent.rfbTypeCombo.currentText() + '.CSV')
-            f = open(file, 'r')
-            f.close()
-        except Exception as e:
-            self.msgSignal.emit('w', 'Can`t open file settings', str(e), 1)
-            return
+        # try:
+        #     file = os.path.join(os.path.dirname(__file__), '..', 'setFiles',
+        #                         self.currParent.rfbTypeCombo.currentText() + '.CSV')
+        #     f = open(file, 'r')
+        #     f.close()
+        # except Exception as e:
+        #     self.msgSignal.emit('w', 'Can`t open file settings', str(e), 1)
+        #     return
 
-        csvfile = open(file)
+        csvfile = open(self.setFile)
         reader = csv.DictReader(csvfile)
         row_count = sum(1 for row in reader) - 1
         csvfile.close()
 
-        with open(file) as csvfile:
+        with open(self.setFile) as csvfile:
             reader = csv.DictReader(csvfile)
             for l, row in enumerate(reader):
                 self.progressBarSignal.emit('Loading set file', row_count, l)
@@ -86,7 +87,7 @@ class ApplySetFile(QtCore.QThread, SelectComPort):
         csvfile.close()
         self.ser.close()
         self.comMovieSignal.emit('', '')
-        self.logSignal.emit('Load settings file complete', 0)
+        self.logSignal.emit('Loading settings file complete', 0)
 
     def getDictKey(self, dict, val):
         for i, j in dict.items():
