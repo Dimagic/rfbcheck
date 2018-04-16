@@ -4,6 +4,7 @@ import os
 import serial
 from PyQt5 import QtCore
 
+from Tests.detector_test import DetectorTest
 from Tests.gain_test import GainTest
 from Tests.flatness_test import FlatnessTest
 from Tests.dsa_test import DsaTest
@@ -118,6 +119,12 @@ class TestContoller(QtCore.QThread, SelectComPort):
             if self.stopTestFlag:
                 return
             ReturnLossTest(self)
+
+        if self.currParent.checkDetectorTest.isChecked():
+            if self.stopTestFlag:
+                return
+            DetectorTest(self)
+
         self.progressBarSignal.emit('Done', 100, 100)
         print(self.currParent.testLogDl)
 
@@ -136,6 +143,8 @@ class TestContoller(QtCore.QThread, SelectComPort):
             self.testArr.append('Alc Test')
         if currParent.checkRlossTest.isChecked():
             self.testArr.append('Return loss test')
+        if currParent.checkDetectorTest.isChecked():
+            self.testArr.append('Detector test')
 
     def getComConn(self):
         port, baud = self.getCurrPortBaud()

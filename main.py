@@ -1,6 +1,5 @@
 # stylesheet
 # import qdarkstyle
-
 from Forms.mainwindow import Ui_MainWindow
 from Equip.instrumentSettings import TestSettings
 from Equip.selectUser import SelectUser
@@ -12,7 +11,7 @@ from Equip.journal import *
 from Tests.testController import *
 from Tests.bitAlarm_test import *
 from PyQt5.QtCore import QSize
-from PyQt5.QtGui import QMovie
+from PyQt5.QtGui import QMovie, QStandardItem
 from PyQt5 import QtCore, QtWidgets, QtGui
 from PyQt5.QtWidgets import QTableWidgetItem, QAbstractItemView, QLabel, QAction, QFileDialog
 from PIL import Image
@@ -20,7 +19,7 @@ from Equip.config import *
 import threading
 import re
 
-version = '0.3.7'
+version = '0.3.8'
 
 
 class TestTime(threading.Thread):
@@ -798,6 +797,14 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
             self.rfbSN.setText(rfSn)
         else:
             self.sendMsg('i', 'RFBCheck', 'RF ' + rfType + " not found", 1)
+
+    def setTestsWidget(self):
+        for n in range(10):
+            item = QStandardItem('Item %s' % n)
+            check = Qt.Checked
+            item.setCheckState(check)
+            item.setCheckable(True)
+            self.testView.addItem(item)
 
 
 if __name__ == '__main__':

@@ -190,6 +190,7 @@ class ApplySetFile(QtCore.QThread, SelectComPort):
         rx = str(binascii.hexlify(self.ser.read(self.ser.inWaiting()))).replace("b'", "").replace("'", "").upper()
         if addr in rx:
             self.logSignal.emit(namePar, 0)
+            # self.logSignal.emit('Tx: ' + str(toSend).upper(), 0)
             self.logSignal.emit('Tx: ' + str(toSend)[:95].upper(), 0)
             self.logSignal.emit('written ' + str(writingBytes) + ' bytes', 0)
             self.logSignal.emit('Rx: ' + str(rx), 0)
@@ -219,10 +220,8 @@ class ApplySetFile(QtCore.QThread, SelectComPort):
                 if str(row.get(namePar)).find("#") != -1:
                     continue
                 addr = str(hex(int(row.get(None)[0], 16) + 1)).replace("0x", "")
-
                 self.ser.flushInput()
                 self.ser.flushOutput()
-
                 outWait = int(self.ser.outWaiting())
                 inWait = int(self.ser.inWaiting())
 
@@ -230,7 +229,6 @@ class ApplySetFile(QtCore.QThread, SelectComPort):
                 toSend += addr
                 crc = getCrc(toSend)
                 toSend += crc
-                print(toSend)
                 # print(binascii.unhexlify(toSend))
                 self.ser.write(binascii.unhexlify(toSend))
                 k = 0

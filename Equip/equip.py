@@ -235,10 +235,7 @@ def getCrc(line):
         msg = line[n:n + 2]
         sum += int(msg[0:2], 16)
         n += 2
-    ##    print('Line = ' + line)
-    ##    print("Sum = " + str(sum))
-    ##    print("CRC = " + str(hex(sum%256)))
     crc = str(hex(sum % 256).replace('0x', ''))
     if len(crc) < 2:
         crc = '0' + crc
-    return crc
+    return crc.upper()

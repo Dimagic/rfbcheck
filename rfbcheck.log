@@ -18,3 +18,235 @@ Traceback (most recent call last):
   File "C:\123\RFBCheck\Tests\bitAlarm_test.py", line 23, in __init__
     self.listSettings = self.mainParent.listSettings
 AttributeError: 'BitAlarmTest' object has no attribute 'mainParent'
+ERROR:root:2018-04-15 15:05:51: RA00057 xxxx
+Traceback (most recent call last):
+  File "C:\123\RFBCheck\Tests\testController.py", line 69, in run
+    self.runTests()
+  File "C:\123\RFBCheck\Tests\testController.py", line 125, in runTests
+    DetectorTest(self)
+NameError: name 'DetectorTest' is not defined
+ERROR:root:2018-04-15 15:06:57.328125: RA00057 xxxx
+Traceback (most recent call last):
+  File "C:\123\RFBCheck\Tests\testController.py", line 70, in run
+    self.runTests()
+  File "C:\123\RFBCheck\Tests\testController.py", line 126, in runTests
+    DetectorTest(self)
+  File "C:\123\RFBCheck\Tests\detector_test.py", line 29, in __init__
+    self.detectorTest(self.freqDl)
+AttributeError: 'DetectorTest' object has no attribute 'detectorTest'
+ERROR:root:2018-04-15 15:14:42.718750: RA00057 xxxx
+Traceback (most recent call last):
+  File "C:\123\RFBCheck\Tests\testController.py", line 70, in run
+    self.runTests()
+  File "C:\123\RFBCheck\Tests\testController.py", line 126, in runTests
+    DetectorTest(self)
+  File "C:\123\RFBCheck\Tests\detector_test.py", line 30, in __init__
+    self.detectorTest(self.freqDl)
+AttributeError: 'DetectorTest' object has no attribute 'detectorTest'
+ERROR:root:2018-04-15 16:06:07.500000: RA00057 xxxx
+Traceback (most recent call last):
+  File "C:\123\RFBCheck\Tests\testController.py", line 66, in run
+    self.readAdemSettings()
+  File "C:\123\RFBCheck\Tests\testController.py", line 289, in readAdemSettings
+    lenNewArr = int(row.get(None)[3])
+TypeError: 'NoneType' object is not subscriptable
+ERROR:root:2018-04-15 16:06:31.218750: RA00057 xxxx
+Traceback (most recent call last):
+  File "C:\123\RFBCheck\Tests\testController.py", line 66, in run
+    self.readAdemSettings()
+  File "C:\123\RFBCheck\Tests\testController.py", line 289, in readAdemSettings
+    lenNewArr = int(row.get(None)[3])
+TypeError: 'NoneType' object is not subscriptable
+ERROR:root:2018-04-15 16:07:43.890625: RA00057 xxxx
+Traceback (most recent call last):
+  File "C:\123\RFBCheck\Tests\testController.py", line 66, in run
+    self.readAdemSettings()
+  File "C:\123\RFBCheck\Tests\testController.py", line 289, in readAdemSettings
+    lenNewArr = int(row.get(None)[3])
+TypeError: 'NoneType' object is not subscriptable
+ERROR:root:2018-04-15 16:08:29.859375: RA00057 xxxx
+Traceback (most recent call last):
+  File "C:\123\RFBCheck\Tests\testController.py", line 66, in run
+    self.readAdemSettings()
+  File "C:\123\RFBCheck\Tests\testController.py", line 289, in readAdemSettings
+    lenNewArr = int(row.get(None)[3])
+TypeError: 'NoneType' object is not subscriptable
+ERROR:root:2018-04-15 16:09:02.218750: RA00057 xxxx
+Traceback (most recent call last):
+  File "C:\123\RFBCheck\Tests\testController.py", line 66, in run
+    self.readAdemSettings()
+  File "C:\123\RFBCheck\Tests\testController.py", line 289, in readAdemSettings
+    lenNewArr = int(row.get(None)[3])
+TypeError: 'NoneType' object is not subscriptable
+ERROR:root:2018-04-15 16:10:52.437500: RA00057 xxxx
+Traceback (most recent call last):
+  File "C:/123/RFBCheck\Tests\testController.py", line 66, in run
+    self.readAdemSettings()
+  File "C:/123/RFBCheck\Tests\testController.py", line 289, in readAdemSettings
+    lenNewArr = int(row.get(None)[3])
+TypeError: 'NoneType' object is not subscriptable
+ERROR:root:2018-04-15 16:11:53.250000: RA00057 xxxx
+Traceback (most recent call last):
+  File "C:\123\RFBCheck\Tests\testController.py", line 66, in run
+    self.readAdemSettings()
+  File "C:\123\RFBCheck\Tests\testController.py", line 289, in readAdemSettings
+    lenNewArr = int(row.get(None)[3])
+TypeError: 'NoneType' object is not subscriptable
+ERROR:root:2018-04-15 16:14:31.234375: RA00057 xxxx
+Traceback (most recent call last):
+  File "C:\123\RFBCheck\Tests\testController.py", line 66, in run
+    self.readAdemSettings()
+  File "C:\123\RFBCheck\Tests\testController.py", line 289, in readAdemSettings
+    lenNewArr = int(row.get(None)[3])
+TypeError: 'NoneType' object is not subscriptable
+ERROR:root:2018-04-15 16:14:53.859375: RA00057 xxxx
+Traceback (most recent call last):
+  File "C:\123\RFBCheck\Tests\testController.py", line 66, in run
+    self.readAdemSettings()
+  File "C:\123\RFBCheck\Tests\testController.py", line 289, in readAdemSettings
+    lenNewArr = int(row.get(None)[3])
+TypeError: 'NoneType' object is not subscriptable
+ERROR:root:2018-04-15 16:15:06.078125: RA00057 xxxx
+Traceback (most recent call last):
+  File "C:\123\RFBCheck\Tests\testController.py", line 66, in run
+    self.readAdemSettings()
+  File "C:\123\RFBCheck\Tests\testController.py", line 289, in readAdemSettings
+    lenNewArr = int(row.get(None)[3])
+TypeError: 'NoneType' object is not subscriptable
+ERROR:root:2018-04-15 16:16:38.500000: RA00057 xxxx
+Traceback (most recent call last):
+  File "C:\123\RFBCheck\Tests\testController.py", line 66, in run
+    self.readAdemSettings()
+  File "C:\123\RFBCheck\Tests\testController.py", line 289, in readAdemSettings
+    lenNewArr = int(row.get(None)[3])
+TypeError: 'NoneType' object is not subscriptable
+ERROR:root:2018-04-15 16:16:52.953125: RA00057 xxxx
+Traceback (most recent call last):
+  File "C:\123\RFBCheck\Tests\testController.py", line 66, in run
+    self.readAdemSettings()
+  File "C:\123\RFBCheck\Tests\testController.py", line 289, in readAdemSettings
+    lenNewArr = int(row.get(None)[3])
+TypeError: 'NoneType' object is not subscriptable
+ERROR:root:2018-04-16 08:43:14.093084: RA00057 xxxx
+Traceback (most recent call last):
+  File "C:\123\RFBCheck\Tests\testController.py", line 70, in run
+    self.runTests()
+  File "C:\123\RFBCheck\Tests\testController.py", line 126, in runTests
+    DetectorTest(self)
+  File "C:\123\RFBCheck\Tests\detector_test.py", line 31, in __init__
+    self.forwardTest(self.freqDl)
+  File "C:\123\RFBCheck\Tests\detector_test.py", line 51, in forwardTest
+    print("Anch.: %s: Det.: %s") % (anchor, rx)
+TypeError: unsupported operand type(s) for %: 'NoneType' and 'tuple'
+ERROR:root:2018-04-16 08:44:31.218084: RA00057 xxxx
+Traceback (most recent call last):
+  File "C:\123\RFBCheck\Tests\testController.py", line 70, in run
+    self.runTests()
+  File "C:\123\RFBCheck\Tests\testController.py", line 126, in runTests
+    DetectorTest(self)
+  File "C:\123\RFBCheck\Tests\detector_test.py", line 31, in __init__
+    self.forwardTest(self.freqDl)
+  File "C:\123\RFBCheck\Tests\detector_test.py", line 51, in forwardTest
+    print("Anch.: %s: Det.: %s") % (str(anchor), str(rx))
+TypeError: unsupported operand type(s) for %: 'NoneType' and 'tuple'
+ERROR:root:2018-04-16 08:50:13.655584: RA00057 xxxx
+Traceback (most recent call last):
+  File "C:\123\RFBCheck\Tests\testController.py", line 70, in run
+    self.runTests()
+  File "C:\123\RFBCheck\Tests\testController.py", line 126, in runTests
+    DetectorTest(self)
+  File "C:\123\RFBCheck\Tests\detector_test.py", line 31, in __init__
+    self.forwardTest(self.freqDl)
+  File "C:\123\RFBCheck\Tests\detector_test.py", line 52, in forwardTest
+    print("Anch.: %s: Det.: %s") % (str(anchor), str(detector))
+TypeError: unsupported operand type(s) for %: 'NoneType' and 'tuple'
+ERROR:root:2018-04-16 11:18:42.921209: RA00057 xxxx
+Traceback (most recent call last):
+  File "C:\123\RFBCheck\Tests\testController.py", line 70, in run
+    self.runTests()
+  File "C:\123\RFBCheck\Tests\testController.py", line 126, in runTests
+    DetectorTest(self)
+  File "C:\123\RFBCheck\Tests\detector_test.py", line 31, in __init__
+    self.forwardTest(self.freqUl)
+  File "C:\123\RFBCheck\Tests\detector_test.py", line 46, in forwardTest
+    self.preTest()
+  File "C:\123\RFBCheck\Tests\detector_test.py", line 41, in preTest
+    self.send(self, 'SetAlc', i + '00FF')
+TypeError: send() takes 3 positional arguments but 4 were given
+ERROR:root:2018-04-16 12:44:24.311834: RA00057 xxxx
+Traceback (most recent call last):
+  File "C:\123\RFBCheck\Tests\testController.py", line 70, in run
+    self.runTests()
+  File "C:\123\RFBCheck\Tests\testController.py", line 126, in runTests
+    DetectorTest(self)
+  File "C:\123\RFBCheck\Tests\detector_test.py", line 32, in __init__
+    self.forwardTest(self.freqUl)
+  File "C:\123\RFBCheck\Tests\detector_test.py", line 50, in forwardTest
+    anchor = int(rx[rx.find(self.reqAddr.get(addrAnch)) + 4: rx.find(self.reqAddr.get(addrAnch)) + 8], 16)
+AttributeError: 'bool' object has no attribute 'find'
+ERROR:root:2018-04-16 14:23:27.671209: RA00057 xxxx
+Traceback (most recent call last):
+  File "C:\123\RFBCheck\Tests\testController.py", line 70, in run
+    self.runTests()
+  File "C:\123\RFBCheck\Tests\testController.py", line 126, in runTests
+    DetectorTest(self)
+  File "C:\123\RFBCheck\Tests\detector_test.py", line 30, in __init__
+    self.forwardTest(self.freqDl)
+  File "C:\123\RFBCheck\Tests\detector_test.py", line 81, in forwardTest
+    print(len(arrDetector))
+TypeError: object of type 'NoneType' has no len()
+ERROR:root:2018-04-16 14:40:18.624334: RA00057 xxxx
+Traceback (most recent call last):
+  File "C:\123\RFBCheck\Tests\testController.py", line 70, in run
+    self.runTests()
+  File "C:\123\RFBCheck\Tests\testController.py", line 126, in runTests
+    DetectorTest(self)
+  File "C:\123\RFBCheck\Tests\detector_test.py", line 30, in __init__
+    self.forwardTest(self.freqDl)
+  File "C:\123\RFBCheck\Tests\detector_test.py", line 82, in forwardTest
+    for i in arrDetector.reverse():
+TypeError: 'NoneType' object is not iterable
+ERROR:root:2018-04-16 14:42:48.452459: RA00057 xxxx
+Traceback (most recent call last):
+  File "C:\123\RFBCheck\Tests\testController.py", line 70, in run
+    self.runTests()
+  File "C:\123\RFBCheck\Tests\testController.py", line 126, in runTests
+    DetectorTest(self)
+  File "C:\123\RFBCheck\Tests\detector_test.py", line 30, in __init__
+    self.forwardTest(self.freqDl)
+  File "C:\123\RFBCheck\Tests\detector_test.py", line 82, in forwardTest
+    for i in arrDetector.reverse():
+TypeError: 'NoneType' object is not iterable
+ERROR:root:2018-04-16 14:46:59.358709: RA00057 xxxx
+Traceback (most recent call last):
+  File "C:\123\RFBCheck\Tests\testController.py", line 70, in run
+    self.runTests()
+  File "C:\123\RFBCheck\Tests\testController.py", line 126, in runTests
+    DetectorTest(self)
+  File "C:\123\RFBCheck\Tests\detector_test.py", line 30, in __init__
+    self.forwardTest(self.freqDl)
+  File "C:\123\RFBCheck\Tests\detector_test.py", line 83, in forwardTest
+    for i in arrDetector.reverse():
+TypeError: 'NoneType' object is not iterable
+ERROR:root:2018-04-16 15:46:25.077459: RA00057 xxxx
+Traceback (most recent call last):
+  File "C:\123\RFBCheck\Tests\testController.py", line 70, in run
+    self.runTests()
+  File "C:\123\RFBCheck\Tests\testController.py", line 126, in runTests
+    DetectorTest(self)
+  File "C:\123\RFBCheck\Tests\detector_test.py", line 31, in __init__
+    self.reversTest(self.freqDl)
+  File "C:\123\RFBCheck\Tests\detector_test.py", line 112, in reversTest
+    anchor = int(rx[rx.find(self.reqAddr.get(addrAnch)) + 4: rx.find(self.reqAddr.get(addrAnch)) + 8], 16)
+AttributeError: 'bool' object has no attribute 'find'
+ERROR:root:2018-04-16 15:50:01.452459: RA00057 xxxx
+Traceback (most recent call last):
+  File "C:\123\RFBCheck\Tests\testController.py", line 70, in run
+    self.runTests()
+  File "C:\123\RFBCheck\Tests\testController.py", line 126, in runTests
+    DetectorTest(self)
+  File "C:\123\RFBCheck\Tests\detector_test.py", line 31, in __init__
+    self.reversTest(self.freqDl)
+  File "C:\123\RFBCheck\Tests\detector_test.py", line 112, in reversTest
+    anchor = int(rx[rx.find(self.reqAddr.get(addrAnch)) + 4: rx.find(self.reqAddr.get(addrAnch)) + 8], 16)
+AttributeError: 'bool' object has no attribute 'find'
