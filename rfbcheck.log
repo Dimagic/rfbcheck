@@ -250,3 +250,36 @@ Traceback (most recent call last):
   File "C:\123\RFBCheck\Tests\detector_test.py", line 112, in reversTest
     anchor = int(rx[rx.find(self.reqAddr.get(addrAnch)) + 4: rx.find(self.reqAddr.get(addrAnch)) + 8], 16)
 AttributeError: 'bool' object has no attribute 'find'
+ERROR:root:2018-04-17 07:45:52.468750: RA00057 xxxx
+Traceback (most recent call last):
+  File "C:\123\RFBCheck\Tests\testController.py", line 70, in run
+    self.runTests()
+  File "C:\123\RFBCheck\Tests\testController.py", line 126, in runTests
+    DetectorTest(self)
+  File "C:\123\RFBCheck\Tests\detector_test.py", line 31, in __init__
+    self.reversTest(self.freqDl)
+  File "C:\123\RFBCheck\Tests\detector_test.py", line 127, in reversTest
+    detector = int(rx[rx.find(self.reqAddr.get(addrDet)) + 12: rx.find(self.reqAddr.get(addrDet)) + 16], 16)
+AttributeError: 'bool' object has no attribute 'find'
+ERROR:root:2018-04-17 08:32:50.171875: RA00297 xxxx
+Traceback (most recent call last):
+  File "C:\123\RFBCheck\Tests\testController.py", line 70, in run
+    self.runTests()
+  File "C:\123\RFBCheck\Tests\testController.py", line 126, in runTests
+    DetectorTest(self)
+  File "C:\123\RFBCheck\Tests\detector_test.py", line 30, in __init__
+    self.forwardTest(self.freqDl)
+  File "C:\123\RFBCheck\Tests\detector_test.py", line 45, in forwardTest
+    str(int(self.parent.saAtten.text()) + abs(float(self.getOffset(freq)))))
+AttributeError: 'builtin_function_or_method' object has no attribute 'saAtten'
+ERROR:root:2018-04-17 09:41:36.578125: RA00057 xxxx
+Traceback (most recent call last):
+  File "C:\123\RFBCheck\Tests\testController.py", line 70, in run
+    self.runTests()
+  File "C:\123\RFBCheck\Tests\testController.py", line 126, in runTests
+    DetectorTest(self)
+  File "C:\123\RFBCheck\Tests\detector_test.py", line 30, in __init__
+    self.forwardTest(self.freqDl)
+  File "C:\123\RFBCheck\Tests\detector_test.py", line 44, in forwardTest
+    self.setNaOffset(freq)
+AttributeError: 'DetectorTest' object has no attribute 'setNaOffset'

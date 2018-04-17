@@ -17,6 +17,7 @@ import re
 class Calibration(QtWidgets.QDialog):
 
     def __init__(self, parent):
+        print(parent)
         super(Calibration, self).__init__(parent)
         self.currParent = parent
         # self.dialog = loadUi('Forms/calibration.ui', self)

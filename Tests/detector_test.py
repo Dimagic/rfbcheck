@@ -5,7 +5,7 @@ from PyQt5 import QtCore
 from PyQt5.QtWidgets import QMessageBox
 
 import Equip.commands as cmd
-from Equip.equip import setAmplTo, getCrc, setAlc
+from Equip.equip import setAmplTo, getCrc
 
 
 class DetectorTest(QtCore.QThread):
@@ -41,6 +41,7 @@ class DetectorTest(QtCore.QThread):
     def forwardTest(self, freq):
         self.preTest()
         haveFail = False
+        self.setNaOffset(freq)
         arrDetector = []
         if self.testController.whatConn == "Dl":
             addrDet = 'dlDet'
@@ -105,6 +106,7 @@ class DetectorTest(QtCore.QThread):
     def reversTest(self, freq):
         self.preTest()
         haveFail = False
+        self.setNaOffset(freq)
         if self.testController.whatConn == "Dl":
             addrDet = 'dlDet'
             addrAnch = 'dlRvsCal'
@@ -197,3 +199,10 @@ class DetectorTest(QtCore.QThread):
             print(namePar + ': OK')
             print('--------------------------')
             return rx
+
+    def setNaOffset(self, freq):
+        conn, cursor = self.mainParent.getConnDb()
+        rows = cursor.execute("select delta from calSaToGen where freq = :n", {'n': freq}).fetchone()
+        conn.close()
+        self.sa.write("DISP:WIND:TRAC:Y:RLEV:OFFS " +
+                      str(int(self.mainParent.saAtten.text()) + abs(float(rows[0]))))

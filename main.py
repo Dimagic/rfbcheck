@@ -123,7 +123,7 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
         self.setSaRadio.clicked.connect(self.radioInstrChecked)
         self.setGenRadio.clicked.connect(self.radioInstrChecked)
         self.setNaRadio.clicked.connect(self.radioInstrChecked)
-        self.calibrationBtn.clicked.connect(Calibration)
+        self.calibrationBtn.clicked.connect(self.calibrationBtnClick)
         self.clearCalBtn.clicked.connect(self.clearCalibrationBtnClick)
         self.calAllBands.clicked.connect(self.calAllBandsCheck)
         self.calibrStart.setValidator(QtGui.QIntValidator())
