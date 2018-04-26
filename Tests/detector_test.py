@@ -71,8 +71,8 @@ class DetectorTest(QtCore.QThread):
                 haveFail = True
             else:
                 status = 0
-            self.testController.logSignal.emit("Anch. forw.: " + str(anchor) +
-                                               ": Det.: " + str(detector) +
+            self.testController.logSignal.emit("Pout forw.: " + str(anchor) +
+                                               ": Detector: " + str(detector) +
                                                " Delta: " + str(delta) + "", status)
             currPower -= 1
             anchor -= 1
@@ -134,8 +134,8 @@ class DetectorTest(QtCore.QThread):
                 haveFail = True
             else:
                 status = 0
-            self.testController.logSignal.emit("Anch. rev.: " + str(anchor) +
-                                               ": Det.: " + str(detector) +
+            self.testController.logSignal.emit("Pout rev.: " + str(anchor) +
+                                               ": Detector: " + str(detector) +
                                                " Delta: " + str(delta) + "", status)
             currPower -= 1
             anchor -= 1

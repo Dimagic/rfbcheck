@@ -1,10 +1,17 @@
 import datetime
 import sqlite3
 
+from PyQt5.QtWidgets import QMessageBox
+
+
 class WriteResult:
     def __init__(self, testController, testLogDl, testLogUl):
         self.testController = testController
         self.parent = testController.getParent()
+        # if len(testLogDl) != len(testLogUl):
+        #     q = self.testController.sendMsg('i', 'RFBCheck', 'Do you want save test results?', 2)
+        #     if q == QMessageBox.Cancel:
+        #         return
         try:
             dateTest = datetime.datetime.today().strftime("%Y%m%d %H:%M:%S")
             if len(testLogDl) > 0:

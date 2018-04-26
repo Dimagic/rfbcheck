@@ -16,10 +16,11 @@ from PyQt5 import QtCore, QtWidgets, QtGui
 from PyQt5.QtWidgets import QTableWidgetItem, QAbstractItemView, QLabel, QAction, QFileDialog
 from PIL import Image
 from Equip.config import *
+
 import threading
 import re
 
-version = '0.3.8'
+version = '0.3.10'
 
 
 class TestTime(threading.Thread):
@@ -143,11 +144,18 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
             if len(self.editRfbCombo) == 0: self.editRfbCombo.addItem('New')
             self.editRfbCombo.addItem(str(i).replace("('", "").replace("',)", ""))
 
+        """ Get test type list and fill combobox """
+        self.testType = cursor.execute("select name from test_type").fetchall()
+        for i in self.testType:
+            self.testTypeCombo.addItem(i[0])
+
         rep = Report(None, None, None, self)
         rep.getTemplates(self)
 
         self.rfbIsChecked()
         self.rfbTypeCombo.activated.connect(self.rfbIsChecked)
+        self.setTestsList()
+        self.testTypeCombo.activated.connect(self.setTestsList)
 
         self.journalDateStart.setDate(QtCore.QDate.currentDate().addMonths(-1))
         self.journalDateStop.setDate(QtCore.QDate.currentDate())
@@ -155,6 +163,8 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
         self.newRfbBtn.clicked.connect(self.on_newRfbBtn_clicked)
         conn.close()
         self.journal = Journal(self)
+
+        self.setTestsList()
 
     def on_newRfbBtn_clicked(self):
         self.dialog = EditRFB(self, self)
@@ -550,6 +560,7 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
         self.testIsRun = True
         self.rfbTypeCombo.setEnabled(False)
         self.rfbSN.setEnabled(False)
+        self.applySetBtn.setEnabled(False)
         self.testsGroupBox.setEnabled(False)
         self.instrumentsGroupBox.setEnabled(False)
         self.gainTestgroupBox.setEnabled(False)
@@ -564,6 +575,7 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
         self.testIsRun = False
         self.rfbTypeCombo.setEnabled(True)
         self.rfbSN.setEnabled(True)
+        self.applySetBtn.setEnabled(True)
         self.testsGroupBox.setEnabled(True)
         self.instrumentsGroupBox.setEnabled(True)
         self.gainTestgroupBox.setEnabled(True)
@@ -613,6 +625,7 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
             self.clrLogBtnClick()
         self.rfbTypeCombo.setEnabled(False)
         self.rfbSN.setEnabled(False)
+        self.testTypeCombo.setEnabled(False)
         self.testsGroupBox.setEnabled(False)
         self.instrumentsGroupBox.setEnabled(False)
         self.gainTestgroupBox.setEnabled(False)
@@ -633,6 +646,7 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
         self.whatConn = None
         self.rfbTypeCombo.setEnabled(True)
         self.rfbSN.setEnabled(True)
+        self.testTypeCombo.setEnabled(True)
         self.testsGroupBox.setEnabled(True)
         self.instrumentsGroupBox.setEnabled(True)
         self.gainTestgroupBox.setEnabled(True)
@@ -798,13 +812,22 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
         else:
             self.sendMsg('i', 'RFBCheck', 'RF ' + rfType + " not found", 1)
 
-    def setTestsWidget(self):
-        for n in range(10):
-            item = QStandardItem('Item %s' % n)
-            check = Qt.Checked
-            item.setCheckState(check)
+    def setTestsList(self):
+        self.tableModel = QtGui.QStandardItemModel(self)
+        # self.tableModel.itemChanged.connect(self.itemChanged)
+        conn, cursor = self.getConnDb()
+        query = "select name from test_list where type = '%s' order by queue" % self.testTypeCombo.currentText()
+        rows = cursor.execute(query).fetchall()
+        for row in rows:
+            item = QtGui.QStandardItem(row[0])
             item.setCheckable(True)
-            self.testView.addItem(item)
+            item.setCheckState(2)
+            self.tableModel.appendRow(item)
+
+        self.testTable.setModel(self.tableModel)
+        self.testTable.resizeRowsToContents()
+        self.testTable.setColumnWidth(0, 300)
+        conn.close()
 
 
 if __name__ == '__main__':

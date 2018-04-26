@@ -118,8 +118,6 @@ def getAvgGain(parent):
 
     # testController.instr.sa.write("TRAC1:MODE WRIT")
     if testController.useCorrection:
-        # print(sum(gainArr) / len(gainArr))
-        # print(sum(gainArr) / len(gainArr) - saToGen - genToSa)
         return sum(gainArr) / len(gainArr) - saToGen - genToSa
     else:
         return sum(gainArr) / len(gainArr)

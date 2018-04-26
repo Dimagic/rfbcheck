@@ -283,3 +283,67 @@ Traceback (most recent call last):
   File "C:\123\RFBCheck\Tests\detector_test.py", line 44, in forwardTest
     self.setNaOffset(freq)
 AttributeError: 'DetectorTest' object has no attribute 'setNaOffset'
+ERROR:root:2018-04-21 22:28:23.609375: RA002900 18040652
+Traceback (most recent call last):
+  File "C:\123\RFBCheck\Tests\testController.py", line 70, in run
+    self.runTests()
+  File "C:\123\RFBCheck\Tests\testController.py", line 121, in runTests
+    ReturnLossTest(self)
+  File "C:\123\RFBCheck\Tests\rloss_test.py", line 25, in __init__
+    self.returnLossTest()
+  File "C:\123\RFBCheck\Tests\rloss_test.py", line 30, in returnLossTest
+    if currRloss > rlossmax:
+TypeError: unorderable types: float() > NoneType()
+ERROR:root:2018-04-22 20:15:32.156250: RA00297 xxxx
+Traceback (most recent call last):
+  File "C:\123\RFBCheck\Tests\testController.py", line 60, in run
+    self.whatConn = self.checkUlDl()
+  File "C:\123\RFBCheck\Tests\testController.py", line 207, in checkUlDl
+    self.instr.gen.write(":OUTP:STAT ON")
+AttributeError: 'NoneType' object has no attribute 'write'
+ERROR:root:2018-04-24 21:33:42.500000: RA002900 xxxx
+Traceback (most recent call last):
+  File "C:\123\RFBCheck\Tests\testController.py", line 60, in run
+    self.whatConn = self.checkUlDl()
+  File "C:\123\RFBCheck\Tests\testController.py", line 214, in checkUlDl
+    gain = float(getAvgGain(self))
+  File "C:\123\RFBCheck\Equip\equip.py", line 117, in getAvgGain
+    gainArr.append(float(testController.instr.sa.query("CALC:MARK:Y?")) + float(parent.genAtten.text))
+TypeError: float() argument must be a string or a number, not 'builtin_function_or_method'
+ERROR:root:2018-04-25 02:58:59.125000: RA00297 18040718
+Traceback (most recent call last):
+  File "C:\123\RFBCheck\Tests\testController.py", line 73, in run
+    self.runTests()
+  File "C:\123\RFBCheck\Tests\testController.py", line 129, in runTests
+    DetectorTest(self)
+  File "C:\123\RFBCheck\Tests\detector_test.py", line 33, in __init__
+    self.forwardTest(self.freqUl)
+  File "C:\123\RFBCheck\Tests\detector_test.py", line 54, in forwardTest
+    anchor = int(rx[rx.find(self.reqAddr.get(addrAnch)) + 4: rx.find(self.reqAddr.get(addrAnch)) + 8], 16)
+AttributeError: 'NoneType' object has no attribute 'find'
+ERROR:root:2018-04-25 07:04:39.218750: RA002900 xxxx
+Traceback (most recent call last):
+  File "C:\123\RFBCheck\Tests\testController.py", line 73, in run
+    self.runTests()
+  File "C:\123\RFBCheck\Tests\testController.py", line 129, in runTests
+    DetectorTest(self)
+  File "C:\123\RFBCheck\Tests\detector_test.py", line 30, in __init__
+    self.forwardTest(self.freqDl)
+  File "C:\123\RFBCheck\Tests\detector_test.py", line 53, in forwardTest
+    rx = self.send(addrAnch, self.reqAddr.get(addrAnch))
+  File "C:\123\RFBCheck\Tests\detector_test.py", line 195, in send
+    print(namePar)
+OSError: [Errno 22] Invalid argument
+ERROR:root:2018-04-25 07:05:05.359375: RA002900 xxxx
+Traceback (most recent call last):
+  File "C:\123\RFBCheck\Tests\testController.py", line 73, in run
+    self.runTests()
+  File "C:\123\RFBCheck\Tests\testController.py", line 129, in runTests
+    DetectorTest(self)
+  File "C:\123\RFBCheck\Tests\detector_test.py", line 30, in __init__
+    self.forwardTest(self.freqDl)
+  File "C:\123\RFBCheck\Tests\detector_test.py", line 53, in forwardTest
+    rx = self.send(addrAnch, self.reqAddr.get(addrAnch))
+  File "C:\123\RFBCheck\Tests\detector_test.py", line 195, in send
+    print(namePar)
+OSError: [Errno 22] Invalid argument

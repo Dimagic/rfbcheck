@@ -2,7 +2,7 @@ import csv
 import logging
 import os
 import serial
-from PyQt5 import QtCore
+from PyQt5 import QtCore, QtGui
 
 from Tests.detector_test import DetectorTest
 from Tests.gain_test import GainTest
@@ -62,6 +62,9 @@ class TestContoller(QtCore.QThread, SelectComPort):
                 return
             if self.whatConn is None:
                 return
+            if self.stopTestFlag:
+                self.ser.close()
+                return
             # TODO: send message if load set file is fail
             self.readAdemSettings()
             self.logSignal.emit('START TEST', 0)
@@ -85,66 +88,56 @@ class TestContoller(QtCore.QThread, SelectComPort):
 
     def runTests(self):
 
-        if self.currParent.checkGainTest.isChecked():
+        if 'Gain + flatness' in self.testArr:
             if self.stopTestFlag:
                 return
             GainTest(self)
 
-        if self.currParent.checkGainTest.isChecked():
+        if 'Gain + flatness' in self.testArr:
             if self.stopTestFlag:
                 return
             FlatnessTest(self)
 
-        if self.currParent.checkDsaTest.isChecked():
+        if 'DSA' in self.testArr:
             if self.stopTestFlag:
                 return
             DsaTest(self)
 
-        if self.currParent.checkImTest.isChecked():
+        if 'IMod' in self.testArr:
             if self.stopTestFlag:
                 return
             IModTest(self)
 
-        if self.currParent.checkBitAlarmTest.isChecked():
+        if 'BIT alarm' in self.testArr:
             if self.stopTestFlag:
                 return
             BitAlarmTest(self, self.currParent)
 
-        if self.currParent.checkAlcTest.isChecked():
+        if 'ALC' in self.testArr:
             if self.stopTestFlag:
                 return
             AlcTest(self, self.currParent)
 
-        if self.currParent.checkRlossTest.isChecked():
+        if 'Return loss' in self.testArr:
             if self.stopTestFlag:
                 return
             ReturnLossTest(self)
 
-        if self.currParent.checkDetectorTest.isChecked():
+        if 'Detector' in self.testArr:
             if self.stopTestFlag:
                 return
             DetectorTest(self)
 
         self.progressBarSignal.emit('Done', 100, 100)
-        print(self.currParent.testLogDl)
+        # print(self.currParent.testLogDl)
 
     def getTests(self, currParent):
-        if currParent.checkGainTest.isChecked():
-            self.testArr.append('Gain test')
-        if currParent.checkGainTest.isChecked():
-            self.testArr.append('Flatness test')
-        if currParent.checkDsaTest.isChecked():
-            self.testArr.append('DSA test')
-        if currParent.checkImTest.isChecked():
-            self.testArr.append('IM test')
-        if currParent.checkBitAlarmTest.isChecked():
-            self.testArr.append('Alarm test')
-        if currParent.checkAlcTest.isChecked():
-            self.testArr.append('Alc Test')
-        if currParent.checkRlossTest.isChecked():
-            self.testArr.append('Return loss test')
-        if currParent.checkDetectorTest.isChecked():
-            self.testArr.append('Detector test')
+        model = currParent.testTable.model()
+        for i in range(model.rowCount()):
+            index = model.index(i, 0)
+            item = model.item(i, 0)
+            if item.checkState() == 2:
+                self.testArr.append(model.data(index))
 
     def getComConn(self):
         port, baud = self.getCurrPortBaud()
@@ -193,6 +186,8 @@ class TestContoller(QtCore.QThread, SelectComPort):
         self.progressBarSignal.emit('Check connection', 0, 0)
 
         for i in [Dl, Ul]:
+            if self.stopTestFlag:
+                return
             if i == 0:
                 continue
             try:

@@ -97,13 +97,13 @@
              <property name="minimumSize">
               <size>
                <width>559</width>
-               <height>150</height>
+               <height>171</height>
               </size>
              </property>
              <property name="maximumSize">
               <size>
                <width>16777215</width>
-               <height>150</height>
+               <height>171</height>
               </size>
              </property>
              <property name="autoFillBackground">
@@ -451,6 +451,29 @@
            </layout>
           </item>
           <item>
+           <widget class="QLabel" name="label">
+            <property name="text">
+             <string>Test type:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QComboBox" name="testTypeCombo">
+            <property name="minimumSize">
+             <size>
+              <width>120</width>
+              <height>20</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>120</width>
+              <height>20</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item>
            <layout class="QHBoxLayout" name="horizontalLayout_13">
             <item>
              <widget class="QLabel" name="label3_2">
@@ -734,7 +757,7 @@
         <item row="2" column="0">
          <widget class="QGroupBox" name="testsGroupBox">
           <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
@@ -742,186 +765,75 @@
           <property name="minimumSize">
            <size>
             <width>211</width>
-            <height>181</height>
+            <height>201</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
             <width>211</width>
-            <height>181</height>
+            <height>201</height>
            </size>
           </property>
           <property name="title">
            <string>Tests</string>
           </property>
-          <widget class="QCheckBox" name="checkGainTest">
+          <widget class="QTableView" name="testTable">
            <property name="geometry">
             <rect>
              <x>10</x>
-             <y>23</y>
+             <y>20</y>
              <width>191</width>
-             <height>16</height>
-            </rect>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>191</width>
-             <height>16777215</height>
-            </size>
-           </property>
-           <property name="text">
-            <string>Gain and flatness</string>
-           </property>
-           <property name="checked">
-            <bool>true</bool>
-           </property>
-           <property name="autoExclusive">
-            <bool>false</bool>
-           </property>
-          </widget>
-          <widget class="QCheckBox" name="checkDsaTest">
-           <property name="geometry">
-            <rect>
-             <x>10</x>
-             <y>44</y>
-             <width>191</width>
-             <height>16</height>
-            </rect>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>191</width>
-             <height>17</height>
-            </size>
-           </property>
-           <property name="text">
-            <string>DSA</string>
-           </property>
-           <property name="checked">
-            <bool>true</bool>
-           </property>
-           <property name="autoExclusive">
-            <bool>false</bool>
-           </property>
-          </widget>
-          <widget class="QCheckBox" name="checkImTest">
-           <property name="geometry">
-            <rect>
-             <x>10</x>
-             <y>65</y>
-             <width>191</width>
-             <height>16</height>
+             <height>171</height>
             </rect>
            </property>
            <property name="minimumSize">
             <size>
              <width>191</width>
-             <height>16</height>
+             <height>171</height>
             </size>
            </property>
            <property name="maximumSize">
             <size>
              <width>191</width>
-             <height>16777215</height>
+             <height>171</height>
             </size>
            </property>
-           <property name="text">
-            <string>Intermodulation</string>
+           <property name="autoScroll">
+            <bool>false</bool>
            </property>
-           <property name="checked">
-            <bool>true</bool>
+           <property name="editTriggers">
+            <set>QAbstractItemView::NoEditTriggers</set>
            </property>
-          </widget>
-          <widget class="QCheckBox" name="checkBitAlarmTest">
-           <property name="enabled">
-            <bool>true</bool>
+           <property name="tabKeyNavigation">
+            <bool>false</bool>
            </property>
-           <property name="geometry">
-            <rect>
-             <x>10</x>
-             <y>85</y>
-             <width>191</width>
-             <height>16</height>
-            </rect>
+           <property name="showDropIndicator" stdset="0">
+            <bool>false</bool>
            </property>
-           <property name="maximumSize">
-            <size>
-             <width>191</width>
-             <height>16777215</height>
-            </size>
+           <property name="dragDropOverwriteMode">
+            <bool>false</bool>
            </property>
-           <property name="text">
-            <string>BIT alarm</string>
+           <property name="showGrid">
+            <bool>false</bool>
            </property>
-           <property name="checked">
-            <bool>true</bool>
+           <property name="wordWrap">
+            <bool>false</bool>
            </property>
-          </widget>
-          <widget class="QCheckBox" name="checkRlossTest">
-           <property name="geometry">
-            <rect>
-             <x>10</x>
-             <y>127</y>
-             <width>191</width>
-             <height>16</height>
-            </rect>
+           <property name="cornerButtonEnabled">
+            <bool>false</bool>
            </property>
-           <property name="maximumSize">
-            <size>
-             <width>191</width>
-             <height>16777215</height>
-            </size>
-           </property>
-           <property name="text">
-            <string>Return loss</string>
-           </property>
-           <property name="checked">
-            <bool>true</bool>
-           </property>
-          </widget>
-          <widget class="QCheckBox" name="checkAlcTest">
-           <property name="geometry">
-            <rect>
-             <x>10</x>
-             <y>106</y>
-             <width>191</width>
-             <height>16</height>
-            </rect>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>191</width>
-             <height>16777215</height>
-            </size>
-           </property>
-           <property name="text">
-            <string>ALC</string>
-           </property>
-           <property name="checked">
-            <bool>true</bool>
-           </property>
-          </widget>
-          <widget class="QCheckBox" name="checkDetectorTest">
-           <property name="geometry">
-            <rect>
-             <x>10</x>
-             <y>150</y>
-             <width>191</width>
-             <height>16</height>
-            </rect>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>191</width>
-             <height>16777215</height>
-            </size>
-           </property>
-           <property name="text">
-            <string>Detector (RF+PA)</string>
-           </property>
-           <property name="checked">
-            <bool>true</bool>
-           </property>
+           <attribute name="horizontalHeaderVisible">
+            <bool>false</bool>
+           </attribute>
+           <attribute name="horizontalHeaderHighlightSections">
+            <bool>false</bool>
+           </attribute>
+           <attribute name="verticalHeaderVisible">
+            <bool>false</bool>
+           </attribute>
+           <attribute name="verticalHeaderHighlightSections">
+            <bool>false</bool>
+           </attribute>
           </widget>
          </widget>
         </item>
@@ -2217,6 +2129,175 @@
          </property>
         </widget>
        </widget>
+       <widget class="QCheckBox" name="checkImTest">
+        <property name="geometry">
+         <rect>
+          <x>360</x>
+          <y>329</y>
+          <width>191</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>191</width>
+          <height>16</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>191</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Intermodulation</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+       <widget class="QCheckBox" name="checkBitAlarmTest">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="geometry">
+         <rect>
+          <x>360</x>
+          <y>349</y>
+          <width>191</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>191</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>BIT alarm</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+       <widget class="QCheckBox" name="checkRlossTest">
+        <property name="geometry">
+         <rect>
+          <x>360</x>
+          <y>391</y>
+          <width>191</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>191</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Return loss</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+       <widget class="QCheckBox" name="checkDetectorTest">
+        <property name="geometry">
+         <rect>
+          <x>360</x>
+          <y>414</y>
+          <width>191</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>191</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Detector (RF+PA)</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+       <widget class="QCheckBox" name="checkDsaTest">
+        <property name="geometry">
+         <rect>
+          <x>360</x>
+          <y>308</y>
+          <width>191</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>191</width>
+          <height>17</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>DSA</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+        <property name="autoExclusive">
+         <bool>false</bool>
+        </property>
+       </widget>
+       <widget class="QCheckBox" name="checkGainTest">
+        <property name="geometry">
+         <rect>
+          <x>360</x>
+          <y>287</y>
+          <width>191</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>191</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Gain and flatness</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+        <property name="autoExclusive">
+         <bool>false</bool>
+        </property>
+       </widget>
+       <widget class="QCheckBox" name="checkAlcTest">
+        <property name="geometry">
+         <rect>
+          <x>360</x>
+          <y>370</y>
+          <width>191</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>191</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>ALC</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
       </widget>
      </widget>
     </item>
@@ -2270,14 +2351,9 @@
   </action>
  </widget>
  <tabstops>
-  <tabstop>listLog</tabstop>
   <tabstop>clrLogBtn</tabstop>
   <tabstop>startTestBtn</tabstop>
   <tabstop>rfbTypeCombo</tabstop>
-  <tabstop>checkGainTest</tabstop>
-  <tabstop>checkDsaTest</tabstop>
-  <tabstop>checkBitAlarmTest</tabstop>
-  <tabstop>checkImTest</tabstop>
   <tabstop>rfbSN</tabstop>
   <tabstop>tableResult</tabstop>
   <tabstop>tableJournal</tabstop>

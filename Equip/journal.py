@@ -18,6 +18,7 @@ class Journal:
         parent.tableJournal.cellEntered.connect(self.cellHover)
         self.signalId = None
         self.flatness = None
+        self.limitsDict = {}
         self.feelJournal()
 
     def cellHover(self, row, column):
@@ -27,6 +28,18 @@ class Journal:
                (Journal.parent.tableJournal.item(row, 1).text(),
                 Journal.parent.tableJournal.item(row, 2).text(),
                 Journal.parent.tableJournal.item(row, 3).text())
+
+        if column == 4:
+            minGain = self.limitsDict.get(Journal.parent.tableJournal.item(row, 0).text() +
+                                          Journal.parent.tableJournal.item(row, 3).text() + '_gainMin')
+            maxGain = self.limitsDict.get(Journal.parent.tableJournal.item(row, 0).text() +
+                                          Journal.parent.tableJournal.item(row, 3).text() + '_gainMax')
+            # print(minGain, maxGain)
+            Journal.parent.tableJournal.setToolTip('min: ' + str(minGain) + ' max: ' + str(maxGain))
+            return
+        else:
+            Journal.parent.tableJournal.setToolTip('')
+
         if column == 5:
             q = "select id from flat_result where rfb  = (%s)" % qrow
         elif column == 9:
@@ -45,8 +58,9 @@ class Journal:
                 conn, cursor = Journal.parent.getConnDb()
                 rows = cursor.execute(q).fetchone()
                 conn.close()
-            except Exception:
-                pass
+            except Exception as e:
+                print(q, str(e))
+                return
             if rows is not None:
                 if column in [5, 9]:
                     Journal.parent.tableJournal.setToolTip("Double click for view signal")
@@ -89,8 +103,10 @@ class Journal:
         for row in rows:
             numrows = Journal.parent.tableJournal.rowCount()
             Journal.parent.tableJournal.insertRow(numrows)
+            limitsDictKey = row[1] + row[4]
             j = 1
             while j < len(row):
+
                 if row[j] is None:
                     toCell = ''
                 else:
@@ -110,12 +126,16 @@ class Journal:
                         if toFloat(row[5]):
                             gain = toFloat(row[5])
                             if str(row[4]) == 'Dl':
-                                if not limits[0]-2 <= gain <= limits[1]+2:
+                                self.limitsDict.update({limitsDictKey + '_gainMin': limits[0],
+                                                        limitsDictKey + '_gainMax': limits[1]})
+                                if not limits[0]-2 <= gain <= limits[1]+5:
                                     Journal.parent.tableJournal.item(numrows, j - 1).setBackground(QtCore.Qt.red)
                                 elif not limits[0] <= gain <= limits[1]:
                                     Journal.parent.tableJournal.item(numrows, j - 1).setBackground(QtCore.Qt.yellow)
                             else:
-                                if not limits[2]-2 <= gain <= limits[3]+2:
+                                self.limitsDict.update({limitsDictKey + '_gainMin': limits[2],
+                                                        limitsDictKey + '_gainMax': limits[3]})
+                                if not limits[2]-2 <= gain <= limits[3]+5:
                                     Journal.parent.tableJournal.item(numrows, j - 1).setBackground(QtCore.Qt.red)
                                 elif not limits[2] <= gain <= limits[3]:
                                     Journal.parent.tableJournal.item(numrows, j - 1).setBackground(QtCore.Qt.yellow)
