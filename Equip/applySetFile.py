@@ -19,6 +19,7 @@ class ApplySetFile(QtCore.QThread, SelectComPort):
         self.haveConn = False
         self.currParent = currParent
         self.setFile = setFile
+        self.haveFail = False
         self.loadPref = 'aaaa5430'
         self.sizeData = {'CHAR8': 8, 'FLOAT32': 32, 'INT16': 16, 'RawData': 8,
                         'STRING_ARRAY': 128, 'UCHAR8': 8, 'UINT16': 16, 'ULONG32': 32}
@@ -87,7 +88,10 @@ class ApplySetFile(QtCore.QThread, SelectComPort):
         csvfile.close()
         self.ser.close()
         self.comMovieSignal.emit('', '')
-        self.logSignal.emit('Loading settings file complete', 0)
+        if not self.haveFail:
+            self.logSignal.emit('Loading settings file complete', 1)
+        else:
+            self.logSignal.emit('Loading settings file fail', -1)
 
     def getDictKey(self, dict, val):
         for i, j in dict.items():
@@ -169,6 +173,7 @@ class ApplySetFile(QtCore.QThread, SelectComPort):
         k = 0
         while outWait != 0:
             if k > 15:
+                self.haveFail = True
                 self.logSignal.emit(namePar + ':OUT ERROR', -1)
                 print('--------------------------', 0)
                 return False
@@ -179,6 +184,7 @@ class ApplySetFile(QtCore.QThread, SelectComPort):
         k = 0
         while inWait == 0:
             if k > 5:
+                self.haveFail = True
                 self.logSignal.emit(namePar + ':IN ERROR', -1)
                 self.logSignal.emit('--------------------------', 0)
                 return False

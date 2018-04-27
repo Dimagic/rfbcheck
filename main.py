@@ -20,7 +20,7 @@ from Equip.config import *
 import threading
 import re
 
-version = '0.3.10'
+version = '0.3.11'
 
 
 class TestTime(threading.Thread):
@@ -131,9 +131,7 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
         self.calibrStop.setValidator(QtGui.QIntValidator())
         self.startTestBtn.clicked.connect(self.startThreadTest)
         self.applySetBtn.clicked.connect(self.startThreadLoadSet)
-
         self.startTestBtn.setEnabled(False)
-        # self.applySetBtn.setEnabled(False)
 
         conn, cursor = self.getConnDb()
         self.rfbList = cursor.execute("select name from rfb_type order by name")
@@ -511,7 +509,7 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
                 self.naAtten2.setText('0')
             else:
                 int(self.naAtten2.text())
-        except Exception as e:
+        except Exception:
             self.sendMsg('w', 'Warning', 'Incorrect value of attenuator', 1)
 
     def checkRecordInDb(self):
@@ -546,7 +544,6 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
                                                   "CSV Files (*.csv)", options=options)
         if not fileName:
             return
-
         self.setFileThread = ApplySetFile(self, fileName)
         self.setFileThread.logSignal.connect(self.sendLog, QtCore.Qt.QueuedConnection)
         self.setFileThread.msgSignal.connect(self.sendMsg, QtCore.Qt.QueuedConnection)
@@ -558,31 +555,26 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
 
     def on_startedSet(self):
         self.testIsRun = True
-        self.rfbTypeCombo.setEnabled(False)
-        self.rfbSN.setEnabled(False)
-        self.applySetBtn.setEnabled(False)
-        self.testsGroupBox.setEnabled(False)
-        self.instrumentsGroupBox.setEnabled(False)
-        self.gainTestgroupBox.setEnabled(False)
-        self.dsaGroupBox.setEnabled(False)
-        self.rfbAtrGroupBox.setEnabled(False)
-        self.calibrationGroupBox.setEnabled(False)
-        self.instrAddrCombo.setMouseTracking(False)
+        self.setComponentAvail(False)
         self.tt = Thread(name='testTimer', target=TestTime, args=(self,))
         self.tt.start()
 
     def on_finishedSet(self):
         self.testIsRun = False
-        self.rfbTypeCombo.setEnabled(True)
-        self.rfbSN.setEnabled(True)
-        self.applySetBtn.setEnabled(True)
-        self.testsGroupBox.setEnabled(True)
-        self.instrumentsGroupBox.setEnabled(True)
-        self.gainTestgroupBox.setEnabled(True)
-        self.dsaGroupBox.setEnabled(True)
-        self.rfbAtrGroupBox.setEnabled(True)
-        self.calibrationGroupBox.setEnabled(True)
-        self.instrAddrCombo.setMouseTracking(True)
+        self.setComponentAvail(True)
+
+    def setComponentAvail(self, status):
+        self.rfbTypeCombo.setEnabled(status)
+        self.rfbSN.setEnabled(status)
+        self.testsGroupBox.setEnabled(status)
+        self.instrumentsGroupBox.setEnabled(status)
+        self.gainTestgroupBox.setEnabled(status)
+        self.dsaGroupBox.setEnabled(status)
+        self.rfbAtrGroupBox.setEnabled(status)
+        self.calibrationGroupBox.setEnabled(status)
+        self.applySetBtn.setEnabled(status)
+        self.instrAddrCombo.setMouseTracking(status)
+        self.testTypeCombo.setEnabled(status)
 
     def startThreadTest(self):
         if self.calibrLbl.text() == 'False':
@@ -623,16 +615,17 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
             self.testLogUl = {}
         if self.testLogDl == {} and self.testLogUl == {}:
             self.clrLogBtnClick()
-        self.rfbTypeCombo.setEnabled(False)
-        self.rfbSN.setEnabled(False)
-        self.testTypeCombo.setEnabled(False)
-        self.testsGroupBox.setEnabled(False)
-        self.instrumentsGroupBox.setEnabled(False)
-        self.gainTestgroupBox.setEnabled(False)
-        self.dsaGroupBox.setEnabled(False)
-        self.rfbAtrGroupBox.setEnabled(False)
-        self.calibrationGroupBox.setEnabled(False)
-        self.instrAddrCombo.setMouseTracking(False)
+        # self.rfbTypeCombo.setEnabled(False)
+        # self.rfbSN.setEnabled(False)
+        # self.testTypeCombo.setEnabled(False)
+        # self.testsGroupBox.setEnabled(False)
+        # self.instrumentsGroupBox.setEnabled(False)
+        # self.gainTestgroupBox.setEnabled(False)
+        # self.dsaGroupBox.setEnabled(False)
+        # self.rfbAtrGroupBox.setEnabled(False)
+        # self.calibrationGroupBox.setEnabled(False)
+        # self.instrAddrCombo.setMouseTracking(False)
+        self.setComponentAvail(False)
         self.startTestBtn.setText('Stop')
         self.tt = Thread(name='testTimer', target=TestTime, args=(self,))
         self.tt.start()
@@ -644,16 +637,17 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
         Journal(self)
         self.testIsRun = False
         self.whatConn = None
-        self.rfbTypeCombo.setEnabled(True)
-        self.rfbSN.setEnabled(True)
-        self.testTypeCombo.setEnabled(True)
-        self.testsGroupBox.setEnabled(True)
-        self.instrumentsGroupBox.setEnabled(True)
-        self.gainTestgroupBox.setEnabled(True)
-        self.dsaGroupBox.setEnabled(True)
-        self.rfbAtrGroupBox.setEnabled(True)
-        self.calibrationGroupBox.setEnabled(True)
-        self.instrAddrCombo.setMouseTracking(True)
+        # self.rfbTypeCombo.setEnabled(True)
+        # self.rfbSN.setEnabled(True)
+        # self.testTypeCombo.setEnabled(True)
+        # self.testsGroupBox.setEnabled(True)
+        # self.instrumentsGroupBox.setEnabled(True)
+        # self.gainTestgroupBox.setEnabled(True)
+        # self.dsaGroupBox.setEnabled(True)
+        # self.rfbAtrGroupBox.setEnabled(True)
+        # self.calibrationGroupBox.setEnabled(True)
+        # self.instrAddrCombo.setMouseTracking(True)
+        self.setComponentAvail(True)
         self.startTestBtn.setText('Start')
         self.setProgressBar('Done', 100, 100)
 
