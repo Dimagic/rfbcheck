@@ -26,17 +26,47 @@ class DetectorTest(QtCore.QThread):
         self.gen.write("POW:AMPL -60 dBm")
         self.sa.write("DISP:WIND:TRAC:Y:RLEV 50 dBm")
 
+        if not self.getPampCurrent():
+            self.testController.sendMsg('i', 'RFBCheck', self.testController.whatConn + ' PAMP Current fail', 1)
+            return
+
         if self.testController.whatConn == "Dl":
-            self.forwardTest(self.freqDl)
-            self.reversTest(self.freqDl)
+            if 'Forw. detector' in self.testController.testArr:
+                self.forwardTest(self.freqDl)
+            if 'Rev. detector' in self.testController.testArr:
+                self.reversTest(self.freqDl)
         elif self.testController.whatConn == "Ul":
-            self.forwardTest(self.freqUl)
-            self.reversTest(self.freqUl)
+            if 'Forw. detector' in self.testController.testArr:
+                self.forwardTest(self.freqUl)
+            if 'Rev. detector' in self.testController.testArr:
+                self.reversTest(self.freqUl)
 
     def preTest(self):
         self.ser.write(binascii.unhexlify(cmd.setSalcOpMode))
         for i in ['3244', '3245', '3246', '3247']:
             self.send('SetAlc', i + '00FF')
+
+    def getPampCurrent(self):
+        currLimits = {'dlPampCurrent': '3262', 'ulPampCurrent': '3263'}
+        for i in currLimits.keys():
+            if self.testController.whatConn.upper() not in i.upper():
+                continue
+            addr = currLimits.get(i)
+            rx = self.send(i, addr)
+            current = int(rx[rx.find(addr) + len(addr): len(rx) - 2], 16)
+            limAddr = str(int(addr) + 10)
+            rx = self.send(i, limAddr)
+            hexStr = rx[rx.find(limAddr) + len(limAddr): (len(rx) - 2)]
+            minLimit = int(hexStr[:4], 16)
+            maxLimit = int(hexStr[5:], 16)
+            if minLimit <= current <= maxLimit:
+                self.testController.logSignal.emit(self.testController.whatConn +
+                                                   ' PAMP Current = ' + str(current) + ' :PASS', 1)
+                return True
+            else:
+                self.testController.logSignal.emit(self.testController.whatConn +
+                                                   ' PAMP Current = ' + str(current) + ' :FAIL', -1)
+                return False
 
     def forwardTest(self, freq):
         self.preTest()
@@ -71,7 +101,7 @@ class DetectorTest(QtCore.QThread):
                 haveFail = True
             else:
                 status = 0
-            self.testController.logSignal.emit("Pout forw.: " + str(anchor) +
+            self.testController.logSignal.emit("Pout forw. " + self.testController.whatConn + ": " + str(anchor) +
                                                ": Detector: " + str(detector) +
                                                " Delta: " + str(delta) + "", status)
             currPower -= 1
@@ -134,7 +164,7 @@ class DetectorTest(QtCore.QThread):
                 haveFail = True
             else:
                 status = 0
-            self.testController.logSignal.emit("Pout rev.: " + str(anchor) +
+            self.testController.logSignal.emit("Pout rev. " + self.testController.whatConn + ": " + str(anchor) +
                                                ": Detector: " + str(detector) +
                                                " Delta: " + str(delta) + "", status)
             currPower -= 1

@@ -38,15 +38,6 @@ class ApplySetFile(QtCore.QThread, SelectComPort):
 
     def readSetFile(self):
         namePar = '# 0 1182685875'
-        # try:
-        #     file = os.path.join(os.path.dirname(__file__), '..', 'setFiles',
-        #                         self.currParent.rfbTypeCombo.currentText() + '.CSV')
-        #     f = open(file, 'r')
-        #     f.close()
-        # except Exception as e:
-        #     self.msgSignal.emit('w', 'Can`t open file settings', str(e), 1)
-        #     return
-
         csvfile = open(self.setFile)
         reader = csv.DictReader(csvfile)
         row_count = sum(1 for row in reader) - 1
@@ -196,8 +187,8 @@ class ApplySetFile(QtCore.QThread, SelectComPort):
         rx = str(binascii.hexlify(self.ser.read(self.ser.inWaiting()))).replace("b'", "").replace("'", "").upper()
         if addr in rx:
             self.logSignal.emit(namePar, 0)
-            # self.logSignal.emit('Tx: ' + str(toSend).upper(), 0)
-            self.logSignal.emit('Tx: ' + str(toSend)[:95].upper(), 0)
+            self.logSignal.emit('Tx: ' + str(toSend).upper(), 0)
+            # self.logSignal.emit('Tx: ' + str(toSend)[:95].upper(), 0)
             self.logSignal.emit('written ' + str(writingBytes) + ' bytes', 0)
             self.logSignal.emit('Rx: ' + str(rx), 0)
             self.logSignal.emit(namePar + ': OK', 1)

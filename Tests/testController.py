@@ -123,7 +123,7 @@ class TestContoller(QtCore.QThread, SelectComPort):
                 return
             ReturnLossTest(self)
 
-        if 'Detector' in self.testArr:
+        if 'Forw. detector' in self.testArr or 'Rev. detector' in self.testArr:
             if self.stopTestFlag:
                 return
             DetectorTest(self)

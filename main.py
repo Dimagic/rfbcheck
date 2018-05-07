@@ -20,7 +20,7 @@ from Equip.config import *
 import threading
 import re
 
-version = '0.3.11'
+version = '0.3.12'
 
 
 class TestTime(threading.Thread):
