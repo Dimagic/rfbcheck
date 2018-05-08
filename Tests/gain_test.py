@@ -34,7 +34,7 @@ class GainTest(QtCore.QThread):
         if self.mainParent.gainSA.isChecked():
             self.sa.write(":SENSE:FREQ:center " + str(freq) + " MHz")
             self.gen.write(":FREQ:FIX " + str(freq) + " MHz")
-            self.gen.write("POW:AMPL " + self.config.getConfAttr('gen_gainFlatPow') + " dBm")
+            self.gen.write("POW:AMPL " + self.config.getConfAttr('instruments', 'gen_gainFlatPow') + " dBm")
             time.sleep(1)
             self.testController.useCorrection = True
             ampl = getAvgGain(self.testController)

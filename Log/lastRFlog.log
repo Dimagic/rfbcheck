@@ -1,0 +1,18 @@
+Connected to port COM3
+Agilent Technologies,N9000A,MY54230882,A.16.05
+ - not connected
+invalid literal for int() with base 10: '1p'
+Agilent Technologies,N9000A,MY54230882,A.16.05
+ - not connected
+invalid literal for int() with base 10: '1p'
+Testing UpLink
+START TEST
+***** Start Gain test *****
+Gain Ul = 56.61 dBm
+***** Start Flatness test *****
+RFB has one range of frequency
+Bandwidth = 60 MHz
+RG-test start Freq: 1920.0 MHz; end Freq: 1980.0 MHz
+MIN = -56.12 dBm on freq = 1920.5 MHz
+MAX = -56.74 dBm on freq = 1924.5 MHz
+Flatness = 0.6 dBm

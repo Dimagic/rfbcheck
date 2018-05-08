@@ -32,7 +32,7 @@ class Report:
         tmpData = []
         Story = []
 
-        doc = SimpleDocTemplate("test_report_lab.pdf", pagesize=A4, rightMargin=5, leftMargin=5, topMargin=5,
+        doc = SimpleDocTemplate("test_report.pdf", pagesize=A4, rightMargin=5, leftMargin=5, topMargin=5,
                                 bottomMargin=5)
         workbook = self.getTemplates(parent)
         worksheet = workbook.sheet_by_name(parent.reportTemplateCombo.currentText())
@@ -111,7 +111,7 @@ class Report:
             Story.append(t)
             doc.multiBuild(Story)
             # doc.build(elements)
-            os.startfile(r'test_report_lab.pdf')
+            os.startfile(r'test_report.pdf')
         except Exception as e:
             parent.sendMsg('w', 'Create report error', str(e), 1)
 

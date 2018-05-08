@@ -6,10 +6,10 @@ class Config:
         self.config = configparser.ConfigParser()
         self.config.read('./config.ini', encoding='utf-8-sig')
 
-    def getConfAttr(self, attrName):
-        return self.config.get('instruments', attrName)
+    def getConfAttr(self, blockName, attrName):
+        return self.config.get(blockName, attrName)
 
-
+# 'instruments'
 # # update existing value
 # config.set('section_a', 'string_val', 'world')
 

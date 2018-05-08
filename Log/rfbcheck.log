@@ -1,0 +1,59 @@
+ERROR:root:2018-05-08 09:04:55.703125: RA00297 xxxx
+Traceback (most recent call last):
+  File "C:\123\RFBCheck\Tests\testController.py", line 73, in run
+    self.runTests()
+  File "C:\123\RFBCheck\Tests\testController.py", line 129, in runTests
+    DetectorTest(self)
+  File "C:\123\RFBCheck\Tests\detector_test.py", line 37, in __init__
+    self.reversTest(self.freqDl)
+  File "C:\123\RFBCheck\Tests\detector_test.py", line 148, in reversTest
+    anchor = int(rx[rx.find(self.reqAddr.get(addrAnch)) + 4: rx.find(self.reqAddr.get(addrAnch)) + 8], 16)
+AttributeError: 'bool' object has no attribute 'find'
+ERROR:root:2018-05-08 10:40:43.328125: RA00297 xxxx
+Traceback (most recent call last):
+  File "C:\123\RFBCheck\Tests\testController.py", line 73, in run
+    self.runTests()
+  File "C:\123\RFBCheck\Tests\testController.py", line 129, in runTests
+    DetectorTest(self)
+  File "C:\123\RFBCheck\Tests\detector_test.py", line 40, in __init__
+    self.forwardTest(self.freqUl)
+  File "C:\123\RFBCheck\Tests\detector_test.py", line 99, in forwardTest
+    if delta < int(self.mainParent.config.get('limits', 'fwr_pwr_detector')):
+AttributeError: 'mainProgram' object has no attribute 'config'
+ERROR:root:2018-05-08 10:45:56.656250: RA00297 xxxx
+Traceback (most recent call last):
+  File "C:\Python\Python34\lib\configparser.py", line 761, in get
+    value = d[option]
+  File "C:\Python\Python34\lib\collections\__init__.py", line 805, in __getitem__
+    return self.__missing__(key)            # support subclasses that define __missing__
+  File "C:\Python\Python34\lib\collections\__init__.py", line 797, in __missing__
+    raise KeyError(key)
+KeyError: 'rvs_pwr_detector'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\123\RFBCheck\Tests\testController.py", line 73, in run
+    self.runTests()
+  File "C:\123\RFBCheck\Tests\testController.py", line 129, in runTests
+    DetectorTest(self)
+  File "C:\123\RFBCheck\Tests\detector_test.py", line 42, in __init__
+    self.reversTest(self.freqUl)
+  File "C:\123\RFBCheck\Tests\detector_test.py", line 162, in reversTest
+    if delta < int(self.config.getConfAttr('limits', 'rvs_pwr_detector')):
+  File "C:\123\RFBCheck\Equip\config.py", line 10, in getConfAttr
+    return self.config.get(blockName, attrName)
+  File "C:\Python\Python34\lib\configparser.py", line 764, in get
+    raise NoOptionError(option, section)
+configparser.NoOptionError: No option 'rvs_pwr_detector' in section: 'limits'
+ERROR:root:2018-05-08 14:15:07.046875: RA00297 xxxx
+Traceback (most recent call last):
+  File "C:\123\RFBCheck\Tests\testController.py", line 73, in run
+    self.runTests()
+  File "C:\123\RFBCheck\Tests\testController.py", line 94, in runTests
+    GainTest(self)
+  File "C:\123\RFBCheck\Tests\gain_test.py", line 30, in __init__
+    self.gainTest(self.freqUl, gainUlMin, gainUlMax)
+  File "C:\123\RFBCheck\Tests\gain_test.py", line 37, in gainTest
+    self.gen.write("POW:AMPL " + self.config.getConfAttr('gen_gainFlatPow') + " dBm")
+TypeError: getConfAttr() missing 1 required positional argument: 'attrName'

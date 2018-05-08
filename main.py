@@ -15,12 +15,12 @@ from PyQt5.QtGui import QMovie, QStandardItem
 from PyQt5 import QtCore, QtWidgets, QtGui
 from PyQt5.QtWidgets import QTableWidgetItem, QAbstractItemView, QLabel, QAction, QFileDialog
 from PIL import Image
-from Equip.config import *
+from Equip.config import Config
 
 import threading
 import re
 
-version = '0.3.12'
+version = '0.3.13'
 
 
 class TestTime(threading.Thread):
@@ -44,6 +44,8 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
         # stylesheet
         # app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())
         self.startTestTime = None
+        self.logFile = None
+        self.config = Config()
 
         """ Setting images """
         self.appIcon = QtGui.QIcon("Img/ico32_pgn_icon.ico")
@@ -329,13 +331,14 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
         return str(datetime.datetime.today().strftime("%H:%M:%S"))
 
     def startBtnEnabled(self):
+        snLen = int(self.config.getConfAttr('limits', 'sn_length'))
         try:
             line = self.rfbSN.text()
-            if len(line) > 8 and line[len(line)-8:].isnumeric():
+            if len(line) > snLen and line[len(line)-snLen:].isnumeric():
                 self.getSnViaScanner()
         except Exception as e:
             print(str(e))
-        if ((self.rfbSN.text().isdigit() and len(self.rfbSN.text()) >= 8)
+        if ((self.rfbSN.text().isdigit() and len(self.rfbSN.text()) >= snLen)
                 or (self.rfbSN.text().upper() == 'XXXX')):
             self.startTestBtn.setEnabled(True)
         else:
@@ -604,9 +607,7 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
                     self.setProgressBar('Canceled', 100, 100)
 
     def on_started(self):
-        # TODO: For loading default set file before running tests
-        # if not self.isNeedLoadSetFile():
-        #     return
+        self.logFile = open('./Log/lastRFlog.log', 'w')
         self.testIsRun = True
         self.answer = None
         if self.testLogDl.get('SN') not in [self.rfbSN.text(), None]:
@@ -615,16 +616,6 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
             self.testLogUl = {}
         if self.testLogDl == {} and self.testLogUl == {}:
             self.clrLogBtnClick()
-        # self.rfbTypeCombo.setEnabled(False)
-        # self.rfbSN.setEnabled(False)
-        # self.testTypeCombo.setEnabled(False)
-        # self.testsGroupBox.setEnabled(False)
-        # self.instrumentsGroupBox.setEnabled(False)
-        # self.gainTestgroupBox.setEnabled(False)
-        # self.dsaGroupBox.setEnabled(False)
-        # self.rfbAtrGroupBox.setEnabled(False)
-        # self.calibrationGroupBox.setEnabled(False)
-        # self.instrAddrCombo.setMouseTracking(False)
         self.setComponentAvail(False)
         self.startTestBtn.setText('Stop')
         self.tt = Thread(name='testTimer', target=TestTime, args=(self,))
@@ -637,16 +628,6 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
         Journal(self)
         self.testIsRun = False
         self.whatConn = None
-        # self.rfbTypeCombo.setEnabled(True)
-        # self.rfbSN.setEnabled(True)
-        # self.testTypeCombo.setEnabled(True)
-        # self.testsGroupBox.setEnabled(True)
-        # self.instrumentsGroupBox.setEnabled(True)
-        # self.gainTestgroupBox.setEnabled(True)
-        # self.dsaGroupBox.setEnabled(True)
-        # self.rfbAtrGroupBox.setEnabled(True)
-        # self.calibrationGroupBox.setEnabled(True)
-        # self.instrAddrCombo.setMouseTracking(True)
         self.setComponentAvail(True)
         self.startTestBtn.setText('Start')
         self.setProgressBar('Done', 100, 100)
@@ -661,6 +642,7 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
                 self.testLogDl = {}
                 self.testLogUl = {}
                 self.to_DsaUlDl = {}
+            self.logFile.close()
 
     def isNeedLoadSetFile(self):
         try:
@@ -723,6 +705,10 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
         if clr == 1:
             self.listLog.item(numrows - 1).setForeground(QtCore.Qt.darkGreen)
         self.listLog.scrollToBottom()
+        try:
+            self.logFile.write("%s\n" % msg)
+        except:
+            pass
 
     def fillTestLog(self, key, val):
         if self.myThread.whatConn == 'Dl':
@@ -790,6 +776,8 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
     def getSnViaScanner(self):
         r = re.findall('[A-Z0-9]+', self.rfbSN.text())
         if len(r) < 2:
+            self.sendMsg('w', 'RFBCheck', 'Incorrect serial number', 1)
+            self.rfbSN.clear()
             return
         rfType = str(r[0])
         rfSn = str(r[len(r)-1])

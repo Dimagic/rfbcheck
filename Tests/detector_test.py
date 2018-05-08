@@ -1,10 +1,9 @@
 import time
-
 import binascii
 from PyQt5 import QtCore
 from PyQt5.QtWidgets import QMessageBox
-
 import Equip.commands as cmd
+from Equip.config import Config
 from Equip.equip import setAmplTo, getCrc
 
 
@@ -12,6 +11,7 @@ class DetectorTest(QtCore.QThread):
     def __init__(self, testController, parent=None):
         super(DetectorTest, self).__init__(parent)
         testController.logSignal.emit("***** Start detector test *****", 0)
+        self.config = Config()
         self.testController = testController
         self.mainParent = testController.getParent()
         self.sa = testController.instr.sa
@@ -96,7 +96,7 @@ class DetectorTest(QtCore.QThread):
             arrDetector.append(rx[rx.find(self.reqAddr.get(addrDet)) + 8: rx.find(self.reqAddr.get(addrDet)) + 12])
             delta = oldDetector - detector
             oldDetector = detector
-            if delta <= 3:
+            if delta < int(self.config.getConfAttr('limits', 'fwr_pwr_detector')):
                 status = -1
                 haveFail = True
             else:
@@ -159,7 +159,7 @@ class DetectorTest(QtCore.QThread):
             detector = int(rx[rx.find(self.reqAddr.get(addrDet)) + 12: rx.find(self.reqAddr.get(addrDet)) + 16], 16)
             delta = oldDetector - detector
             oldDetector = detector
-            if delta <= 3:
+            if delta < int(self.config.getConfAttr('limits', 'rvs_pwr_detector')):
                 status = -1
                 haveFail = True
             else:

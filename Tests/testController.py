@@ -33,9 +33,9 @@ class TestContoller(QtCore.QThread, SelectComPort):
     def __init__(self, currParent, parent=None):
         QtCore.QThread.__init__(self, parent)
 
-        LOG_FILENAME = './rfbcheck.log'
+        LOG_FILENAME = './Log/rfbcheck.log'
         logging.basicConfig(filename=LOG_FILENAME, level=logging.ERROR)
-        logging.debug('This message should go to the log file')
+        logging.debug('\n----------------------------------------------\n')
 
         self.currentThread = QtCore.QThread.currentThread()
         self.controller = self
