@@ -1,5 +1,6 @@
 import visa
 import time
+import re
 from Equip.config import Config
 from Equip.equip import toFloat
 
@@ -101,33 +102,22 @@ class Instrument:
         self.sa.write(":CALC:MARK:PEAK:TABL:STAT ON")
         time.sleep(1)
         rx = self.sa.query("TRAC:MATH:PEAK?")
-        tmp = ''
-        arr = []
-        freq = []
-        ampl = []
-        for i in rx:
-            if i != ",":
-                tmp = tmp + i
-            else:
-                arr.append(float(tmp))
-                tmp = ''
-        arr.append(float(tmp))
+        pNum = re.compile(r"[-+.\w]+")
+        arr = [float(i) for i in pNum.findall(rx)]
         self.sa.write(":CALC:MARK:PEAK:TABL:STAT OFF")
-        k = 0
-        while k < len(arr):
-            freq.append(arr[k])
-            ampl.append(arr[k + 1])
-            k = k + 2
+        freq = [i for i in arr if i % 2 == 0]
+        ampl = [i for i in arr if i % 2 != 0]
         return freq, ampl
 
-    def getInstrName(addr):
+    def getInstrName(self, addr):
         rm = visa.ResourceManager()
         rm.timeout = 5000
         try:
             currInstr = rm.open_resource(addr)
             return currInstr.query('*IDN?')
         except Exception as e:
-            print(str(e))
+            msg = 'getInstrName() in instrument.py error:\n' % str(e)
+            self.parent.sendMsg('w', 'RFBCheck', msg, 1)
             return None
 
 

@@ -20,7 +20,7 @@ from Equip.config import Config
 import threading
 import re
 
-version = '0.3.13'
+version = '0.3.14'
 
 
 class TestTime(threading.Thread):
@@ -167,9 +167,9 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
         self.setTestsList()
 
     def on_newRfbBtn_clicked(self):
-        self.dialog = EditRFB(self, self)
-        self.dialog.setWindowIcon(self.appIcon)
-        self.dialog.show()
+        dialog = EditRFB(self, self)
+        dialog.setWindowIcon(self.appIcon)
+        dialog.show()
 
     def setUser(self):
         try:
@@ -281,10 +281,15 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
                     'Ul ALC OUT pow']
         rows = cursor.execute("select * from test_settings where rfb_type = :n",
                               {'n': self.rfbTypeCombo.currentText()}).fetchall()
-        # TODO: if not fined setting??? need error
-        for rowSetttings in rows:
-            self.listSettings = list(rowSetttings)[1:]
         conn.close()
+
+        if len(rows) == 0:
+            msg = 'Test settings for %s not found' % self.rfbTypeCombo.currentText()
+            self.sendMsg('c', 'RFBCheck', msg, 1)
+            return
+        else:
+            for rowSetttings in rows:
+                self.listSettings = list(rowSetttings)[1:]
 
         for i, j in enumerate(self.col):
             row = self.tableSettings.rowCount()
@@ -322,10 +327,12 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
 
     def connectDb(self):
         try:
-            # TODO: if file not exist
+            f = open('./DB/rfb.db', 'r')
+            f.close()
             return sqlite3.connect('./DB/rfb.db')
         except Exception as e:
             self.sendMsg("c", "Opening DB error", str(e), 1)
+            sys.exit(0)
 
     def timeNow(self):
         return str(datetime.datetime.today().strftime("%H:%M:%S"))
@@ -557,12 +564,14 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
         self.setFileThread.start()
 
     def on_startedSet(self):
+        self.logFile = open('./Log/lastRFlog.log', 'w')
         self.testIsRun = True
         self.setComponentAvail(False)
         self.tt = Thread(name='testTimer', target=TestTime, args=(self,))
         self.tt.start()
 
     def on_finishedSet(self):
+        self.logFile.close()
         self.testIsRun = False
         self.setComponentAvail(True)
 

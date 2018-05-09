@@ -236,3 +236,6 @@ class DetectorTest(QtCore.QThread):
         conn.close()
         self.sa.write("DISP:WIND:TRAC:Y:RLEV:OFFS " +
                       str(int(self.mainParent.saAtten.text()) + abs(float(rows[0]))))
+
+    def writeDataToAdem(self):
+        pass

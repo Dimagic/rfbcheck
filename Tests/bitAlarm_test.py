@@ -59,7 +59,7 @@ class BitAlarmTest(QtCore.QThread):
 
         n = float(self.sa.query("CALC:MARK:Y?"))
         self.testController.logSignal.emit('BIT gain: ' + str(n), 0)
-        if n < -10:  # TODO: ??????
+        if n < -10:
             gain = False
 
         self.testController.logSignal.emit('Send IF 0 GHz', 0)
@@ -82,8 +82,8 @@ class BitAlarmTest(QtCore.QThread):
             status = 'Fail'
         self.testController.fillTestLogSignal.emit('BIT', status)
 
-    def getHexAddr(self):
-        pref = 'AAAA543022556677'
+    # def getHexAddr(self):
+    #     pref = 'AAAA543022556677'
 
     def getAlarms(self):
         self.ser.flushInput()

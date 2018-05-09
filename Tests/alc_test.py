@@ -55,7 +55,7 @@ class AlcTest(QtCore.QThread):
         else:
             print('ALC ERROR')
         self.testController.useCorrection = True
-        self.gen.write(":OUTP:STAT OFF")
+        # self.gen.write(":OUTP:STAT OFF")
 
     def alcInTest(self, conn, alc, whatConn, shift):
         self.testController.logSignal.emit("***** Start ALC in test *****", 0)

@@ -124,14 +124,17 @@ def getAvgGain(parent):
 
 
 def strToFreq(curRange):
-    r = re.findall('[0-9]+', curRange)
-    start = toFloat(r[0])
-    stop = toFloat(r[1])
-    return start, stop
+    try:
+        r = re.findall('[\d]+', curRange)
+        start = toFloat(r[0])
+        stop = toFloat(r[1])
+        return start, stop
+    except:
+        return False
 
 
 def calibrationCheck(parent):
-    if parent.atrSettings == None:
+    if parent.atrSettings is None:
         parent.sendMsg('c', 'Warning', 'ATR settings not found', 1)
         haveCalibr = False
         return

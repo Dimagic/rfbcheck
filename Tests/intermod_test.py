@@ -49,7 +49,6 @@ class IModTest(QtCore.QThread):
         self.gen.write(":OUTP:MOD:STAT OFF")
         # self.gen.write(":OUTP:STAT ON")
         time.sleep(1)
-        # TODO: use corr parent or test controller?
         self.testController.useCorrection = False
         n1 = getAvgGain(self.testController)
 

@@ -57,3 +57,30 @@ Traceback (most recent call last):
   File "C:\123\RFBCheck\Tests\gain_test.py", line 37, in gainTest
     self.gen.write("POW:AMPL " + self.config.getConfAttr('gen_gainFlatPow') + " dBm")
 TypeError: getConfAttr() missing 1 required positional argument: 'attrName'
+ERROR:root:2018-05-09 08:13:46.593750: RA00057 xxxx
+Traceback (most recent call last):
+  File "C:\123\RFBCheck\Tests\testController.py", line 73, in run
+    if self.currParent.loopTest.isChecable():
+AttributeError: 'QCheckBox' object has no attribute 'isChecable'
+ERROR:root:2018-05-09 14:08:52.203125: RA00057 xxxx
+Traceback (most recent call last):
+  File "C:\123\RFBCheck\Tests\testController.py", line 77, in run
+    self.runTests()
+  File "C:\123\RFBCheck\Tests\testController.py", line 102, in runTests
+    FlatnessTest(self)
+  File "C:\123\RFBCheck\Tests\flatness_test.py", line 30, in __init__
+    self.flatnessTest(self.listSettings[1], self.atrSettings.get('flat_dl_max'))
+  File "C:\123\RFBCheck\Tests\flatness_test.py", line 76, in flatnessTest
+    " dBm, freq = " + str(minFreq) + " MHz", 0)
+NameError: name 'minFreq' is not defined
+ERROR:root:2018-05-09 16:19:00.015625: RA00297 xxxx
+Traceback (most recent call last):
+  File "C:\123\RFBCheck\Tests\testController.py", line 77, in run
+    self.runTests()
+  File "C:\123\RFBCheck\Tests\testController.py", line 132, in runTests
+    DetectorTest(self)
+  File "C:\123\RFBCheck\Tests\detector_test.py", line 35, in __init__
+    self.forwardTest(self.freqDl)
+  File "C:\123\RFBCheck\Tests\detector_test.py", line 84, in forwardTest
+    anchor = int(rx[rx.find(self.reqAddr.get(addrAnch)) + 4: rx.find(self.reqAddr.get(addrAnch)) + 8], 16)
+AttributeError: 'bool' object has no attribute 'find'

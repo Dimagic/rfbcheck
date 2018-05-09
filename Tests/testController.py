@@ -3,6 +3,7 @@ import logging
 import os
 import serial
 from PyQt5 import QtCore, QtGui
+from PyQt5.QtWidgets import QMessageBox
 
 from Tests.detector_test import DetectorTest
 from Tests.gain_test import GainTest
@@ -65,12 +66,15 @@ class TestContoller(QtCore.QThread, SelectComPort):
             if self.stopTestFlag:
                 self.ser.close()
                 return
-            # TODO: send message if load set file is fail
             self.readAdemSettings()
             self.logSignal.emit('START TEST', 0)
             self.instr.gen.write(":OUTP:STAT ON")
             self.stopTestFlag = False
-            self.runTests()
+            if self.currParent.loopTest.isChecked():
+                while not self.stopTestFlag and self.currParent.loopTest.isChecked():
+                    self.runTests()
+            else:
+                self.runTests()
         except Exception as e:
             self.stopTestFlag = True
             self.sendMsg('c', 'Test error', str(e), 1)
@@ -87,7 +91,6 @@ class TestContoller(QtCore.QThread, SelectComPort):
             self.writeResults()
 
     def runTests(self):
-
         if 'Gain + flatness' in self.testArr:
             if self.stopTestFlag:
                 return
@@ -225,13 +228,13 @@ class TestContoller(QtCore.QThread, SelectComPort):
                     uldl = False
             if uldl:
                 if i == Dl:
-                    self.logSignal.emit("Testing DownLink", 0)
+                    self.logSignal.emit("--->> Testing DownLink", 0)
                     self.whatConn = "Dl"
                     self.fillTestLogSignal.emit('SN', str(self.currParent.rfbSN.text()))
                     self.fillTestLogSignal.emit('RF', str(self.currParent.rfbTypeCombo.currentText()))
                     break
                 elif i == Ul:
-                    self.logSignal.emit("Testing UpLink", 0)
+                    self.logSignal.emit("--->> Testing UpLink", 0)
                     self.whatConn = "Ul"
                     self.fillTestLogSignal.emit('SN', str(self.currParent.rfbSN.text()))
                     self.fillTestLogSignal.emit('RF', str(self.currParent.rfbTypeCombo.currentText()))
@@ -252,16 +255,23 @@ class TestContoller(QtCore.QThread, SelectComPort):
                 WriteResult(self, self.currParent.testLogDl, self.currParent.testLogUl)
 
     def sendMsg(self, icon, msgTitle, msgText, typeQestions):
-        self.msgSignal.emit(icon, msgTitle, msgText, typeQestions)
-        while self.currParent.answer is None:
-            time.sleep(.05)
+        if self.currParent.loopTest.isChecked():
+            if self.currParent.autoIgnore.isChecked():
+                self.logSignal.emit("--->> Auto ignore", 0)
+                return QMessageBox.Ignore
+            if self.currParent.autoRetry.isChecked():
+                self.logSignal.emit("--->> Auto retry", 0)
+                return QMessageBox.Retry
         else:
-            forReturn = self.currParent.answer
-            self.currParent.answer = None
-            return forReturn
+            self.msgSignal.emit(icon, msgTitle, msgText, typeQestions)
+            while self.currParent.answer is None:
+                time.sleep(.05)
+            else:
+                forReturn = self.currParent.answer
+                self.currParent.answer = None
+                return forReturn
 
     def readAdemSettings(self):
-        # stm32f103vet6
         try:
             file = os.path.join(os.path.dirname(__file__), '..', 'setFiles',
                                 self.currParent.rfbTypeCombo.currentText() + '.CSV')

@@ -1988,9 +1988,9 @@
        <widget class="QGroupBox" name="gainTestgroupBox">
         <property name="geometry">
          <rect>
-          <x>10</x>
-          <y>180</y>
-          <width>71</width>
+          <x>120</x>
+          <y>260</y>
+          <width>102</width>
           <height>65</height>
          </rect>
         </property>
@@ -2072,9 +2072,9 @@
        <widget class="QGroupBox" name="dsaGroupBox">
         <property name="geometry">
          <rect>
-          <x>90</x>
-          <y>180</y>
-          <width>71</width>
+          <x>120</x>
+          <y>190</y>
+          <width>103</width>
           <height>65</height>
          </rect>
         </property>
@@ -2126,6 +2126,61 @@
          </property>
          <property name="text">
           <string>full</string>
+         </property>
+        </widget>
+       </widget>
+       <widget class="QGroupBox" name="groupBox_4">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>190</y>
+          <width>102</width>
+          <height>131</height>
+         </rect>
+        </property>
+        <property name="title">
+         <string>Tests</string>
+        </property>
+        <widget class="QCheckBox" name="loopTest">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>20</y>
+           <width>70</width>
+           <height>17</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>loop test</string>
+         </property>
+        </widget>
+        <widget class="QRadioButton" name="autoIgnore">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>40</y>
+           <width>82</width>
+           <height>17</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>auto ignore</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+        </widget>
+        <widget class="QRadioButton" name="autoRetry">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>60</y>
+           <width>82</width>
+           <height>17</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>auto retry</string>
          </property>
         </widget>
        </widget>

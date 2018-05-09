@@ -89,7 +89,7 @@ class Journal:
         Journal.parent.tableJournal.setRowCount(0)
         Journal.parent.tableJournal.clear()
         headers = ['RFB', 'SN', 'Date test', 'Band', 'Gain', 'Flatnes', 'DSA 1', 'DSA 2', 'DSA 3', 'IMod', 'BIT',
-                   'ALC In', 'ALC Out', 'RLoss','Status', 'User']
+                   'ALC In', 'ALC Out', 'RLoss', 'Status', 'User']
         Journal.parent.tableJournal.setHorizontalHeaderLabels(headers)
         conn, cursor = Journal.parent.getConnDb()
         dateBegin = int(str(Journal.parent.journalDateStart.date().toPyDate()).replace('-', ''))
@@ -98,7 +98,6 @@ class Journal:
              % (dateBegin, dateEnd)
         q = "select * from ("+q1+") where (rfb_type like '%"+Journal.parent.journalFilter.text()+"%' or sn like '%" + \
             Journal.parent.journalFilter.text()+"%') order by dateTest DESC"
-        # TODO: set pass/fail for numeric data (make limits dictionary)
         rows = cursor.execute(q).fetchall()
         for row in rows:
             numrows = Journal.parent.tableJournal.rowCount()
@@ -146,8 +145,8 @@ class Journal:
         conn.close()
         try:
             self.parent.onResize
-        except Exception:
-            return
+        except Exception as e:
+            self.parent.sendMsg('c', 'RFBCheck', 'Filling fail:\n' + str(e), 1)
 
     def deleteRecords(self):
         sn, dateTest = self.getSelectedRow()

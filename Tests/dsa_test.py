@@ -3,6 +3,7 @@ import Equip.commands as cmd
 from PyQt5.QtWidgets import QMessageBox
 from PyQt5 import QtCore
 
+
 class DsaTest(QtCore.QThread):
     def __init__(self, testController, parent=None):
         super(DsaTest, self).__init__(parent)
@@ -31,7 +32,6 @@ class DsaTest(QtCore.QThread):
         else:
             self.forDSAtest = np.arange(0, 31.5, 0.5)
 
-        # TODO: useCorrection in main or testController?
         self.testController.useCorrection = False
         self.dsaTest(testController.listSettings, 1)
         self.dsaTest(testController.listSettings, 2)
@@ -40,7 +40,6 @@ class DsaTest(QtCore.QThread):
         self.sa.write(":SENSE:FREQ:span 3 MHz")
 
     def dsaTest(self, listSet, dsaType):
-        # TODO: write DSA result to DB fail
         self.ser.write(binascii.unhexlify(cmd.reset))
         time.sleep(1)
         if self.whatConn == "Dl":
@@ -68,7 +67,6 @@ class DsaTest(QtCore.QThread):
             dsa1test = 0
             dsa2test = toFloat(dsa2)
             dsa3test = toFloat(dsa3)
-
         else:
             self.testController.sendMsg('c', 'Error', 'Incorrect DSA type', 1)
             return
@@ -110,7 +108,7 @@ class DsaTest(QtCore.QThread):
             delta = round(curGain - d1 + i, 2)
             self.testController.logSignal.emit(dsaName + ': ' + str(i) + '    Gain: ' + str(curGain) +
                                                '    Delta: ' + str(delta), 0)
-# if gain more then SA display line
+            # if gain more then SA display line
             if dsaType == 1:
                 k = '1'
                 self.to_DsaResult.update({i: delta})

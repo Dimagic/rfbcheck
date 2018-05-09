@@ -1,5 +1,4 @@
 from Equip.equip import *
-
 from PyQt5.QtWidgets import QMessageBox
 from PyQt5 import QtCore
 
@@ -38,9 +37,8 @@ class FlatnessTest(QtCore.QThread):
         testController.instr.sa.write("TRAC1:MODE WRIT")
 
     def flatnessTest(self, freq, flat):
-        if self.rfBands.get('band_dl_2').find('@') == -1 and self.rfBands.get('band_ul_2').find('@') == -1:
+        if not strToFreq(self.rfBands.get('band_dl_2')) and not strToFreq(self.rfBands.get('band_ul_2')):
             self.testController.logSignal.emit("RFB has one range of frequency", 0)
-
             if self.whatConn == 'Dl':
                 start, stop = strToFreq(self.rfBands.get('band_dl_1'))
                 self.getFlatness(start, stop)
@@ -50,7 +48,7 @@ class FlatnessTest(QtCore.QThread):
         else:
             self.testController.logSignal.emit("RFB has two ranges of frequency", 0)
             for k in self.rfBands.keys():
-                if self.rfBands.get(k).find('@') == -1:
+                if not strToFreq(self.rfBands.get(k)):
                     continue
                 start, stop = strToFreq(self.rfBands.get(k))
                 if self.testController.whatConn == 'Dl':
@@ -59,29 +57,16 @@ class FlatnessTest(QtCore.QThread):
                 else:
                     if k.find('_ul_') != -1 and self.rfBands.get(k).find('@') != -1:
                         self.getFlatness(start, stop)
-        minGain = maxGain = None
-        minFreq = maxFreq = None
-        t = False
-        for i in self.gainDict:
-            if not t:
-                minGain = maxGain = round(self.gainDict.get(i), 2)
-                minFreq = maxFreq = i
-                t = True
-            if minGain > self.gainDict.get(i):
-                minGain = round(self.gainDict.get(i), 2)
-                minFreq = i
-            if maxGain < self.gainDict.get(i):
-                maxGain = round(self.gainDict.get(i), 2)
-                maxFreq = i
-
         genPow = float(self.gen.query("POW:AMPL?"))
-        self.testController.logSignal.emit("MIN = " + str(genPow - minGain) + " dBm on freq = " + str(minFreq) + " MHz",
-                                           0)
-        self.testController.logSignal.emit("MAX = " + str(genPow - maxGain) + " dBm on freq = " + str(maxFreq) + " MHz",
-                                           0)
-        currFlat = round(abs(minGain - maxGain), 1)
 
+        minFreq, minGain, maxFreq, maxGain = self.getMinMaxDict(self.gainDict)
+        currFlat = round(abs(minGain - maxGain), 1)
+        self.testController.logSignal.emit("MIN = " + str(minGain + abs(genPow)) +
+                                           " dBm, freq = " + str(minFreq) + " MHz", 0)
+        self.testController.logSignal.emit("MAX = " + str(maxGain + abs(genPow)) +
+                                           " dBm, freq = " + str(maxFreq) + " MHz", 0)
         self.testController.logSignal.emit("Flatness = " + str(currFlat) + " dBm", 0)
+
         if currFlat <= flat and (minGain > -50 and maxGain > -50):
             self.testController.resSignal.emit('Flatness', self.testController.whatConn, '0', str(currFlat), str(flat), 1)
         else:
@@ -125,12 +110,16 @@ class FlatnessTest(QtCore.QThread):
         self.sa.write("CALC:MARK1:STAT 0")
         self.sa.write("CALC:MARK:CPS 1")
 
+    def getMinMaxDict(self, arr):
+        minFreq = min(arr.keys(), key=(lambda k: self.gainDict[k]))
+        maxFreq = max(arr.keys(), key=(lambda k: self.gainDict[k]))
+        minGain = arr.get(minFreq)
+        maxGain = arr.get(maxFreq)
+        return minFreq, minGain, maxFreq, maxGain
+
     def fillTestLog(self, flat):
-        minKey = min(self.gainDict.keys(), key=(lambda k: self.gainDict[k]))
-        maxKey = max(self.gainDict.keys(), key=(lambda k: self.gainDict[k]))
-        minGain = self.gainDict.get(minKey)
-        maxGain = self.gainDict.get(maxKey)
-        currFlat = round(maxGain - minGain, 2)
+        minFreq, minGain, maxFreq, maxGain = self.getMinMaxDict(self.gainDict)
+        currFlat = round(maxGain - minGain, 1)
         self.testController.logSignal.emit("Flatness = " + str(currFlat) + " dBm", 0)
         if currFlat <= flat and (minGain > -50 and maxGain > -50):
             self.testController.resSignal.emit('Flatness', self.testController.whatConn, '0', str(currFlat), str(flat),
@@ -140,7 +129,7 @@ class FlatnessTest(QtCore.QThread):
             if q == QMessageBox.Retry:
                 self.testController.instr.sa.write("TRAC1:CLE:ALL")
                 if self.mainParent.gainSA.isChecked():
-                    self.flatnessTest(freq, flat)
+                    self.flatnessTest(flat)
                 else:
                     self.flatnessTestNa(flat)
                 return
