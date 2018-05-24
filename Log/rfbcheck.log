@@ -84,3 +84,47 @@ Traceback (most recent call last):
   File "C:\123\RFBCheck\Tests\detector_test.py", line 84, in forwardTest
     anchor = int(rx[rx.find(self.reqAddr.get(addrAnch)) + 4: rx.find(self.reqAddr.get(addrAnch)) + 8], 16)
 AttributeError: 'bool' object has no attribute 'find'
+ERROR:root:2018-05-10 11:45:30.031250: RA00057 xxxx
+Traceback (most recent call last):
+  File "C:\123\RFBCheck\Tests\testController.py", line 75, in run
+    self.runTests()
+  File "C:\123\RFBCheck\Tests\testController.py", line 132, in runTests
+    DetectorTest(self)
+  File "C:\123\RFBCheck\Tests\detector_test.py", line 35, in __init__
+    self.forwardTest(self.freqDl)
+  File "C:\123\RFBCheck\Tests\detector_test.py", line 84, in forwardTest
+    anchor = int(rx[rx.find(self.reqAddr.get(addrAnch)) + 4: rx.find(self.reqAddr.get(addrAnch)) + 8], 16)
+AttributeError: 'bool' object has no attribute 'find'
+ERROR:root:2018-05-10 11:50:37.531250: RA00057 xxxx
+Traceback (most recent call last):
+  File "C:\123\RFBCheck\Tests\testController.py", line 75, in run
+    self.runTests()
+  File "C:\123\RFBCheck\Tests\testController.py", line 132, in runTests
+    DetectorTest(self)
+  File "C:\123\RFBCheck\Tests\detector_test.py", line 35, in __init__
+    self.forwardTest(self.freqDl)
+  File "C:\123\RFBCheck\Tests\detector_test.py", line 84, in forwardTest
+    anchor = int(rx[rx.find(self.reqAddr.get(addrAnch)) + 4: rx.find(self.reqAddr.get(addrAnch)) + 8], 16)
+AttributeError: 'bool' object has no attribute 'find'
+ERROR:root:2018-05-10 12:13:16.796875: RA00057 xxxx
+Traceback (most recent call last):
+  File "C:\123\RFBCheck\Tests\testController.py", line 77, in run
+    self.runTests()
+  File "C:\123\RFBCheck\Tests\testController.py", line 132, in runTests
+    DetectorTest(self)
+  File "C:\123\RFBCheck\Tests\detector_test.py", line 40, in __init__
+    self.forwardTest(self.freqUl)
+  File "C:\123\RFBCheck\Tests\detector_test.py", line 84, in forwardTest
+    anchor = int(rx[rx.find(self.reqAddr.get(addrAnch)) + 4: rx.find(self.reqAddr.get(addrAnch)) + 8], 16)
+AttributeError: 'bool' object has no attribute 'find'
+ERROR:root:2018-05-23 11:28:17.796875: RA00297 xxxx
+Traceback (most recent call last):
+  File "C:\123\RFBCheck\Tests\testController.py", line 75, in run
+    self.runTests()
+  File "C:\123\RFBCheck\Tests\testController.py", line 132, in runTests
+    DetectorTest(self)
+  File "C:\123\RFBCheck\Tests\detector_test.py", line 40, in __init__
+    self.forwardTest(self.freqUl)
+  File "C:\123\RFBCheck\Tests\detector_test.py", line 84, in forwardTest
+    anchor = int(rx[rx.find(self.reqAddr.get(addrAnch)) + 4: rx.find(self.reqAddr.get(addrAnch)) + 8], 16)
+AttributeError: 'NoneType' object has no attribute 'find'

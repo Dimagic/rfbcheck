@@ -37,13 +37,6 @@ class Report:
         workbook = self.getTemplates(parent)
         worksheet = workbook.sheet_by_name(parent.reportTemplateCombo.currentText())
 
-        # styleSheet = getSampleStyleSheet()
-        # P = Paragraph('''
-        #      <para align=center spaceb=3>The <b>ReportLab Left
-        #      <font color=red>Logo</font></b>
-        #      Image</para>''',
-        #      styleSheet["BodyText"])
-
         for row in range(0, worksheet.nrows - 1):
             for col in range(0, worksheet.ncols - 1):
                 val = str(worksheet.cell(row, col).value)

@@ -12,7 +12,7 @@ class Journal:
 
     def __init__(self, parent):
         Journal.parent = parent
-        self.parent = parent
+        # self.parent = parent
         # self.current_hover = [0, 0]
         parent.tableJournal.cellDoubleClicked.connect(self.tableDoubleClick)
         parent.tableJournal.cellEntered.connect(self.cellHover)
@@ -144,9 +144,9 @@ class Journal:
                 j += 1
         conn.close()
         try:
-            self.parent.onResize
+            Journal.parent.onResize
         except Exception as e:
-            self.parent.sendMsg('c', 'RFBCheck', 'Filling fail:\n' + str(e), 1)
+            Journal.parent.sendMsg('c', 'RFBCheck', 'Filling fail:\n' + str(e), 1)
 
     def deleteRecords(self):
         sn, dateTest = self.getSelectedRow()

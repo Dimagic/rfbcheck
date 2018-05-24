@@ -44,7 +44,7 @@ class DetectorTest(QtCore.QThread):
     def preTest(self):
         self.ser.write(binascii.unhexlify(cmd.setSalcOpMode))
         for i in ['3244', '3245', '3246', '3247']:
-            self.send('SetAlc', i + '00FF')
+            self.send('SetAlc', i + '00FF', None)
 
     def getPampCurrent(self):
         currLimits = {'dlPampCurrent': '3262', 'ulPampCurrent': '3263'}
@@ -52,10 +52,10 @@ class DetectorTest(QtCore.QThread):
             if self.testController.whatConn.upper() not in i.upper():
                 continue
             addr = currLimits.get(i)
-            rx = self.send(i, addr)
+            rx = self.send(i, addr, None)
             current = int(rx[rx.find(addr) + len(addr): len(rx) - 2], 16)
             limAddr = str(int(addr) + 10)
-            rx = self.send(i, limAddr)
+            rx = self.send(i, limAddr, None)
             hexStr = rx[rx.find(limAddr) + len(limAddr): (len(rx) - 2)]
             minLimit = int(hexStr[:4], 16)
             maxLimit = int(hexStr[5:], 16)
@@ -80,7 +80,7 @@ class DetectorTest(QtCore.QThread):
             addrDet = 'ulDet'
             addrAnch = 'ulPowCal'
 
-        rx = self.send(addrAnch, self.reqAddr.get(addrAnch))
+        rx = self.send(addrAnch, self.reqAddr.get(addrAnch), None)
         anchor = int(rx[rx.find(self.reqAddr.get(addrAnch)) + 4: rx.find(self.reqAddr.get(addrAnch)) + 8], 16)
         anchorHex = rx[rx.find(self.reqAddr.get(addrAnch)) + 4: rx.find(self.reqAddr.get(addrAnch)) + 8]
         setAmplTo(self.ser, cmd, self.gen, anchor, self.testController)
@@ -91,7 +91,7 @@ class DetectorTest(QtCore.QThread):
                 return
             self.gen.write("POW:AMPL " + str(currPower) + " dBm")
             time.sleep(1)
-            rx = self.send(addrDet, self.reqAddr.get(addrDet))
+            rx = self.send(addrDet, self.reqAddr.get(addrDet), None)
             detector = int(rx[rx.find(self.reqAddr.get(addrDet)) + 8: rx.find(self.reqAddr.get(addrDet)) + 12], 16)
             arrDetector.append(rx[rx.find(self.reqAddr.get(addrDet)) + 8: rx.find(self.reqAddr.get(addrDet)) + 12])
             delta = oldDetector - detector
@@ -119,7 +119,7 @@ class DetectorTest(QtCore.QThread):
         while len(toSend) < 528:
             toSend += '0'
         #     write detector calibration
-        # self.send('SetDet', toSend)
+        # self.send('SetDet', toSend, None)
 
         if haveFail:
             q = self.testController.sendMsg('i', 'RFBCheck', 'Forward detector test fail', 3)
@@ -144,7 +144,7 @@ class DetectorTest(QtCore.QThread):
             addrDet = 'ulDet'
             addrAnch = 'ulRvsCal'
 
-        rx = self.send(addrAnch, self.reqAddr.get(addrAnch))
+        rx = self.send(addrAnch, self.reqAddr.get(addrAnch), None)
         anchor = int(rx[rx.find(self.reqAddr.get(addrAnch)) + 4: rx.find(self.reqAddr.get(addrAnch)) + 8], 16)
         setAmplTo(self.ser, cmd, self.gen, anchor, self.testController)
         currPower = float(self.gen.query("POW:AMPL?"))
@@ -155,7 +155,7 @@ class DetectorTest(QtCore.QThread):
                 return
             self.gen.write("POW:AMPL " + str(currPower) + " dBm")
             time.sleep(1)
-            rx = self.send(addrDet, self.reqAddr.get(addrDet))
+            rx = self.send(addrDet, self.reqAddr.get(addrDet), None)
             detector = int(rx[rx.find(self.reqAddr.get(addrDet)) + 12: rx.find(self.reqAddr.get(addrDet)) + 16], 16)
             delta = oldDetector - detector
             oldDetector = detector
@@ -183,10 +183,13 @@ class DetectorTest(QtCore.QThread):
         else:
             self.testController.resSignal.emit('Rev. detector', self.testController.whatConn, '', 'Pass', '', 1)
 
-    def send(self, param, addr):
+    def send(self, param, addr, addr2):
         self.ser.flushInput()
         self.ser.flushOutput()
         namePar = param
+        # if addr2 is not None:
+        #     toSend = 'AAAA54%s556677%s' % addr2, addr
+        #     return
         if param == 'SetAlc':
             toSend = 'AAAA543024556677' + addr
         elif param == 'SetDet':

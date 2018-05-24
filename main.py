@@ -20,7 +20,7 @@ from Equip.config import Config
 import threading
 import re
 
-version = '0.3.14'
+version = '0.3.15'
 
 
 class TestTime(threading.Thread):
@@ -115,6 +115,7 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
         self.printReportBtn.clicked.connect(self.printReportBtnClicked)
 
         self.clrLogBtn.clicked.connect(self.clrLogBtnClick)
+        self.saveLogBtn.clicked.connect(self.saveLogBtnClick)
         self.portLbl.setText("")
         self.baudLbl.setText("")
 
@@ -237,6 +238,17 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
         self.tableResult.clear()
         self.tableResult.setRowCount(0)
         self.tableResult.setHorizontalHeaderLabels(['Test name', 'Dl/Ul', 'Min', 'Current', 'Max', 'Result'])
+
+    def saveLogBtnClick(self):
+        fileLog = './Log/lastRFlog.log'
+        count = self.listLog.count()
+        if count == 0:
+            return
+        f = open(fileLog, 'w')
+        for i in range(count):
+            f.write("%s\n" % self.listLog.item(i).text())
+        f.close()
+        os.startfile(fileLog)
 
     def calibrationBtnClick(self):
         # self.t = Thread(name='calibration', target=Calibration, args=(self,))
@@ -470,9 +482,6 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
 
     def setCurrInstrAddr(self):
         conn, cursor = self.getConnDb()
-        # allIntst = [self.instrAddrCombo.itemText(i) for i in range(self.instrAddrCombo.count())]
-        # for i in allIntst:
-        #     print(i)
         try:
             q = "update instruments set address = '', useAtten = '0', fullName = '' where address = '%s'" % (self.instrAddrCombo.currentText())
             self.updateDbQuery(q)
@@ -564,14 +573,12 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
         self.setFileThread.start()
 
     def on_startedSet(self):
-        self.logFile = open('./Log/lastRFlog.log', 'w')
         self.testIsRun = True
         self.setComponentAvail(False)
         self.tt = Thread(name='testTimer', target=TestTime, args=(self,))
         self.tt.start()
 
     def on_finishedSet(self):
-        self.logFile.close()
         self.testIsRun = False
         self.setComponentAvail(True)
 
@@ -616,7 +623,6 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
                     self.setProgressBar('Canceled', 100, 100)
 
     def on_started(self):
-        self.logFile = open('./Log/lastRFlog.log', 'w')
         self.testIsRun = True
         self.answer = None
         if self.testLogDl.get('SN') not in [self.rfbSN.text(), None]:
@@ -651,7 +657,6 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
                 self.testLogDl = {}
                 self.testLogUl = {}
                 self.to_DsaUlDl = {}
-            self.logFile.close()
 
     def isNeedLoadSetFile(self):
         try:
@@ -714,10 +719,6 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
         if clr == 1:
             self.listLog.item(numrows - 1).setForeground(QtCore.Qt.darkGreen)
         self.listLog.scrollToBottom()
-        try:
-            self.logFile.write("%s\n" % msg)
-        except:
-            pass
 
     def fillTestLog(self, key, val):
         if self.myThread.whatConn == 'Dl':
