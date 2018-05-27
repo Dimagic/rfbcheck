@@ -20,7 +20,7 @@ from Equip.config import Config
 import threading
 import re
 
-version = '0.3.15'
+version = '0.3.16'
 
 
 class TestTime(threading.Thread):
@@ -248,7 +248,10 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
         for i in range(count):
             f.write("%s\n" % self.listLog.item(i).text())
         f.close()
-        os.startfile(fileLog)
+        try:
+            os.startfile(os.path.abspath(fileLog))
+        except Exception as e:
+            self.sendMsg('w', 'Open log file error', str(e), 1)
 
     def calibrationBtnClick(self):
         # self.t = Thread(name='calibration', target=Calibration, args=(self,))

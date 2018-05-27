@@ -20,46 +20,47 @@ class Calibration(QtWidgets.QDialog):
         print(parent)
         super(Calibration, self).__init__(parent)
         self.currParent = parent
-        # self.dialog = loadUi('Forms/calibration.ui', self)
-        # self.dialog.setWindowTitle('Calibration')
-        # self.dialog.setWindowIcon(parent.appIcon)
-        # m = PlotCanvas(self)
-        # m.move(0, 0)
-        # self.dialog.show()
+        self.dialog = loadUi('Forms/calibration.ui', self)
+        self.dialog.setWindowTitle('Calibration')
+        self.dialog.setWindowIcon(parent.appIcon)
+        m = PlotCanvas(self)
+        # m.resize(100, 50)
+        m.move(0, 0)
+        self.dialog.show()
 
-        self.calibration(parent)
+        # self.calibration(parent)
 
-    def grafic(self, parent):
-        try:
-            conn, cursor = parent.getConnDb()
-            query = "select * from calGenToSa"
-            rows = cursor.execute(query).fetchall()
-            freq = {}
-            for row in rows:
-                freq.update({row[1]: row[2]})
-        except Exception as e:
-            parent.sendMsg('c', 'DB error', e, 1)
-            return
-        startFreq = min(freq.keys())
-        stopFreq = max(freq.keys())
-
-        bars = ('A', 'B', 'C', 'D', 'E')
-        y_pos = np.arange(len(bars))
-        height = [3, 12, 5, 18, 45]
-        plt.bar(y_pos, height)
-
-        # If we have long labels, we cannot see it properly
-        # names = ("very long group name 1", "very long group name 2", "very long group name 3", "very long group name 4",
-        #          "very long group name 5")
-        # plt.xticks(y_pos, names, rotation=90)
-
-        # Thus we have to give more margin:
-        # plt.subplots_adjust(bottom=0.4)
-
-        # It's the same concept if you need more space for your titles
-        # plt.title("This is\na very very\nloooooong\ntitle!")
-        # plt.subplots_adjust(top=0.7)
-        plt.show()
+    # def grafic(self, parent):
+    #     try:
+    #         conn, cursor = parent.getConnDb()
+    #         query = "select * from calGenToSa"
+    #         rows = cursor.execute(query).fetchall()
+    #         freq = {}
+    #         for row in rows:
+    #             freq.update({row[1]: row[2]})
+    #     except Exception as e:
+    #         parent.sendMsg('c', 'DB error', e, 1)
+    #         return
+    #     startFreq = min(freq.keys())
+    #     stopFreq = max(freq.keys())
+    #
+    #     bars = ('A', 'B', 'C', 'D', 'E')
+    #     y_pos = np.arange(len(bars))
+    #     height = [3, 12, 5, 18, 45]
+    #     plt.bar(y_pos, height)
+    #
+    #     # If we have long labels, we cannot see it properly
+    #     # names = ("very long group name 1", "very long group name 2", "very long group name 3", "very long group name 4",
+    #     #          "very long group name 5")
+    #     # plt.xticks(y_pos, names, rotation=90)
+    #
+    #     # Thus we have to give more margin:
+    #     # plt.subplots_adjust(bottom=0.4)
+    #
+    #     # It's the same concept if you need more space for your titles
+    #     # plt.title("This is\na very very\nloooooong\ntitle!")
+    #     # plt.subplots_adjust(top=0.7)
+    #     plt.show()
 
     def calibration(self, parent):
         parent.currTestLbl.setText('Calibration')
@@ -118,7 +119,6 @@ class Calibration(QtWidgets.QDialog):
 
         parent.sendMsg('i', 'Message', 'Calibration complete', 1)
         parent.useCorrection = True
-
 
     def makeCalibr(self, parent, table, attenuator, freqArr):
         startFreqFull = freqArr[0]
@@ -203,8 +203,14 @@ class PlotCanvas(FigureCanvas):
         self.plot()
 
     def plot(self):
-        data = [i%2 for i in range(100)]
-        ax = self.figure.add_subplot(111)
-        ax.bar(data, data)
-        # ax.set_title('PyQt Matplotlib Example')
-        self.draw()
+        for i in range(1000):
+            y = 30 + np.random.random()
+            plt.bar(i, y, color='#624ea7')
+            plt.pause(0.005)
+
+        # data = [i for i in range(1000)]
+        # ax = self.figure.add_subplot(111)
+        # ax.bar(data, data)
+        # # ax.set_title('PyQt Matplotlib Example')
+        # self.draw()
+
