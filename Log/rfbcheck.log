@@ -128,3 +128,25 @@ Traceback (most recent call last):
   File "C:\123\RFBCheck\Tests\detector_test.py", line 84, in forwardTest
     anchor = int(rx[rx.find(self.reqAddr.get(addrAnch)) + 4: rx.find(self.reqAddr.get(addrAnch)) + 8], 16)
 AttributeError: 'NoneType' object has no attribute 'find'
+ERROR:root:None: RA002900 xxxx
+Traceback (most recent call last):
+  File "C:\123\RFBCheck\Tests\testController.py", line 77, in run
+    self.runTests()
+  File "C:\123\RFBCheck\Tests\testController.py", line 132, in runTests
+    DetectorTest(self)
+  File "C:\123\RFBCheck\Tests\detector_test.py", line 35, in __init__
+    self.forwardTest(self.freqDl)
+  File "C:\123\RFBCheck\Tests\detector_test.py", line 84, in forwardTest
+    anchor = int(rx[rx.find(self.reqAddr.get(addrAnch)) + 4: rx.find(self.reqAddr.get(addrAnch)) + 8], 16)
+AttributeError: 'NoneType' object has no attribute 'find'
+ERROR:root:None: RA002900 xxxx
+Traceback (most recent call last):
+  File "C:\123\RFBCheck\Tests\testController.py", line 77, in run
+    self.runTests()
+  File "C:\123\RFBCheck\Tests\testController.py", line 132, in runTests
+    DetectorTest(self)
+  File "C:\123\RFBCheck\Tests\detector_test.py", line 37, in __init__
+    self.reversTest(self.freqDl)
+  File "C:\123\RFBCheck\Tests\detector_test.py", line 148, in reversTest
+    anchor = int(rx[rx.find(self.reqAddr.get(addrAnch)) + 4: rx.find(self.reqAddr.get(addrAnch)) + 8], 16)
+AttributeError: 'bool' object has no attribute 'find'

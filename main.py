@@ -8,23 +8,25 @@ from Equip.calibration import *
 from Equip.printReport import *
 from Equip.editRFB import *
 from Equip.journal import *
+from Tests.stormFufu_test import StormFufuTest
 from Tests.testController import *
 from Tests.bitAlarm_test import *
 from PyQt5.QtCore import QSize
 from PyQt5.QtGui import QMovie, QStandardItem
-from PyQt5 import QtCore, QtWidgets, QtGui
+from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtWidgets import QTableWidgetItem, QAbstractItemView, QLabel, QAction, QFileDialog
 from PIL import Image
 from Equip.config import Config
 
-import threading
+import datetime
 import re
 
-version = '0.3.16'
+version = '0.3.17'
 
 
-class TestTime(threading.Thread):
-    def __init__(self, parent):
+class TestTime(QtCore.QThread):
+    def __init__(self, parent=None):
+        QtCore.QThread.__init__(self, parent)
         startTime = datetime.datetime.now()
         parent.startTestTime = startTime
         while parent.testIsRun:
@@ -134,6 +136,7 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
         self.calibrStop.setValidator(QtGui.QIntValidator())
         self.startTestBtn.clicked.connect(self.startThreadTest)
         self.applySetBtn.clicked.connect(self.startThreadLoadSet)
+        self.stormFufu.clicked.connect(self.stormFufuTest)
         self.startTestBtn.setEnabled(False)
 
         conn, cursor = self.getConnDb()
@@ -248,14 +251,14 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
         for i in range(count):
             f.write("%s\n" % self.listLog.item(i).text())
         f.close()
-        try:
-            os.startfile(os.path.abspath(fileLog))
-        except Exception as e:
-            self.sendMsg('w', 'Open log file error', str(e), 1)
+        os.startfile(fileLog)
 
     def calibrationBtnClick(self):
         # self.t = Thread(name='calibration', target=Calibration, args=(self,))
         # self.t.start()
+
+        # t = Calibration(self)
+        # t.start()
         Calibration(self)
 
     def calAllBandsCheck(self):
@@ -578,8 +581,10 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
     def on_startedSet(self):
         self.testIsRun = True
         self.setComponentAvail(False)
-        self.tt = Thread(name='testTimer', target=TestTime, args=(self,))
+        # self.tt = Thread(name='testTimer', target=TestTime, args=(self,))
+        self.tt = TestTime(self)
         self.tt.start()
+        # pass
 
     def on_finishedSet(self):
         self.testIsRun = False
@@ -636,8 +641,8 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
             self.clrLogBtnClick()
         self.setComponentAvail(False)
         self.startTestBtn.setText('Stop')
-        self.tt = Thread(name='testTimer', target=TestTime, args=(self,))
-        self.tt.start()
+        # self.tt = Thread(name='testTimer', target=TestTime, args=(self,))
+        # self.tt.start()
         q = "update settings set lastRfbType = '%s', lastRfbSn = '%s'" % (str(self.rfbTypeCombo.currentText()),
                                                                           str(self.rfbSN.text()))
         self.updateDbQuery(q)
@@ -660,6 +665,12 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
                 self.testLogDl = {}
                 self.testLogUl = {}
                 self.to_DsaUlDl = {}
+
+    def stormFufuTest(self):
+        self.myThread = StormFufuTest(self)
+        self.myThread.msgSignal.connect(self.sendMsg, QtCore.Qt.QueuedConnection)
+        self.myThread.start()
+
 
     def isNeedLoadSetFile(self):
         try:

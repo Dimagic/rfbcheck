@@ -2203,6 +2203,19 @@
          </property>
         </widget>
        </widget>
+       <widget class="QPushButton" name="stormFufu">
+        <property name="geometry">
+         <rect>
+          <x>230</x>
+          <y>200</y>
+          <width>75</width>
+          <height>23</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Storm FUFU</string>
+        </property>
+       </widget>
       </widget>
      </widget>
     </item>
