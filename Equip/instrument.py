@@ -7,16 +7,17 @@ from Equip.equip import toFloat
 
 class Instrument:
     def __init__(self, freq, parent):
-        self.parent = parent
+        self.currParent = parent
         self.config = Config()
+        self.rm = visa.ResourceManager()
+        self.rm.timeout = 50000
         self.sa = None
         self.gen = None
         self.na = None
         if freq == 0:
             return None
         else:
-            self.rm = visa.ResourceManager()
-            self.rm.timeout = 50000
+
             self.initAnalyser(freq)
             self.initGenerator(freq)
             self.initNetwork(freq)
@@ -30,14 +31,23 @@ class Instrument:
     def sendQeryNa(self, q):
         return self.na.query(q)
 
+    def writeSa(self, w):
+        self.sa.write(w)
+
+    def writeGen(self, w):
+        self.gen.write(w)
+
+    def writeNa(self, w):
+        self.na.write(w)
+
     def initAnalyser(self, freq):
         try:
-            self.sa = self.rm.open_resource(self.parent.currSaLbl.text(), send_end=False)
+            self.sa = self.rm.open_resource(self.currParent.currSaLbl.text(), send_end=False)
             self.sa.chunk_size = 102400
             self.sa.write(":SYST:PRES")
             self.sa.write(":SENSE:FREQ:center " + str(freq) + " MHz")
             self.sa.write(":SENSE:FREQ:span " + str(int(self.config.getConfAttr('instruments', 'sa_span'))) + " MHz")
-            self.sa.write("DISP:WIND:TRAC:Y:RLEV:OFFS " + str(int(self.parent.saAtten.text())))
+            self.sa.write("DISP:WIND:TRAC:Y:RLEV:OFFS " + str(int(self.currParent.saAtten.text())))
             self.sa.write("DISP:WIND:TRAC:Y:DLIN -50 dBm")
             self.sa.write("DISP:WIND:TRAC:Y:DLIN:STAT 1")
             self.sa.write("CALC:MARK:CPS 1")
@@ -45,13 +55,13 @@ class Instrument:
             self.sa.write("BAND:VID " + str(int(self.config.getConfAttr('instruments', 'sa_videoBw'))) + " KHZ")
             self.sa.write(":CAL:AUTO ON")
         except Exception as e:
-            self.parent.myThread.logSignal.emit(str(self.parent.currSaNameLbl.text()) + " - not connected", -1)
-            self.parent.myThread.logSignal.emit(str(e), -1)
+            self.currParent.myThread.logSignal.emit(str(self.currParent.currSaNameLbl.text()) + " - not connected", -1)
+            # self.currParent.myThread.logSignal.emit(str(e), -1)
             return
 
     def initGenerator(self, freq):
         try:
-            self.gen = self.rm.open_resource(self.parent.currGenLbl.text(), send_end=False)
+            self.gen = self.rm.open_resource(self.currParent.currGenLbl.text(), send_end=False)
             self.gen.chunk_size = 102400
             self.gen.write("*RST")
             self.gen.write(":OUTP:STAT OFF")
@@ -64,13 +74,13 @@ class Instrument:
             self.gen.write(":RAD:MTON:ARB:SET:TABL:PHAS:INIT RAND")
             self.gen.write(":RAD:MTON:ARB:STAT 1")
         except Exception as e:
-            self.parent.myThread.logSignal.emit(str(self.parent.currGenNameLbl.text()) + " - not connected", -1)
-            self.parent.myThread.logSignal.emit(str(e), -1)
+            self.currParent.myThread.logSignal.emit(str(self.currParent.currGenNameLbl.text()) + " - not connected", -1)
+            # self.currParent.myThread.logSignal.emit(str(e), -1)
             return
 
     def initNetwork(self, freq):
         try:
-            self.na = self.rm.open_resource(self.parent.currNaLbl.text())
+            self.na = self.rm.open_resource(self.currParent.currNaLbl.text())
             self.na.write(":SYST:PRES")
             self.na.write(":MMEM:LOAD '" + self.config.getConfAttr('instruments', 'na_fileCalibr') + "'")
             time.sleep(2)
@@ -92,8 +102,8 @@ class Instrument:
             # print(min(arr))
             # print(min(arr) + max(arr))
         except Exception as e:
-            self.parent.myThread.logSignal.emit(str(self.parent.currNaNameLbl.text()) + " - not connected", -1)
-            self.parent.myThread.logSignal.emit(str(e), -1)
+            self.currParent.myThread.logSignal.emit(str(self.currParent.currNaNameLbl.text()) + " - not connected", -1)
+            # self.currParent.myThread.logSignal.emit(str(e), -1)
             return
 
     def getPeakTable(self):
@@ -117,7 +127,32 @@ class Instrument:
             return currInstr.query('*IDN?')
         except Exception as e:
             msg = 'getInstrName() in instrument.py error:\n' % str(e)
-            self.parent.sendMsg('w', 'RFBCheck', msg, 1)
+            self.currParent.sendMsg('w', 'RFBCheck', msg, 1)
             return None
+    # ---------- Generator ----------
+
+    def genSetPow(self, pow):
+        self.writeGen("POW:AMPL %s dBm") % str(pow)
+
+    def genSetFreq(self, freq):
+        self.writeGen(":FREQ:FIX " + str(freq) + " MHz")
+
+    def getPow(self):
+        return float(self.sendQeryGen("POW:AMPL?"))
 
 
+    # ---------- System analyser ----------
+
+    def saGetGainByFreq(self, freq):
+        self.writeSa("CALC:MARK1:X " + str(freq) + " MHz")
+        time.sleep(.1)
+        gainArr = []
+        for n in range(1, 11, 1):
+            gainArr.append(float(self.sendQerySa("CALC:MARK1:Y?")))
+        return round(sum(gainArr) / len(gainArr), 2)
+
+    def saGetGainViaGen(self, freq):
+        self.genSetFreq(freq)
+        time.sleep(.1)
+        return self.saGetGainByFreq(freq)
+    # ---------- Network ----------

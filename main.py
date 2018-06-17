@@ -1,5 +1,8 @@
 # stylesheet
 # import qdarkstyle
+import threading
+from threading import Thread
+
 from Forms.mainwindow import Ui_MainWindow
 from Equip.instrumentSettings import TestSettings
 from Equip.selectUser import SelectUser
@@ -21,12 +24,11 @@ from Equip.config import Config
 import datetime
 import re
 
-version = '0.3.17'
+version = '0.3.19'
 
 
-class TestTime(QtCore.QThread):
-    def __init__(self, parent=None):
-        QtCore.QThread.__init__(self, parent)
+class TestTime(threading.Thread):
+    def __init__(self, parent):
         startTime = datetime.datetime.now()
         parent.startTestTime = startTime
         while parent.testIsRun:
@@ -254,12 +256,11 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
         os.startfile(fileLog)
 
     def calibrationBtnClick(self):
-        # self.t = Thread(name='calibration', target=Calibration, args=(self,))
-        # self.t.start()
-
-        # t = Calibration(self)
-        # t.start()
-        Calibration(self)
+        self.myThread = Calibration(self)
+        self.myThread.logSignal.connect(self.sendLog, QtCore.Qt.QueuedConnection)
+        self.myThread.msgSignal.connect(self.sendMsg, QtCore.Qt.QueuedConnection)
+        self.myThread.progressBarSignal.connect(self.setProgressBar, QtCore.Qt.QueuedConnection)
+        self.myThread.start()
 
     def calAllBandsCheck(self):
         if self.calAllBands.isChecked():
@@ -582,9 +583,8 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
         self.testIsRun = True
         self.setComponentAvail(False)
         # self.tt = Thread(name='testTimer', target=TestTime, args=(self,))
-        self.tt = TestTime(self)
-        self.tt.start()
-        # pass
+        # self.tt = TestTime(self)
+        # self.tt.start()
 
     def on_finishedSet(self):
         self.testIsRun = False
@@ -641,7 +641,7 @@ class mainProgram(QtWidgets.QMainWindow, QtCore.QObject, Ui_MainWindow):
             self.clrLogBtnClick()
         self.setComponentAvail(False)
         self.startTestBtn.setText('Stop')
-        # self.tt = Thread(name='testTimer', target=TestTime, args=(self,))
+        # self.tt = threading.Thread(name='testTimer', target=TestTime, args=(self,))
         # self.tt.start()
         q = "update settings set lastRfbType = '%s', lastRfbSn = '%s'" % (str(self.rfbTypeCombo.currentText()),
                                                                           str(self.rfbSN.text()))
