@@ -17,6 +17,10 @@ class DetectorTest(QtCore.QThread):
         self.sa = testController.instr.sa
         self.gen = testController.instr.gen
         self.ser = testController.ser
+        self.frwDetArr = []
+        self.revDetArr = []
+        self.tmpFrwDetArr = []
+        self.tmpRevDetArr = []
         self.freqDl = self.mainParent.listSettings[1]
         self.freqUl = self.mainParent.listSettings[2]
         self.reqAddr = {'ulPowCal': '320D', 'ulRvsCal': '320E',
@@ -40,6 +44,7 @@ class DetectorTest(QtCore.QThread):
                 self.forwardTest(self.freqUl)
             if 'Rev. detector' in self.testController.testArr:
                 self.reversTest(self.freqUl)
+        self.writeDataToAdem()
 
     def preTest(self):
         self.ser.write(binascii.unhexlify(cmd.setSalcOpMode))
@@ -69,6 +74,7 @@ class DetectorTest(QtCore.QThread):
                 return False
 
     def forwardTest(self, freq):
+        self.frwDetArr.clear()
         self.preTest()
         haveFail = False
         self.setNaOffset(freq)
@@ -81,8 +87,11 @@ class DetectorTest(QtCore.QThread):
             addrAnch = 'ulPowCal'
 
         rx = self.send(addrAnch, self.reqAddr.get(addrAnch), None)
-        anchor = int(rx[rx.find(self.reqAddr.get(addrAnch)) + 4: rx.find(self.reqAddr.get(addrAnch)) + 8], 16)
         anchorHex = rx[rx.find(self.reqAddr.get(addrAnch)) + 4: rx.find(self.reqAddr.get(addrAnch)) + 8]
+        anchor = int(anchorHex, 16)
+        self.tmpFrwDetArr.append(anchor)
+        self.tmpFrwDetArr.append(0)
+
         setAmplTo(self.ser, cmd, self.gen, anchor, self.testController)
         currPower = float(self.gen.query("POW:AMPL?"))
         oldDetector = 10000
@@ -93,6 +102,7 @@ class DetectorTest(QtCore.QThread):
             time.sleep(1)
             rx = self.send(addrDet, self.reqAddr.get(addrDet), None)
             detector = int(rx[rx.find(self.reqAddr.get(addrDet)) + 8: rx.find(self.reqAddr.get(addrDet)) + 12], 16)
+            self.frwDetArr.append(detector)
             arrDetector.append(rx[rx.find(self.reqAddr.get(addrDet)) + 8: rx.find(self.reqAddr.get(addrDet)) + 12])
             delta = oldDetector - detector
             oldDetector = detector
@@ -134,6 +144,7 @@ class DetectorTest(QtCore.QThread):
             self.testController.resSignal.emit('Forw. detector', self.testController.whatConn, '', 'Pass', '', 1)
 
     def reversTest(self, freq):
+        self.revDetArr.clear()
         self.preTest()
         haveFail = False
         self.setNaOffset(freq)
@@ -145,7 +156,11 @@ class DetectorTest(QtCore.QThread):
             addrAnch = 'ulRvsCal'
 
         rx = self.send(addrAnch, self.reqAddr.get(addrAnch), None)
-        anchor = int(rx[rx.find(self.reqAddr.get(addrAnch)) + 4: rx.find(self.reqAddr.get(addrAnch)) + 8], 16)
+        anchorHex = rx[rx.find(self.reqAddr.get(addrAnch)) + 4: rx.find(self.reqAddr.get(addrAnch)) + 8]
+        anchor = int(anchorHex, 16)
+        self.tmpRevDetArr.append(anchor)
+        self.tmpRevDetArr.append(0)
+
         setAmplTo(self.ser, cmd, self.gen, anchor, self.testController)
         currPower = float(self.gen.query("POW:AMPL?"))
         self.testController.sendMsg('i', 'RFBCheck', 'Disconnect signal analyzer cable and press Ok', 1)
@@ -157,6 +172,7 @@ class DetectorTest(QtCore.QThread):
             time.sleep(1)
             rx = self.send(addrDet, self.reqAddr.get(addrDet), None)
             detector = int(rx[rx.find(self.reqAddr.get(addrDet)) + 12: rx.find(self.reqAddr.get(addrDet)) + 16], 16)
+            self.revDetArr.append(detector)
             delta = oldDetector - detector
             oldDetector = detector
             if delta < int(self.config.getConfAttr('limits', 'rvs_pwr_detector')):
@@ -198,6 +214,7 @@ class DetectorTest(QtCore.QThread):
             toSend = self.prefToSend + addr
         crc = getCrc(toSend)
         toSend += crc
+        print(toSend)
         writingBytes = self.ser.write(binascii.unhexlify(toSend))
         outWait = int(self.ser.outWaiting())
         inWait = int(self.ser.inWaiting())
@@ -241,4 +258,30 @@ class DetectorTest(QtCore.QThread):
                       str(int(self.mainParent.saAtten.text()) + abs(float(rows[0]))))
 
     def writeDataToAdem(self):
-        pass
+        if self.testController.sendMsg('i', 'RFBCheck', 'Save detector data?', 2) == QMessageBox.Cancel:
+            return
+        lenDet = 64
+        self.frwDetArr = self.frwDetArr + self.tmpFrwDetArr[::-1]
+        self.revDetArr = self.revDetArr + self.tmpRevDetArr[::-1]
+        for j, i in enumerate([self.frwDetArr, self.revDetArr]):
+            if len(i) == 0:
+                continue
+            for row, data in enumerate(i):
+                k = str(hex(i[row])).replace("0x", "")
+                while len(k) < 4:
+                    k = '0' + k
+                i[row] = k
+            i = i[::-1]
+            while len(i) < lenDet:
+                i.insert(2, '0000')
+            strToSend = ''
+            for row in i:
+                strToSend += row
+            if self.testController.whatConn == 'Dl':
+                listAdr = ['3201', '3202']
+            else:
+                listAdr = ['3205', '3206']
+            self.send('SetDet', listAdr[j], None)
+
+
+

@@ -24,7 +24,7 @@ from Equip.config import Config
 import datetime
 import re
 
-version = '0.3.19'
+version = '0.3.20'
 
 
 class TestTime(threading.Thread):

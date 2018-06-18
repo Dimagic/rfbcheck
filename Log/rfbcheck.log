@@ -150,3 +150,109 @@ Traceback (most recent call last):
   File "C:\123\RFBCheck\Tests\detector_test.py", line 148, in reversTest
     anchor = int(rx[rx.find(self.reqAddr.get(addrAnch)) + 4: rx.find(self.reqAddr.get(addrAnch)) + 8], 16)
 AttributeError: 'bool' object has no attribute 'find'
+ERROR:root:None: RA00297 xxxx
+Traceback (most recent call last):
+  File "C:\123\RFBCheck\Tests\testController.py", line 77, in run
+    self.runTests()
+  File "C:\123\RFBCheck\Tests\testController.py", line 132, in runTests
+    DetectorTest(self)
+  File "C:\123\RFBCheck\Tests\detector_test.py", line 42, in __init__
+    self.reversTest(self.freqUl)
+  File "C:\123\RFBCheck\Tests\detector_test.py", line 148, in reversTest
+    anchor = int(rx[rx.find(self.reqAddr.get(addrAnch)) + 4: rx.find(self.reqAddr.get(addrAnch)) + 8], 16)
+AttributeError: 'bool' object has no attribute 'find'
+ERROR:root:None: RA00297 xxxx
+Traceback (most recent call last):
+  File "C:\123\RFBCheck\Tests\testController.py", line 77, in run
+    self.runTests()
+  File "C:\123\RFBCheck\Tests\testController.py", line 132, in runTests
+    DetectorTest(self)
+  File "C:\123\RFBCheck\Tests\detector_test.py", line 42, in __init__
+    self.reversTest(self.freqUl)
+  File "C:\123\RFBCheck\Tests\detector_test.py", line 148, in reversTest
+    anchor = int(rx[rx.find(self.reqAddr.get(addrAnch)) + 4: rx.find(self.reqAddr.get(addrAnch)) + 8], 16)
+AttributeError: 'bool' object has no attribute 'find'
+ERROR:root:None: RA00297 xxxx
+Traceback (most recent call last):
+  File "C:\123\RFBCheck\Tests\testController.py", line 77, in run
+    self.runTests()
+  File "C:\123\RFBCheck\Tests\testController.py", line 132, in runTests
+    DetectorTest(self)
+  File "C:\123\RFBCheck\Tests\detector_test.py", line 44, in __init__
+    self.reversTest(self.freqUl)
+  File "C:\123\RFBCheck\Tests\detector_test.py", line 165, in reversTest
+    self.revDetArr.append(detector)
+AttributeError: 'DetectorTest' object has no attribute 'revDetArr'
+ERROR:root:None: RA00297 xxxx
+Traceback (most recent call last):
+  File "C:\123\RFBCheck\Tests\testController.py", line 77, in run
+    self.runTests()
+  File "C:\123\RFBCheck\Tests\testController.py", line 132, in runTests
+    DetectorTest(self)
+  File "C:\123\RFBCheck\Tests\detector_test.py", line 45, in __init__
+    self.writeDataToAdem()
+  File "C:\123\RFBCheck\Tests\detector_test.py", line 251, in writeDataToAdem
+    for i in (self.frwDetArr, self.revDevArr):
+AttributeError: 'DetectorTest' object has no attribute 'revDevArr'
+ERROR:root:None: RA00297 xxxx
+Traceback (most recent call last):
+  File "C:\123\RFBCheck\Tests\testController.py", line 77, in run
+    self.runTests()
+  File "C:\123\RFBCheck\Tests\testController.py", line 132, in runTests
+    DetectorTest(self)
+  File "C:\123\RFBCheck\Tests\detector_test.py", line 45, in __init__
+    self.writeDataToAdem()
+  File "C:\123\RFBCheck\Tests\detector_test.py", line 255, in writeDataToAdem
+    i[row] = str(hex(i[row], 16)).replace(("0x", ""))
+TypeError: hex() takes exactly one argument (2 given)
+ERROR:root:None: RA00297 xxxx
+Traceback (most recent call last):
+  File "C:\123\RFBCheck\Tests\testController.py", line 77, in run
+    self.runTests()
+  File "C:\123\RFBCheck\Tests\testController.py", line 132, in runTests
+    DetectorTest(self)
+  File "C:\123\RFBCheck\Tests\detector_test.py", line 45, in __init__
+    self.writeDataToAdem()
+  File "C:\123\RFBCheck\Tests\detector_test.py", line 255, in writeDataToAdem
+    k = str(hex(i[row])).replace(("0x", ""))
+TypeError: replace() takes at least 2 arguments (1 given)
+ERROR:root:None: RA00297 xxxx
+Traceback (most recent call last):
+  File "C:\123\RFBCheck\Tests\testController.py", line 77, in run
+    self.runTests()
+  File "C:\123\RFBCheck\Tests\testController.py", line 132, in runTests
+    DetectorTest(self)
+  File "C:\123\RFBCheck\Tests\detector_test.py", line 47, in __init__
+    self.writeDataToAdem()
+  File "C:\123\RFBCheck\Tests\detector_test.py", line 265, in writeDataToAdem
+    for j ,i in enumerate(self.frwDetArr, self.revDetArr):
+TypeError: 'list' object cannot be interpreted as an integer
+ERROR:root:None: RA00297 xxxx
+Traceback (most recent call last):
+  File "C:\123\RFBCheck\Tests\testController.py", line 77, in run
+    self.runTests()
+  File "C:\123\RFBCheck\Tests\testController.py", line 132, in runTests
+    DetectorTest(self)
+  File "C:\123\RFBCheck\Tests\detector_test.py", line 47, in __init__
+    self.writeDataToAdem()
+  File "C:\123\RFBCheck\Tests\detector_test.py", line 265, in writeDataToAdem
+    for j, i in enumerate(self.frwDetArr, self.revDetArr):
+TypeError: 'list' object cannot be interpreted as an integer
+ERROR:root:None: RA00297 xxxx
+Traceback (most recent call last):
+  File "C:/123/RFBCheck\Tests\testController.py", line 77, in run
+    self.runTests()
+  File "C:/123/RFBCheck\Tests\testController.py", line 132, in runTests
+    DetectorTest(self)
+  File "C:/123/RFBCheck\Tests\detector_test.py", line 47, in __init__
+    self.writeDataToAdem()
+  File "C:/123/RFBCheck\Tests\detector_test.py", line 265, in writeDataToAdem
+    for j, i in enumerate(self.frwDetArr, self.revDetArr):
+TypeError: 'list' object cannot be interpreted as an integer
+ERROR:root:None: RA00297 xxxx
+Traceback (most recent call last):
+  File "C:\123\RFBCheck\Tests\testController.py", line 61, in run
+    self.whatConn = self.checkUlDl()
+  File "C:\123\RFBCheck\Tests\testController.py", line 205, in checkUlDl
+    self.instr.gen.write(":OUTP:STAT ON")
+AttributeError: 'NoneType' object has no attribute 'write'
